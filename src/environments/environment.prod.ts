@@ -16,69 +16,69 @@ export const environment = {
 
   company: {
     account: {
-      accountsUrl: 'https://sistema-gestao-api.railway.internal/accounts',
-      accountNamesUrl: 'https://sistema-gestao-api.railway.internal/accountNames',
+      accountsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/accounts',
+      accountNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/accountNames',
     },
 
     client: {
-      clientsUrl: 'https://sistema-gestao-api.railway.internal/clients',
-      clientNamesUrl: 'https://sistema-gestao-api.railway.internal/clientNames',
-      createClientUrl: "https://sistema-gestao-api.railway.internal/clients",
-      deleteClient: 'https://sistema-gestao-api.railway.internal/clients/',
+      clientsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/clients',
+      clientNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/clientNames',
+      createClientUrl: "https://sistema-gestao-api-production-9366.up.railway.app/clients",
+      deleteClient: 'https://sistema-gestao-api-production-9366.up.railway.app/clients/',
     },
 
     externalEntity: {
-      deleteExternalEntity: 'https://sistema-gestao-api.railway.internal/externalEntities/',
-      externalEntitiesUrl: 'https://sistema-gestao-api.railway.internal/externalEntities',
+      deleteExternalEntity: 'https://sistema-gestao-api-production-9366.up.railway.app/externalEntities/',
+      externalEntitiesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/externalEntities',
     },
 
     origin: {
-      originNamesUrl: "https://sistema-gestao-api.railway.internal/originNames",
-      originsGroupedUrl: "https://sistema-gestao-api.railway.internal/originsGrouped",
+      originNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/originNames",
+      originsGroupedUrl: "https://sistema-gestao-api-production-9366.up.railway.app/originsGrouped",
     },
 
     supplier: {
-      suppliersUrl: 'https://sistema-gestao-api.railway.internal/suppliers',
-      supplierNamesUrl: 'https://sistema-gestao-api.railway.internal/supplierNames',
+      suppliersUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/suppliers',
+      supplierNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/supplierNames',
     }
   },
 
   construction: {
     construction: {
-      budgetSubItemsForConstruction: "https://sistema-gestao-api.railway.internal/constructions/budgetSubItems/",
-      constructionsUrl: "https://sistema-gestao-api.railway.internal/constructions",
-      markAsFavouriteUrl: "https://sistema-gestao-api.railway.internal/constructions/favourite/",
-      constructionDetailsUrl: "https://sistema-gestao-api.railway.internal/constructions/details/",
-      constructionNamesUrl: "https://sistema-gestao-api.railway.internal/constructionNames",
-      constructionNamesForClientUrl: "https://sistema-gestao-api.railway.internal/constructionNames/",
-      constructionsOngoingUrl: "https://sistema-gestao-api.railway.internal/constructionsOngoing",
+      budgetSubItemsForConstruction: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/budgetSubItems/",
+      constructionsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions",
+      markAsFavouriteUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/favourite/",
+      constructionDetailsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/details/",
+      constructionNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructionNames",
+      constructionNamesForClientUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructionNames/",
+      constructionsOngoingUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructionsOngoing",
     },
 
     costEmployeeHour: {
-      deleteCostEmployeeHoursUrl: "https://sistema-gestao-api.railway.internal/costEmployeeHours/",
-      costEmployeeHoursUrl: "https://sistema-gestao-api.railway.internal/costEmployeeHours",
-      createCostEmployeeHoursUrl: "https://sistema-gestao-api.railway.internal/costEmployeeHours",
+      deleteCostEmployeeHoursUrl: "https://sistema-gestao-api-production-9366.up.railway.app/costEmployeeHours/",
+      costEmployeeHoursUrl: "https://sistema-gestao-api-production-9366.up.railway.app/costEmployeeHours",
+      createCostEmployeeHoursUrl: "https://sistema-gestao-api-production-9366.up.railway.app/costEmployeeHours",
     },
 
     externalService: {
-      externalServicesUrl: "https://sistema-gestao-api.railway.internal/externalServices",
+      externalServicesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/externalServices",
     },
 
     vehicleCost: {
-      deleteVehicleCostUrL: "https://sistema-gestao-api.railway.internal/vehicleCosts/",
-      vehicleCostsUrL: "https://sistema-gestao-api.railway.internal/vehicleCosts"
+      deleteVehicleCostUrL: "https://sistema-gestao-api-production-9366.up.railway.app/vehicleCosts/",
+      vehicleCostsUrL: "https://sistema-gestao-api-production-9366.up.railway.app/vehicleCosts"
     }
   },
 
   dashboard: {
-    dashboardDataUrl: 'https://sistema-gestao-api.railway.internal/dashboard'
+    dashboardDataUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/dashboard'
   },
 
   inventory: {
     article: {
-      articlesUrl: "https://sistema-gestao-api.railway.internal/articles",
-      stockArticles: "https://sistema-gestao-api.railway.internal/articles/stock",
-      issuedArticlesUrl: "https://sistema-gestao-api.railway.internal/issuedArticles"
+      articlesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/articles",
+      stockArticles: "https://sistema-gestao-api-production-9366.up.railway.app/articles/stock",
+      issuedArticlesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/issuedArticles"
     },
 
     equipment: {
@@ -90,25 +90,25 @@ export const environment = {
     },
 
     vehicle: {
-      deleteVehicleUrl: "https://sistema-gestao-api.railway.internal/vehicles/",
-      vehiclesUrl: "https://sistema-gestao-api.railway.internal/vehicles",
-      activeVehicleNamesUrl: "https://sistema-gestao-api.railway.internal/activeVehicleNames",
-      updateVehicleStatus: "https://sistema-gestao-api.railway.internal/vehicles/status/",
+      deleteVehicleUrl: "https://sistema-gestao-api-production-9366.up.railway.app/vehicles/",
+      vehiclesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/vehicles",
+      activeVehicleNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/activeVehicleNames",
+      updateVehicleStatus: "https://sistema-gestao-api-production-9366.up.railway.app/vehicles/status/",
     }
   },
 
   people: {
     absence: {
-      absencesUrl: 'https://sistema-gestao-api.railway.internal/absences',
-      deleteAbsence: 'https://sistema-gestao-api.railway.internal/absences/',
+      absencesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/absences',
+      deleteAbsence: 'https://sistema-gestao-api-production-9366.up.railway.app/absences/',
     },
     
     employee: {
-      createEmployeeUrl: "https://sistema-gestao-api.railway.internal/employees",
-      employeesUrl: "https://sistema-gestao-api.railway.internal/employees?",
-      employeeNamesUrl: "https://sistema-gestao-api.railway.internal/employeeNames",
-      employeeNamesInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api.railway.internal/employeeNamesInCostEmployeeHourForConstruction/",
-      employeeNamesNotInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api.railway.internal/employeeNamesNotInCostEmployeeHourForConstruction/"
+      createEmployeeUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employees",
+      employeesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employees?",
+      employeeNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employeeNames",
+      employeeNamesInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employeeNamesInCostEmployeeHourForConstruction/",
+      employeeNamesNotInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employeeNamesNotInCostEmployeeHourForConstruction/"
     },
 
     timemap: {
@@ -116,50 +116,50 @@ export const environment = {
     },
 
     worklog: {
-      workLogsUrl: 'https://sistema-gestao-api.railway.internal/worklogs',
-      timemapUrl: 'https://sistema-gestao-api.railway.internal/worklogs/summary/'
+      workLogsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/worklogs',
+      timemapUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/worklogs/summary/'
     }
   },
 
   queries: {
     accountLogs: {
-      accountLogsUrl: 'https://sistema-gestao-api.railway.internal/accountLogs/',
-      bankAccountNamesUrl: 'https://sistema-gestao-api.railway.internal/bankAccountNames',
+      accountLogsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/accountLogs/',
+      bankAccountNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/bankAccountNames',
     },
 
     cashLogs: {
-      cashAccountLogsUrl: 'https://sistema-gestao-api.railway.internal/cashAccountLogs',
+      cashAccountLogsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/cashAccountLogs',
     },
 
     currentAccountLogs: {
-      currentAccountLogsUrl: "https://sistema-gestao-api.railway.internal/currentAccountLogs/",
+      currentAccountLogsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/currentAccountLogs/",
     },
 
     debts: {
-      expensesInDebtUrl: "https://sistema-gestao-api.railway.internal/expensesInDebt",
+      expensesInDebtUrl: "https://sistema-gestao-api-production-9366.up.railway.app/expensesInDebt",
     }
   },
 
   transactions: {
     expense: {
-      expensesUrl: "https://sistema-gestao-api.railway.internal/expenses",
+      expensesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/expenses",
     },
 
     movement: {
-      movementsUrl: "https://sistema-gestao-api.railway.internal/movements",
+      movementsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/movements",
     },
 
     payment: {
-      paymentUrl: "https://sistema-gestao-api.railway.internal/payments",
+      paymentUrl: "https://sistema-gestao-api-production-9366.up.railway.app/payments",
     },
 
     revenue: {
-      revenuesUrl: "https://sistema-gestao-api.railway.internal/revenues"
+      revenuesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/revenues"
     },
 
     sale: {
-      deleteSale: 'https://sistema-gestao-api.railway.internal/sales/',
-      salesUrl: "https://sistema-gestao-api.railway.internal/sales"
+      deleteSale: 'https://sistema-gestao-api-production-9366.up.railway.app/sales/',
+      salesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/sales"
     }
   }
 };
