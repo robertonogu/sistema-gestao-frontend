@@ -3,8 +3,8 @@
     "version": "17.0.0",
     "scripts": {
         "ng": "ng",
-        "start": "ng serve",
-        "build": "ng build",
+        "build": "ng build --configuration production",
+    "start": "serve -s dist/apollo-ng",
         "watch": "ng build --watch --configuration production",
         "test": "ng test",
         "lint": "ng lint"
