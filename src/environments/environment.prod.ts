@@ -16,69 +16,69 @@ export const environment = {
 
   company: {
     account: {
-      accountsUrl: 'http://localhost:8080/accounts',
-      accountNamesUrl: 'http://localhost:8080/accountNames',
+      accountsUrl: 'https://sistema-gestao-api.railway.internal/accounts',
+      accountNamesUrl: 'https://sistema-gestao-api.railway.internal/accountNames',
     },
 
     client: {
-      clientsUrl: 'http://localhost:8080/clients',
-      clientNamesUrl: 'http://localhost:8080/clientNames',
-      createClientUrl: "http://localhost:8080/clients",
-      deleteClient: 'http://localhost:8080/clients/',
+      clientsUrl: 'https://sistema-gestao-api.railway.internal/clients',
+      clientNamesUrl: 'https://sistema-gestao-api.railway.internal/clientNames',
+      createClientUrl: "https://sistema-gestao-api.railway.internal/clients",
+      deleteClient: 'https://sistema-gestao-api.railway.internal/clients/',
     },
 
     externalEntity: {
-      deleteExternalEntity: 'http://localhost:8080/externalEntities/',
-      externalEntitiesUrl: 'http://localhost:8080/externalEntities',
+      deleteExternalEntity: 'https://sistema-gestao-api.railway.internal/externalEntities/',
+      externalEntitiesUrl: 'https://sistema-gestao-api.railway.internal/externalEntities',
     },
 
     origin: {
-      originNamesUrl: "http://localhost:8080/originNames",
-      originsGroupedUrl: "http://localhost:8080/originsGrouped",
+      originNamesUrl: "https://sistema-gestao-api.railway.internal/originNames",
+      originsGroupedUrl: "https://sistema-gestao-api.railway.internal/originsGrouped",
     },
 
     supplier: {
-      suppliersUrl: 'http://localhost:8080/suppliers',
-      supplierNamesUrl: 'http://localhost:8080/supplierNames',
+      suppliersUrl: 'https://sistema-gestao-api.railway.internal/suppliers',
+      supplierNamesUrl: 'https://sistema-gestao-api.railway.internal/supplierNames',
     }
   },
 
   construction: {
     construction: {
-      budgetSubItemsForConstruction: "http://localhost:8080/constructions/budgetSubItems/",
-      constructionsUrl: "http://localhost:8080/constructions",
-      markAsFavouriteUrl: "http://localhost:8080/constructions/favourite/",
-      constructionDetailsUrl: "http://localhost:8080/constructions/details/",
-      constructionNamesUrl: "http://localhost:8080/constructionNames",
-      constructionNamesForClientUrl: "http://localhost:8080/constructionNames/",
-      constructionsOngoingUrl: "http://localhost:8080/constructionsOngoing",
+      budgetSubItemsForConstruction: "https://sistema-gestao-api.railway.internal/constructions/budgetSubItems/",
+      constructionsUrl: "https://sistema-gestao-api.railway.internal/constructions",
+      markAsFavouriteUrl: "https://sistema-gestao-api.railway.internal/constructions/favourite/",
+      constructionDetailsUrl: "https://sistema-gestao-api.railway.internal/constructions/details/",
+      constructionNamesUrl: "https://sistema-gestao-api.railway.internal/constructionNames",
+      constructionNamesForClientUrl: "https://sistema-gestao-api.railway.internal/constructionNames/",
+      constructionsOngoingUrl: "https://sistema-gestao-api.railway.internal/constructionsOngoing",
     },
 
     costEmployeeHour: {
-      deleteCostEmployeeHoursUrl: "http://localhost:8080/costEmployeeHours/",
-      costEmployeeHoursUrl: "http://localhost:8080/costEmployeeHours",
-      createCostEmployeeHoursUrl: "http://localhost:8080/costEmployeeHours",
+      deleteCostEmployeeHoursUrl: "https://sistema-gestao-api.railway.internal/costEmployeeHours/",
+      costEmployeeHoursUrl: "https://sistema-gestao-api.railway.internal/costEmployeeHours",
+      createCostEmployeeHoursUrl: "https://sistema-gestao-api.railway.internal/costEmployeeHours",
     },
 
     externalService: {
-      externalServicesUrl: "http://localhost:8080/externalServices",
+      externalServicesUrl: "https://sistema-gestao-api.railway.internal/externalServices",
     },
 
     vehicleCost: {
-      deleteVehicleCostUrL: "http://localhost:8080/vehicleCosts/",
-      vehicleCostsUrL: "http://localhost:8080/vehicleCosts"
+      deleteVehicleCostUrL: "https://sistema-gestao-api.railway.internal/vehicleCosts/",
+      vehicleCostsUrL: "https://sistema-gestao-api.railway.internal/vehicleCosts"
     }
   },
 
   dashboard: {
-    dashboardDataUrl: 'http://localhost:8080/dashboard'
+    dashboardDataUrl: 'https://sistema-gestao-api.railway.internal/dashboard'
   },
 
   inventory: {
     article: {
-      articlesUrl: "http://localhost:8080/articles",
-      stockArticles: "http://localhost:8080/articles/stock",
-      issuedArticlesUrl: "http://localhost:8080/issuedArticles"
+      articlesUrl: "https://sistema-gestao-api.railway.internal/articles",
+      stockArticles: "https://sistema-gestao-api.railway.internal/articles/stock",
+      issuedArticlesUrl: "https://sistema-gestao-api.railway.internal/issuedArticles"
     },
 
     equipment: {
@@ -90,25 +90,25 @@ export const environment = {
     },
 
     vehicle: {
-      deleteVehicleUrl: "http://localhost:8080/vehicles/",
-      vehiclesUrl: "http://localhost:8080/vehicles",
-      activeVehicleNamesUrl: "http://localhost:8080/activeVehicleNames",
-      updateVehicleStatus: "http://localhost:8080/vehicles/status/",
+      deleteVehicleUrl: "https://sistema-gestao-api.railway.internal/vehicles/",
+      vehiclesUrl: "https://sistema-gestao-api.railway.internal/vehicles",
+      activeVehicleNamesUrl: "https://sistema-gestao-api.railway.internal/activeVehicleNames",
+      updateVehicleStatus: "https://sistema-gestao-api.railway.internal/vehicles/status/",
     }
   },
 
   people: {
     absence: {
-      absencesUrl: 'http://localhost:8080/absences',
-      deleteAbsence: 'http://localhost:8080/absences/',
+      absencesUrl: 'https://sistema-gestao-api.railway.internal/absences',
+      deleteAbsence: 'https://sistema-gestao-api.railway.internal/absences/',
     },
     
     employee: {
-      createEmployeeUrl: "http://localhost:8080/employees",
-      employeesUrl: "http://localhost:8080/employees?",
-      employeeNamesUrl: "http://localhost:8080/employeeNames",
-      employeeNamesInCostEmployeeHourForConstructionUrl: "http://localhost:8080/employeeNamesInCostEmployeeHourForConstruction/",
-      employeeNamesNotInCostEmployeeHourForConstructionUrl: "http://localhost:8080/employeeNamesNotInCostEmployeeHourForConstruction/"
+      createEmployeeUrl: "https://sistema-gestao-api.railway.internal/employees",
+      employeesUrl: "https://sistema-gestao-api.railway.internal/employees?",
+      employeeNamesUrl: "https://sistema-gestao-api.railway.internal/employeeNames",
+      employeeNamesInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api.railway.internal/employeeNamesInCostEmployeeHourForConstruction/",
+      employeeNamesNotInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api.railway.internal/employeeNamesNotInCostEmployeeHourForConstruction/"
     },
 
     timemap: {
@@ -116,50 +116,50 @@ export const environment = {
     },
 
     worklog: {
-      workLogsUrl: 'http://localhost:8080/worklogs',
-      timemapUrl: 'http://localhost:8080/worklogs/summary/'
+      workLogsUrl: 'https://sistema-gestao-api.railway.internal/worklogs',
+      timemapUrl: 'https://sistema-gestao-api.railway.internal/worklogs/summary/'
     }
   },
 
   queries: {
     accountLogs: {
-      accountLogsUrl: 'http://localhost:8080/accountLogs/',
-      bankAccountNamesUrl: 'http://localhost:8080/bankAccountNames',
+      accountLogsUrl: 'https://sistema-gestao-api.railway.internal/accountLogs/',
+      bankAccountNamesUrl: 'https://sistema-gestao-api.railway.internal/bankAccountNames',
     },
 
     cashLogs: {
-      cashAccountLogsUrl: 'http://localhost:8080/cashAccountLogs',
+      cashAccountLogsUrl: 'https://sistema-gestao-api.railway.internal/cashAccountLogs',
     },
 
     currentAccountLogs: {
-      currentAccountLogsUrl: "http://localhost:8080/currentAccountLogs/",
+      currentAccountLogsUrl: "https://sistema-gestao-api.railway.internal/currentAccountLogs/",
     },
 
     debts: {
-      expensesInDebtUrl: "http://localhost:8080/expensesInDebt",
+      expensesInDebtUrl: "https://sistema-gestao-api.railway.internal/expensesInDebt",
     }
   },
 
   transactions: {
     expense: {
-      expensesUrl: "http://localhost:8080/expenses",
+      expensesUrl: "https://sistema-gestao-api.railway.internal/expenses",
     },
 
     movement: {
-      movementsUrl: "http://localhost:8080/movements",
+      movementsUrl: "https://sistema-gestao-api.railway.internal/movements",
     },
 
     payment: {
-      paymentUrl: "http://localhost:8080/payments",
+      paymentUrl: "https://sistema-gestao-api.railway.internal/payments",
     },
 
     revenue: {
-      revenuesUrl: "http://localhost:8080/revenues"
+      revenuesUrl: "https://sistema-gestao-api.railway.internal/revenues"
     },
 
     sale: {
-      deleteSale: 'http://localhost:8080/sales/',
-      salesUrl: "http://localhost:8080/sales"
+      deleteSale: 'https://sistema-gestao-api.railway.internal/sales/',
+      salesUrl: "https://sistema-gestao-api.railway.internal/sales"
     }
   }
 };
