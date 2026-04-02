@@ -1,0 +1,100 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <p-button 
+                [outlined]="true" 
+                label="Voltar" 
+                icon="pi pi-arrow-left" 
+				(click)="back()"
+			/>
+
+            <div class="flex align-items-center justify-content-between mt-3 mb-5">
+				<h4>Registo Ausência</h4>
+				<div>
+					<p-button 
+						class="mr-2"
+						label="Guardar" 
+						icon="pi pi-save"
+						(click)="newAbsence()" 
+					/>
+					<p-button 
+						severity="danger"
+						label="Apagar" 
+						icon="pi pi-trash" 
+					/>
+				</div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+
+                <div class="field col-12 md:col-6">
+					<label>Funcionário</label>
+					<p-dropdown 
+                        [(ngModel)]="selectedEmployee"
+                        [options]="employeeNames" 
+                        optionLabel="name" 
+                        optionValue="id"
+                        placeholder="Selecione um Funcionário" 
+                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedEmployee }"
+					/>
+				</div>
+
+                <div class="field col-12 md:col-6">
+					<label>Tipo</label>
+					<p-dropdown 
+                        [(ngModel)]="selectedAbsenceType"
+                        [options]="absenceTypes | keyvalue" 
+						optionLabel="value"
+						optionValue="key"
+                        placeholder="Selecione um Tipo" 
+                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedAbsenceType }"
+					>
+
+						<ng-template pTemplate="selectedItem">
+							<p-tag 
+								[value]="AbsenceType[selectedAbsenceType]"
+								severity="danger" 
+							/>
+						</ng-template>
+
+						<ng-template let-option pTemplate="item">
+							<p-tag 
+								[value]="AbsenceType[option.key]" 
+								severity="danger"
+							/>
+						</ng-template>
+					</p-dropdown>
+				</div>
+
+                <div class="field col-12 md:col-6">
+                    <label>Data</label>
+					<p-calendar 
+						[(ngModel)]="date"
+                        dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay"
+                        selectionMode="range" 
+                        [readonlyInput]="true"  
+                    />
+				</div>
+
+				<div class="field col-12 md:col-6">
+					<label>Horas</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-file"></i>
+						<input 
+							[(ngModel)]="hours"
+							type="text" 
+							pInputText 
+						/>
+					</span>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-toast />

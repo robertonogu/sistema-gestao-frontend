@@ -1,0 +1,108 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                <div class="text-900 text-xl font-semibold">Clientes</div>
+                <div class="flex gap-2 sm:ml-auto">
+                    <button 
+                        class="p-button-rounded p-button-outlined"
+                        (click)="newClient()" 
+                        icon="pi pi-plus" 
+                        label="Novo"
+                        pButton 
+                        type="button" 
+                    ></button>
+                    <button 
+                        class="p-button-rounded"
+                        icon="pi pi-download" 
+                        pTooltip="Exportar" 
+                        tooltipPosition="bottom" 
+                        pButton 
+                        type="button" 
+                    ></button>
+                </div>
+            </div>
+
+			<p-table 
+                currentPageReportTemplate="{first} de {last} de {totalRecords} clientes totais"
+                [lazy]="true"
+                [loading]="loading"
+                (onLazyLoad)="nextPage($event)"
+                [paginator]="true"
+                [rows]="5"
+                [rowsPerPageOptions]="[5, 10, 20]"
+                [showCurrentPageReport]="true"
+                styleClass="p-datatable-striped" 
+                [totalRecords]="totalRecords"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                [value]="clients"
+            >
+            
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="name">Nome<p-sortIcon field="name"></p-sortIcon></th>
+                        <th>NIF</th>
+                        <th>Ações</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-client>
+                    <tr>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.nif }}</td>
+                        <td>
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-pencil" 
+                                class="mr-2" 
+                                [rounded]="true" 
+                                [text]="true" 
+                                severity="success" 
+                            />
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-trash" 
+                                severity="danger" 
+                                [rounded]="true" 
+                                [text]="true" 
+                                (click)="deleteClient(client)" />
+                        </td>
+                    </tr>
+                </ng-template>
+                
+            </p-table>
+
+		</div>
+	</div>
+</div>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button
+                    pButton 
+                    label="Eliminar"
+                    (click)="cd.accept()" 
+                    class="bg-red-500 border-transparent text-white w-8rem text-red-500">
+                </button>
+                <button 
+                    pButton 
+                    label="Cancelar" 
+                    (click)="cd.reject()" 
+                    class="p-button-outlined w-8rem ">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-toast />

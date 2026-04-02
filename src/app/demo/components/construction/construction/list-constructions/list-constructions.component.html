@@ -1,0 +1,131 @@
+<div class="grid">
+    <div class="col-12 lg:col-6 xl:col-3" *ngFor="let construction of favouriteConstructions">
+        <div *ngIf="construction.favourite">
+            <p-card header="{{ construction.name }}" subheader="{{ construction.client }}">
+                <ng-template pTemplate="header">
+                    <div class="relative mx-auto">
+                        <i 
+                            (click)="addFavorite(construction)"
+                            class="absolute pi pi-star text-yellow-300 text-2xl cursor-pointer"
+                            [ngStyle]="{ 'left.px': 5, 'top.px': 5 }" 
+                        >
+                        </i>
+                        <img alt="Card" src="https://rpcr.visitesposende.com/wp-content/uploads/2021/05/Igreja-Matriz-de-Apu%CC%81lia-1.jpg" />
+                    </div>
+                </ng-template>
+                <div class="flex justify-content-around">
+                    <div class="text-center">
+                        <p class="text-green-500 font-semibold">{{ construction.amountReceived | currency: 'EUR' }}</p>
+                        <p class="font-bold">Recebido</p>
+                    </div>
+                    <p-divider layout="vertical" />
+                    <div class="text-center">
+                        <p class="text-red-500 font-semibold">{{ construction.amountToReceive | currency: 'EUR' }}</p>
+                        <p class="font-bold">A Receber</p>
+                    </div>
+                </div>
+            </p-card>
+        </div>
+    </div>
+</div>
+
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                <div class="text-900 text-xl font-semibold">Obras</div>
+                <div class="flex gap-2 sm:ml-auto">
+                    <button 
+                        class="p-button-rounded p-button-outlined"
+                        (click)="newConstruction()" 
+                        label="Nova"
+                        icon="pi pi-plus" 
+                        pButton 
+                        type="button"  
+                    ></button>
+                    <button 
+                        class="p-button-rounded"
+                        type="button" 
+                        pButton 
+                        pTooltip="Exportar" 
+                        tooltipPosition="bottom" 
+                        icon="pi pi-download" 
+                    ></button>
+                </div>
+            </div>
+
+			<p-table 
+                currentPageReportTemplate="{first} de {last} de {totalRecords} obras"
+                dataKey="name"
+                [lazy]="true"
+                [loading]="loading"
+                (onLazyLoad)="nextPage($event)"
+                (onRowSelect)="onRowSelect($event)"
+                [paginator]="true"
+                [rows]="5"
+                [rowsPerPageOptions]="[5, 10, 20]" 
+                selectionMode="single"
+                [showCurrentPageReport]="true"
+                styleClass="p-datatable-striped" 
+                [totalRecords]="totalRecords"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                [value]="constructions"
+            >
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th><i class="pi pi-star" ></i></th>
+                        <th>Número</th>
+                        <th>Nome</th>
+                        <th>Cliente</th>
+                        <th>Orçamento Inicial</th>
+                        <th>Valor Recebido</th>
+                        <th>Valor a Receber</th>
+                        <th>Ações</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-construction>
+                    <tr [pSelectableRow]="construction">
+                        <td>
+                            <i 
+                                (click)="addFavorite(construction)" 
+                                class="pi pi-star cursor-pointer" 
+                                [ngClass]="construction.favourite ? 'text-yellow-500' : '' "
+                            >
+                            </i>
+                        </td>
+                        <td>{{ construction.constructionNumber }}</td>
+                        <td>{{ construction.name }}</td>
+                        <td>{{ construction.clientName }}</td>
+                        <td>{{ construction.initialBudget | currency: 'EUR' }}</td>
+                        <td>{{ construction.amountReceived | currency: 'EUR' }}</td>
+                        <td>{{ construction.amountToReceive | currency: 'EUR' }}</td>
+                        <td>
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-pencil" 
+                                class="mr-2" 
+                                [rounded]="true" 
+                                [text]="true" 
+                                severity="success" 
+                            />
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-trash" 
+                                severity="danger" 
+                                [rounded]="true" 
+                                [text]="true" 
+                            />
+                        </td>
+                    </tr>
+                </ng-template>
+                
+            </p-table>
+
+		</div>
+	</div>
+</div>
+
+<p-toast />

@@ -1,7 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Subscription, debounceTime } from 'rxjs';
+import { Sale } from 'src/app/demo/api/sale';
+import { SaleService } from 'src/app/demo/service/transactions/saleService';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
-
+import { TableLazyLoadEvent } from 'primeng/table';
 interface MonthlyPayment {
     name?: string;
     amount?: number;
@@ -11,6 +15,7 @@ interface MonthlyPayment {
 
 @Component({
     templateUrl: './banking.dashboard.component.html',
+    providers: [ConfirmationService, MessageService]
 })
 export class BankingDashboardComponent implements OnInit, OnDestroy {
     chartData: any;
@@ -21,13 +26,36 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
 
     subscription: Subscription;
 
-    constructor(private layoutService: LayoutService) {
+    loading: boolean = true;
+  totalRecords: number = 0;
+  sales!: Sale[];
+
+  currentPage: number = 0;
+  pageSize: number = 5;
+
+    constructor(private layoutService: LayoutService,  private confirmationService: ConfirmationService,
+        private messageService: MessageService, 
+        private router: Router,
+        private saleService: SaleService) {
         this.subscription = this.layoutService.configUpdate$
             .pipe(debounceTime(25))
             .subscribe((config) => {
                 this.initChart();
             });
     }
+
+    nextPage(event: any) {
+        this.loading = true;
+        
+        this.currentPage = event.first / event.rows;
+        this.pageSize = event.rows;
+        
+        this.saleService.getSales(this.currentPage, this.pageSize).subscribe((sales) => {
+          this.sales = sales.objectList;
+          this.totalRecords = sales.totalElements;
+          this.loading = false;
+        });
+      }
 
     ngOnInit() {
         this.initChart();

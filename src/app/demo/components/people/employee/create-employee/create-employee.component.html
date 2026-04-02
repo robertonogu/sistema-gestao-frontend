@@ -1,0 +1,102 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+			<p-button 
+				[outlined]="true" 
+				label="Voltar" 
+				icon="pi pi-arrow-left" 
+				(click)="back()"
+			/>
+
+            <div class="flex align-items-center justify-content-between mt-3 mb-5">
+				<div>
+					<h4>Registo Funcionário</h4>
+				</div>
+				<div>
+					<p-button 
+						class="mr-2"
+						label="Guardar" 
+						icon="pi pi-save" 
+						(click)="createEmployee()" 
+					/>
+					<p-button 
+						severity="danger"
+						label="Apagar" 
+						icon="pi pi-trash" 	
+					/>
+				</div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+				<div class="field col-12 md:col-6">
+                    <label>Nome</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-user"></i>
+						<input type="text" pInputText #name />
+					</span>
+				</div>
+
+                <div class="field col-12 md:col-6">
+                    <label>NIF</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-id-card"></i>
+						<p-inputNumber 
+							#nif
+							inputId="integeronly"
+							[maxlength]="9"
+						/> 
+					</span>
+				</div>
+
+				<div class="field col-12 md:col-6">
+					<label>Vencimento Base</label>
+                    <p-inputNumber 
+						#baseSalary
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+					/> 
+				</div>
+
+				<div class="field col-6">
+					<label>Ajudas de Custo</label>
+					<p-inputNumber 
+						#allowance
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+					/> 
+				</div>
+
+				<div class="field col-12 md:col-6">
+					<label>Subsídio de Alimentação</label>
+					<p-inputNumber 
+						#foodAllowance
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+					/> 
+				</div>
+
+				<div class="field col-12 md:col-6">
+					<label>Seguro de Saúde</label>
+					<p-inputNumber
+						#healthInsurance 
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+					/> 
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<p-toast/>

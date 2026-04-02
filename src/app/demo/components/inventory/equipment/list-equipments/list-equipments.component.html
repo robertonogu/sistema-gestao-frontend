@@ -1,0 +1,108 @@
+<!--<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+			<p-table 
+                [paginator]="true"
+                [rows]="5"
+                [showCurrentPageReport]="true"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                currentPageReportTemplate="{first} de {last} de {totalRecords} registos totais"
+                [rowsPerPageOptions]="[5, 10, 20]"
+                [totalRecords]="totalRecords"
+                [value]="vehicles"
+            >
+
+                <ng-template pTemplate="caption">
+                    <div class="flex align-items-center justify-content-between">
+                        Viaturas
+                        <div>
+                            <p-button 
+                                class="mr-1" 
+                                label="Novo" 
+                                icon="pi pi-plus" 
+                                (click)="newVehicle()" 
+                            />
+                            <p-button 
+                                label="Exportar" 
+                                icon="pi pi-upload" 
+                            />
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Matrícula</th>
+                        <th>Inspeção</th>
+                        <th>Seguro</th>
+                        <th>IUC</th>
+                        <th>Valor por Quilómetro</th>
+                        <th>Ações</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-vehicle>
+                    <tr>
+                        <td class="font-bold">{{ vehicle.registration }}</td>
+                        <td>{{ vehicle.inspectionDate | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ vehicle.insuranceDate | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ vehicle.roadTaxDate | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ vehicle.valueKilometer | currency: 'EUR' }}</td>
+                        <td>
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-pencil" 
+                                class="mr-2" 
+                                [rounded]="true" 
+                                [outlined]="true" 
+                                severity="success" 
+                                (click)="editAbsence(absence)" 
+                            />
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-trash" 
+                                severity="danger" 
+                                [rounded]="true" 
+                                [outlined]="true" 
+                                (click)="deleteVehicle(vehicle)" 
+                            />
+                        </td>
+                    </tr>
+                </ng-template>
+                
+            </p-table>
+
+		</div>
+	</div>
+</div>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button
+                    pButton 
+                    label="Eliminar"
+                    (click)="cd.accept()" 
+                    class="bg-red-500 border-transparent text-white w-8rem text-red-500">
+                </button>
+                <button 
+                    pButton 
+                    label="Cancelar" 
+                    (click)="cd.reject()" 
+                    class="p-button-outlined w-8rem ">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-toast />-->

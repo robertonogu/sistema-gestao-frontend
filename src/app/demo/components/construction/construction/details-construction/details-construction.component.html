@@ -1,0 +1,199 @@
+<div class="grid nested-grid">
+    <div class="col-12 lg:col-6 xl:col-10">
+        <div class="card mb-0">
+            <h5>Calendário</h5>
+            <p-timeline  layout="horizontal" align="alternate">
+                <ng-template pTemplate="content" let-event>
+                    <small class="p-text-secondary">{{ event.date }}</small>
+                </ng-template>
+                <ng-template pTemplate="opposite" let-event>
+                    {{ event.status }}
+                </ng-template>
+            </p-timeline>                
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-6 xl:col-2">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3" pTooltip="Lucro = Valor Pago - Custos Totais de Obra" tooltipPosition="left">
+                <div>
+                    <span class="block text-900 font-bold mb-3">Lucro</span>
+                    <div class="font-bold text-xl" [ngClass]="constructionDetails.profit > 0 ? 'text-green-500' : 'text-red-500'">{{ constructionDetails.profit | currency: 'EUR' }}</div>
+                </div>
+        
+            </div>
+            <div class="flex justify-content-between">
+                <div>
+                    <span class="block text-900 font-bold mb-3">Valor Pago</span>
+                    <div class="text-600 font-bold text-xl">{{ constructionDetails.paymentValue | currency: 'EUR' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="col-12 lg:col-6 xl:col-3">
+        <div class="card mb-0">
+            <h5 class="text-900 font-bold text-xl">Orçamento Inicial</h5>
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Valor Orçamentado</span>
+                    <div class="text-900 font-bold text-xl">{{ constructionDetails.initialBudget | currency: 'EUR' }}</div>
+                </div>
+            </div>
+
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Valor Custos de Obra</span>
+                    <div class="text-900 font-bold text-xl">{{ constructionDetails.costValueWorks  | currency: 'EUR' }}</div>
+                </div>
+            </div>
+
+            <div class="flex justify-content-between">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Diferencial</span>
+                    <div class="font-bold text-xl" [ngClass]="constructionDetails.differential > 0 ? 'text-green-500' : 'text-red-500'">{{ constructionDetails.differential | currency: 'EUR' }}</div>
+                </div>
+            </div>  
+        </div>
+    </div>
+    
+    <!--<div class="col-12 lg:col-6 xl:col-3">
+        <div class="card mb-0">
+            <h5 class="text-900 font-bold text-xl">Orçamento Extra</h5>
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Valor Orçamentado</span>
+                    <div class="text-900 font-bold text-xl">{{ initialBudget | currency: 'EUR' }}</div>
+                </div>
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+                </div>
+            </div>
+
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Valor Custos de Obra</span>
+                    <div class="text-900 font-bold text-xl">{{ constructionCosts | currency: 'EUR' }}</div>
+                </div>
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+                </div>
+            </div>
+
+            <div class="flex justify-content-between">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Diferencial</span>
+                    <div class="text-900 font-bold text-xl">{{ differential | currency: 'EUR' }}</div>
+                </div>
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+                </div>
+            </div>  
+        </div>
+    </div>-->
+
+    <div class="col-12 lg:col-6 xl:col-3">
+        <div class="card mb-0">
+            <p-chart type="doughnut" [data]="paymentValueVersusCostValueWorksData" [options]="options" />
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-6 xl:col-3">
+        <div class="card mb-0">
+            <p-chart type="doughnut" [data]="itemsValue" [options]="options" />
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-6 xl:col-4">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Materiais</span>
+                    <div class="text-900 font-bold text-xl">{{ getItemsSum(constructionDetails.articlesItemsCost) | currency: 'EUR' }}</div>
+                </div>
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                    <i class="pi pi-search text-blue-500 text-xl"></i>
+                </div>
+            </div>
+            <p-table [value]="constructionDetails.articlesItemsCost">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Inicial</th>
+                        <th>Extra</th>
+                    </tr> 
+                </ng-template>
+                <ng-template pTemplate="body" let-itemCost>
+                    <tr>
+                        <td>{{ itemCost.name }}</td>
+                        <td>{{ itemCost.value | currency: 'EUR' }}</td>
+                        <td>{{ 0 | currency: 'EUR' }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-6 xl:col-4">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Mão-de-Obra</span>
+                    <div class="text-900 font-bold text-xl">{{ getItemsSum(constructionDetails.workItemsCost) | currency: 'EUR' }}</div>
+                </div>
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                    <i class="pi pi-search text-blue-500 text-xl"></i>
+                </div>
+            </div>
+            <p-table [value]="constructionDetails.workItemsCost">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Inicial</th>
+                        <th>Extra</th>
+                    </tr> 
+                </ng-template>
+                <ng-template pTemplate="body" let-itemCost>
+                    <tr>
+                        <td>{{ itemCost.name }}</td>
+                        <td>{{ itemCost.value | currency: 'EUR' }}</td>
+                        <td>{{ 0 | currency: 'EUR' }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-6 xl:col-4">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Serviços Externos</span>
+                    <div class="text-900 font-bold text-xl">{{ getItemsSum(constructionDetails.externalServiceItemsCost) | currency: 'EUR' }}</div>
+                </div>
+                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                    <i class="pi pi-search text-blue-500 text-xl"></i>
+                </div>
+            </div>
+            <p-table [value]="constructionDetails.externalServiceItemsCost">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Inicial</th>
+                        <th>Extra</th>
+                    </tr> 
+                </ng-template>
+                <ng-template pTemplate="body" let-itemCost>
+                    <tr>
+                        <td>{{ itemCost.name }}</td>
+                        <td>{{ itemCost.value | currency: 'EUR' }}</td>
+                        <td>{{ 0 | currency: 'EUR' }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+</div>

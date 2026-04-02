@@ -4,6 +4,9 @@ import { Product } from 'src/app/demo/api/product';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { Table } from 'primeng/table';
+import { DashboardService } from 'src/app/demo/service/dashboard/dashboardService';
+import { CategoryCost } from 'src/app/demo/api/categoryCost';
+import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 
 @Component({
     templateUrl: './ecommerce.dashboard.component.html',
@@ -29,9 +32,19 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
 
     cols: any[] = [];
 
+    revenuesValue: number = 0;
+    expensesValue: number = 0;
+    debtsValue: number = 0;
+    balance: number = 0;
+    revenuesPerMonth: number[] = [];
+    expensesPerMonth: number[] = [];
+    categoryCosts: CategoryCost[] = [];
+    CategoryType = CategoryType;
+
     constructor(
         private productService: ProductService,
-        private layoutService: LayoutService
+        private layoutService: LayoutService,
+        private dashboardService: DashboardService
     ) {
         this.subscription = this.layoutService.configUpdate$
             .pipe(debounceTime(25))
@@ -40,7 +53,30 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
             });
     }
 
+    getCategoriesName(): string[] {
+        console.log(this.categoryCosts.map(item => item.categoryType as CategoryType))
+        
+        //console.log(this.categoryCosts.map(item => CategoryType[CategoryType[item.categoryType]]));
+        return this.categoryCosts.map(item => item.categoryType);
+    }
+    
+    getCategoriesValues() {
+        return this.categoryCosts.map(item => item.value);
+    }
+
     ngOnInit(): void {
+        this.dashboardService.getDashboardData().subscribe((dashboardData) => {
+            console.log(dashboardData)
+            this.revenuesValue = dashboardData.revenuesValue;
+            this.expensesValue = dashboardData.expensesValue;
+            this.debtsValue = dashboardData.debtsValue;
+            this.balance = dashboardData.balance;
+            this.revenuesPerMonth = dashboardData.revenuesPerMonth;
+            this.expensesPerMonth = dashboardData.expensesPerMonth;
+            this.categoryCosts = dashboardData.categoryCosts;
+            this.initCharts();
+        });
+
         this.weeks = [
             {
                 label: 'Last Week',
@@ -58,10 +94,18 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
                     [48, 78, 10, 29, 76, 77, 10],
                 ],
             },
+            {
+                label: 'This Weekwekewkekwkekwksk',
+                value: 1,
+                data: [
+                    [35, 19, 40, 61, 16, 55, 30],
+                    [48, 78, 10, 29, 76, 77, 10],
+                ],
+            },
         ];
 
         this.selectedWeek = this.weeks[0];
-        this.initCharts();
+
         this.productService
             .getProductsSmall()
             .then((data) => (this.products = data));
@@ -84,32 +128,30 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
             documentStyle.getPropertyValue('--surface-border');
 
         this.barData = {
-            labels: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+            labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
             datasets: [
                 {
-                    label: 'Revenue',
-                    backgroundColor:
-                        documentStyle.getPropertyValue('--primary-500'),
+                    label: 'Receitas',
+                    backgroundColor: documentStyle.getPropertyValue('--primary-500'),
                     barThickness: 12,
                     borderRadius: 12,
-                    data: this.selectedWeek.data[0],
+                    data: this.revenuesPerMonth,
                 },
                 {
-                    label: 'Profit',
-                    backgroundColor:
-                        documentStyle.getPropertyValue('--primary-200'),
+                    label: 'Despesas',
+                    backgroundColor: documentStyle.getPropertyValue('--primary-200'),
                     barThickness: 12,
                     borderRadius: 12,
-                    data: this.selectedWeek.data[1],
+                    data: this.expensesPerMonth,
                 },
             ],
         };
 
         this.pieData = {
-            labels: ['Electronics', 'Fashion', 'Household'],
+            labels: this.getCategoriesName(),
             datasets: [
                 {
-                    data: [300, 50, 100],
+                    data: this.getCategoriesValues(),
                     backgroundColor: [
                         documentStyle.getPropertyValue('--primary-700'),
                         documentStyle.getPropertyValue('--primary-400'),
@@ -140,6 +182,25 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
                     },
                     position: 'bottom',
                 },
+                tooltip: {
+                    callbacks: {
+                        label: function (context: any) {
+                            let label = context.dataset.label || '';
+
+                            if (label) {
+                                label += ': ';
+                            }
+
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('es-ES', {
+                                    style: 'currency',
+                                    currency: 'EUR',
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        },
+                    },
+                }
             },
             scales: {
                 x: {
@@ -178,10 +239,29 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
                         font: {
                             weight: 700,
                         },
-                        padding: 28,
+                        padding: 15,
                     },
                     position: 'bottom',
                 },
+                tooltip: {
+                    callbacks: {
+                        label: function (context: any) {
+                            let label = context.label || '';
+
+                            if (label) {
+                                label += ': ';
+                            }
+
+                            if (context.parsed !== null) {
+                                label += new Intl.NumberFormat('es-ES', {
+                                    style: 'currency',
+                                    currency: 'EUR',
+                                }).format(context.parsed);
+                            }
+                            return label;
+                        },
+                    },
+                }
             },
         };
     }

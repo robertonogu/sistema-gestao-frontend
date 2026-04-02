@@ -1,0 +1,121 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+				<div class="text-900 text-xl font-semibold">Nova Viatura</div>
+				<div class="flex gap-2 sm:ml-auto">
+                    <button 
+						class="p-button-rounded p-button-outlined"
+						(click)="back()" 
+						icon="pi pi-arrow-left" 
+						pButton 
+						pTooltip="Voltar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded bg-red-500 border-red-500"
+						icon="pi pi-trash" 
+						pButton 
+						pTooltip="Apagar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded"
+						(click)="newVehicle()" 
+						icon="pi pi-save" 
+						label="Guardar" 
+						pButton 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+                </div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+
+                <div class="field col-12 md:col-4">
+					<label>Tipo de Viatura</label>
+					<p-dropdown 
+                        [(ngModel)]="selectedVehicleType"
+                        [options]="vehicleType | keyvalue" 
+                        optionLabel="value" 
+                        optionValue="key"
+                        placeholder="Selecione uma Tipo" 
+
+					/>
+				</div>
+
+                <div class="field col-12 md:col-4">
+                    <label>Matrícula</label>
+                    <input 
+                        [(ngModel)]="registration" 
+                        type="text" 
+                        pInputText 
+                        appFormatInput
+                    />
+                </div>
+
+                <div class="field col-12 md:col-4">
+					<label>Data de Matrícula</label>
+					<p-calendar 
+                        [(ngModel)]="registrationDate"
+                        dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay" 
+                    />
+				</div>
+
+                <div class="field col-12 md:col-4">
+					<label>Data de Inspeção</label>
+					<p-calendar 
+                        [(ngModel)]="inspectionDate"
+                        dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay" 
+                    />
+				</div>
+
+                <div class="field col-12 md:col-4">
+					<label>Data de Seguro</label>
+					<p-calendar 
+                        [(ngModel)]="insuranceDate"
+                        dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay" 
+                    />
+				</div>
+
+                <div class="field col-12 md:col-4">
+					<label>Periodicidade de Seguro</label>
+					<p-dropdown 
+                        [(ngModel)]="selectedInsurancePeriodicity"
+                        [options]="insurancePeriodicity | keyvalue" 
+                        optionLabel="value" 
+                        optionValue="key"
+                        placeholder="Selecione uma Viatura" 
+					/>
+				</div>
+
+                <div class="field col-12 md:col-4">
+                    <label>Valor por Quilómetro</label>
+                    <p-inputNumber 
+                        [(ngModel)]="valueKilometer" 
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+                    /> 
+                </div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-toast />

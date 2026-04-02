@@ -1,0 +1,103 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+			<p-button 
+				[outlined]="true" 
+				label="Voltar" 
+				icon="pi pi-arrow-left" 
+				(click)="back()"
+			/>
+
+            <div class="flex align-items-center justify-content-between mt-3 mb-5">
+				<div>
+					<h4>Registo WorkLog</h4>
+				</div>
+				<div>
+					<p-button 
+						class="mr-2"
+						label="Guardar" 
+						icon="pi pi-save" 
+						(click)="createWorkLog()" 
+                        />
+					<p-button 
+						severity="danger"
+						label="Apagar" 
+						icon="pi pi-trash" 
+						(click)="delete()"
+					/>
+				</div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+				<div class="field col-12 md:col-4">
+                    <label>Data</label>
+					<p-calendar 
+                        [(ngModel)]="date"
+                        dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay"  
+                    />
+				</div>
+
+                <div class="field col-12 md:col-4">
+					<label>Horas</label>
+					<p-inputNumber 
+                        autocomplete="off"
+                        inputId="integeronly" 
+                        [(ngModel)]="hours" 
+					/> 
+				</div>
+
+				<div class="col-12 md:col-4 flex align-items-center gap-3">
+					<p-checkbox
+                        [(ngModel)]="workOnConstruction"
+                        [binary]="true"
+					/> 
+                    <label>Realizado na Obra</label>
+				</div>
+
+                <div class="field col-12 md:col-4">
+                    <label>Obra</label>
+					<p-dropdown 
+                        (onChange)="getBudgetItemsAndEmployees()"
+                        [(ngModel)]="selectedConstruction"
+                        [options]="constructionNames" 
+                        optionLabel="name" 
+                        optionValue="constructionId"
+                        placeholder="Selecione uma Obra" 
+                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedEmployee }"
+					/>
+				</div>
+
+                <div class="field col-12 md:col-4">
+					<label>Sub-Item</label>
+                    <p-dropdown 
+                        [(ngModel)]="selectedBudgetSubItem"
+                        [options]="budgetSubItemNames" 
+                        optionLabel="name" 
+                        optionValue="id"
+                        placeholder="Selecione um Sub-Item" 
+                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedEmployee }"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Funcionário</label>
+                    <p-dropdown 
+                        [(ngModel)]="selectedEmployee"
+                        [options]="employeeNames" 
+                        optionLabel="name" 
+                        optionValue="id"
+                        placeholder="Selecione um Funcionário" 
+                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedEmployee }"
+					/>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-toast/>

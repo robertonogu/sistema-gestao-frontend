@@ -1,0 +1,51 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                <div class="text-900 text-xl font-semibold">Serviços Externos</div>
+                <div class="flex sm:ml-auto">
+                    <button type="button" pButton pTooltip="Exportar" tooltipPosition="bottom" icon="pi pi-download" class="p-button-rounded"></button>
+                </div>
+            </div>
+
+			<p-table 
+                currentPageReportTemplate="{first} de {last} de {totalRecords} serviços externos"
+                [lazy]="true"
+                [loading]="loading"
+                (onLazyLoad)="nextPage($event)"
+                [paginator]="true"
+                [rows]="5"
+                [rowsPerPageOptions]="[5, 10, 20]"
+                [showCurrentPageReport]="true"
+                styleClass="p-datatable-striped" 
+                [totalRecords]="totalRecords"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                [value]="externalServices"
+            >
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Obra</th>
+                        <th>Sub-Item</th>
+                        <th>Descrição</th>
+                        <th>Número de Documento</th>
+                        <th>Valor</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-externalService>
+                    <tr>
+                        <td>{{ externalService.construction }}</td>
+                        <td>{{ externalService.budgetSubItem }}</td>
+                        <td></td>
+                        <td>{{ externalService.expense }}</td>
+                        <td>{{ externalService.value | currency: 'EUR' }}</td>
+                    </tr>
+                </ng-template>
+                
+            </p-table>
+
+		</div>
+	</div>
+</div>

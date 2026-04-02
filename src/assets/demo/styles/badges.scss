@@ -107,3 +107,110 @@
         color: #694382;
     }
 }
+
+.revenue-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+
+    &.status-member_loan {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-credit_note {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+
+    &.status-sales {
+        background: #FEEDAF;
+        color: #8A5340;
+    }
+
+    &.order-returned {
+        background: #ECCFFF;
+        color: #694382;
+    }
+}
+
+.expense-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+
+    &.status-paid {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-partially_paid {
+        background: #FEEDAF;
+        color: #8A5340;
+    }
+
+    &.status-in_debt {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+
+}
+
+.payment-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+
+    &.status-cash {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-bank_transfer {
+        background: #FEEDAF;
+        color: #8A5340;
+    }
+
+    &.status-direct_debt {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+
+}
+
+.absence-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+
+    &.status-justified_absence {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-vacation {
+        background: #FEEDAF;
+        color: #8A5340;
+    }
+
+    &.status-unjustified_absence {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+
+}
+
+
+

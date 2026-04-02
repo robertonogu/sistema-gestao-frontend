@@ -18,6 +18,12 @@ const routes: Routes = [
             { path: 'documentation', data: { breadcrumb: 'Documentation' }, loadChildren: () => import('./demo/components/documentation/documentation.module').then(m => m.DocumentationModule) },
             { path: 'blocks', data: { breadcrumb: 'Prime Blocks' }, loadChildren: () => import('./demo/components/primeblocks/primeblocks.module').then(m => m.PrimeBlocksModule) },
             { path: 'ecommerce', data: { breadcrumb: 'E-Commerce' }, loadChildren: () => import('./demo/components/ecommerce/ecommerce.module').then(m => m.EcommerceModule) },
+            { path: 'transactions', data: { breadcrumb: 'Transações' }, loadChildren: () => import('./demo/components/transactions/transactions.module').then(m => m.TransactionsModule) },
+            { path: 'constructions', data: { breadcrumb: 'Obras' }, loadChildren: () => import('./demo/components/construction/construction.module').then(m => m.ConstructionModule) },
+            { path: 'queries', data: { breadcrumb: 'Consultas' }, loadChildren: () => import('./demo/components/queries/queries.module').then(m => m.QueriesModule) },
+            { path: 'inventory', data: { breadcrumb: 'Inventário' }, loadChildren: () => import('./demo/components/inventory/inventory.module').then(m => m.InventoryModule) },
+            { path: 'people', data: { breadcrumb: 'Pessoal' }, loadChildren: () => import('./demo/components/people/people.module').then(m => m.PeopleModule) },
+            { path: 'company', data: { breadcrumb: 'Empresa' }, loadChildren: () => import('./demo/components/company/company.module').then(m => m.CompanyModule) },
             { path: 'apps', data: { breadcrumb: 'Apps' }, loadChildren: () => import('./demo/components/apps/apps.module').then(m => m.AppsModule) }
         ]
     },

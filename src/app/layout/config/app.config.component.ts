@@ -129,6 +129,7 @@ export class AppConfigComponent implements OnInit {
     }
 
     changeTheme(theme: string) {
+        console.log(theme)
         this.theme = theme;
     }
 

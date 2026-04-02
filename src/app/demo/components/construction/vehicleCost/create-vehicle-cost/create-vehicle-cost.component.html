@@ -1,0 +1,99 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+				<div class="text-900 text-xl font-semibold">Nova Deslocação</div>
+				<div class="flex gap-2 sm:ml-auto">
+                    <button 
+						class="p-button-rounded p-button-outlined"
+						(click)="back()" 
+						icon="pi pi-arrow-left" 
+						pButton 
+						pTooltip="Voltar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded bg-red-500 border-red-500"
+						icon="pi pi-trash" 
+						pButton 
+						pTooltip="Apagar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded"
+						(click)="newVehicleCost()" 
+						icon="pi pi-save" 
+						label="Guardar" 
+						pButton 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+                </div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+
+                <div class="field col-12 md:col-6">
+					<label>Data</label>
+					<p-calendar 
+                        [(ngModel)]="date"
+                        dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay" 
+                    />
+				</div>
+
+                <div class="field col-12 md:col-6">
+					<label>Viatura</label>
+					<p-dropdown 
+                        [(ngModel)]="selectedVehicle"
+                        [options]="vehicleNames" 
+                        optionLabel="name" 
+                        optionValue="id"
+                        placeholder="Selecione uma Viatura" 
+                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedVehicle }"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+                    <label>Obra</label>
+					<p-dropdown 
+                        [(ngModel)]="selectedConstruction"
+                        [options]="constructionNames" 
+                        optionLabel="name" 
+                        optionValue="constructionId"
+                        placeholder="Selecione uma Obra" 
+					/>
+				</div>
+
+				<div class="col-12 md:col-4 flex align-items-center gap-3">
+					<p-checkbox 
+                        [binary]="true" 
+                        [(ngModel)]="isTravelToConstruction"
+                    />
+					<label>Deslocação à Obra</label>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Destino</label>
+					<p-multiSelect 
+						selectedItemsLabel="{0} destinos selecionados"
+						[options]="supplierNames" 
+						[(ngModel)]="selectedSuppliers" 
+						[filter]="true" 
+    					optionLabel="name" 
+						optionValue="id"
+						placeholder="Selecione os Destinos" 
+					/>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-toast />

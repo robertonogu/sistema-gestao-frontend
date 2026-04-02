@@ -1,0 +1,145 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+			<div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+				<div class="text-900 text-xl font-semibold">Nova Receita</div>
+				<div class="flex gap-2 sm:ml-auto">
+                    <button (click)="back()" type="button" pButton pTooltip="Voltar" tooltipPosition="bottom" icon="pi pi-arrow-left" class="p-button-rounded p-button-outlined"></button>
+					<button type="button" pButton pTooltip="Apagar" tooltipPosition="bottom" icon="pi pi-trash" class="p-button-rounded bg-red-500 border-red-500"></button>
+					<button (click)="newRevenue()" type="button" label="Guardar" pButton tooltipPosition="bottom" icon="pi pi-save" class="p-button-rounded"></button>
+                </div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+
+				<div class="field col-12 md:col-4">
+                    <label>Data</label>
+					<p-calendar 
+						dateFormat="dd/mm/yy"
+						[(ngModel)]="date"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay" 
+						[ngClass]="{ 'ng-dirty ng-invalid': !date }"
+                    />
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Tipo</label>
+					<p-dropdown 
+						[(ngModel)]="selectedRevenueType"
+                        [options]="revenueTypes | keyvalue" 
+                        optionLabel="value" 
+						optionValue="key"
+                        placeholder="Selecione um Tipo" 
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedRevenueType }"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+                    <label>Número de Documento</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-file"></i>
+						<input 
+							[(ngModel)]="documentNumber"
+							type="text" 
+							pInputText 
+							[ngClass]="{ 'ng-dirty ng-invalid': !documentNumber }"
+						/>
+					</span>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Origem</label>
+					<p-dropdown
+						(onChange)="getConstructionNames()"
+						[(ngModel)]="selectedOrigin"
+                        [options]="origins" 
+                        placeholder="Selecione uma origem" 
+                        [group]="true"
+                        [filter]="true"
+                        filterBy="label"
+                        optionLabel="label"
+                        optionValue="value"
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedOrigin }"
+                    >
+                        <ng-template let-group pTemplate="group">
+                            <div class="flex align-items-center">
+                                <span>{{ group.label }}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Conta</label>
+					<p-dropdown 
+						[(ngModel)]="selectedAccount"
+                        [options]="accountNames" 
+                        optionLabel="name" 
+						optionValue="objectId"
+                        placeholder="Selecione uma Conta" 
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedAccount }"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Método de Pagamento</label>
+					<p-dropdown 
+						[(ngModel)]="selectedPaymentMethod"
+                        [options]="paymentMethods | keyvalue" 
+                        optionLabel="value" 
+						optionValue="key"
+                        placeholder="Selecione um Método de Pagamento" 
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaymentMethod }"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Valor</label>
+					<p-inputNumber 
+						[(ngModel)]="value"
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+						[ngClass]="{ 'ng-dirty ng-invalid': !value }"
+					/> 
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>IVA</label>
+					<p-dropdown 
+						[(ngModel)]="iva"
+                        [options]="validIvaRates | keyvalue" 
+                        optionLabel="value" 
+						optionValue="value"
+                        placeholder="Selecione uma Taxa" 
+					>
+						<ng-template let-option pTemplate="item">
+							{{ option.value }}%
+						</ng-template>
+						<ng-template let-option pTemplate="selectedItem">
+							{{ option?.value ? option.value + '%' : '' }}
+						</ng-template>
+					</p-dropdown>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Obra</label>
+					<p-dropdown 
+						[(ngModel)]="selectedConstruction"
+                        [options]="constructionNames" 
+                        optionLabel="name" 
+						optionValue="constructionId"
+                        placeholder="Selecione uma Obra" 
+					/>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-toast />

@@ -28,6 +28,208 @@ export class AppMenuComponent implements OnInit {
                 ]
             },
             {
+                label: "Atalhos",
+                icon: 'pi pi-plus',
+                items: [
+                    {
+                        label: 'Nova Venda',
+                        icon: 'pi pi-fw pi-plus',
+                        routerLink: ['/transactions/sales/create-sale']
+                    },
+                    {
+                        label: 'Nova Receita',
+                        icon: 'pi pi-fw pi-plus',
+                        routerLink: ['/transactions/revenues/create-revenue']
+                    },
+                    {
+                        label: 'Nova Despesa',
+                        icon: 'pi pi-fw pi-plus',
+                        routerLink: ['/transactions/expenses/create-expense']
+                    },
+                    {
+                        label: 'Novo Pagamento',
+                        icon: 'pi pi-fw pi-plus',
+                        routerLink: ['/transactions/payments/create-payment']
+                    },
+                    {
+                        label: 'Novo Movimento',
+                        icon: 'pi pi-fw pi-plus',
+                        routerLink: ['/transactions/movements/create-movement']
+                    },
+                    {
+                        label: 'Nova Deslocação',
+                        icon: 'pi pi-fw pi-plus',
+                        routerLink: ['/transactions/constructions/create-vehicleCost']
+                    },
+                ]
+            },
+            {
+                label: 'Transações',
+                icon: 'pi pi-euro',
+                items: [
+                    {
+                        label: 'Vendas',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/transactions/sales']
+                    },
+                    {
+                        label: 'Receitas',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/transactions/revenues']
+                    },
+                    {
+                        label: 'Despesas',
+                        icon: 'pi pi-fw pi-times-circle',
+                        routerLink: ['/transactions/expenses']
+                    },
+                    {
+                        label: 'Pagamentos',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/transactions/payments']
+                    },
+                    {
+                        label: 'Movimentações',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/transactions/movements']
+                    }
+                ]
+            },
+            {
+                label: 'Consultas',
+                icon: 'pi pi-search',
+                items: [
+                    {
+                        label: 'Contas Corrente',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/queries/currentAccounts']
+                    },
+                    {
+                        label: 'Débitos',
+                        icon: 'pi pi-fw pi-times-circle',
+                        routerLink: ['/queries/debts']
+                    },
+                    {
+                        label: 'Extratos de Conta',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/queries/accountLogs']
+                    },
+                    {
+                        label: 'Mapa Caixa',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/queries/cashAccountLogs']
+                    },
+                ]
+            },
+            {
+                label: 'Obras',
+                icon: 'pi pi-building',
+                items: [
+                    { 
+                        label: 'Obras', 
+                        icon: 'pi pi-fw pi-home',
+                        routerLink: ['/constructions'] 
+                    },
+                    { 
+                        label: 'Serviços Externos', 
+                        icon: 'pi pi-fw pi-car',
+                        routerLink: ['/constructions/externalServices'] 
+                    },
+                    { 
+                        label: 'Deslocações', 
+                        icon: 'pi pi-fw pi-car',
+                        routerLink: ['/constructions/vehicleCosts'] 
+                    },
+                    { 
+                        label: 'Custo por Hora', 
+                        icon: 'pi pi-fw pi-car',
+                        routerLink: ['/constructions/costEmployeeHours'] 
+                    },
+                ]
+            },
+            {
+                label: "Inventário",
+                icon: 'pi pi-hammer',
+                items: [
+                    {
+                        label: 'Artigos',
+                        icon: 'pi pi-fw pi-times-circle',
+                        routerLink: ['/inventory/articles']
+                    },
+                    {
+                        label: 'Veículos',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/inventory/vehicles']
+                    },
+                    {
+                        label: 'Equipamentos',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/auth/access']
+                    },
+                    {
+                        label: 'Ferramentas',
+                        icon: 'pi pi-fw pi-wrench',
+                        routerLink: ['/auth/access']
+                    }
+                ]
+            },
+            {
+                label: "Pessoal",
+                icon: 'pi pi-user',
+                items: [
+                    {
+                        label: 'Funcionários',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/people/employees']
+                    },
+                    {
+                        label: 'Ausências',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/people/absences']
+                    },
+                    {
+                        label: 'Mapa de Tempos',
+                        icon: 'pi pi-fw pi-times-circle',
+                        routerLink: ['/people/worklogs']
+                    },
+                    {
+                        label: 'Mapa de horas',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/people/timemap']
+                    },
+                    {
+                        label: 'Mapa custo por hora',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/auth/access']
+                    }
+                ]
+            },
+            {
+                label: "Empresa",
+                icon: 'pi pi-warehouse',
+                items: [
+                    {
+                        label: 'Clientes',
+                        icon: 'pi pi-fw pi-users',
+                        routerLink: ['/company/clients']
+                    },
+                    {
+                        label: 'Fornecedores',
+                        icon: 'pi pi-fw pi-times-circle',
+                        routerLink: ['/company/suppliers']
+                    },
+                    {
+                        label: 'Entidades Externas',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/company/externalEntities']
+                    },
+                    {
+                        label: 'Contas',
+                        icon: 'pi pi-fw pi-lock',
+                        routerLink: ['/company/accounts']
+                    }
+                ]
+            },
+            {
                 label: 'Apps',
                 icon: 'pi pi-th-large',
                 items: [

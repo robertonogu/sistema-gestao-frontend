@@ -1,0 +1,45 @@
+<div class="grid">
+    <div class="col-12">
+      <div class="card">
+        <p-table [value]="days" styleClass="p-datatable-gridlines">
+          <ng-template pTemplate="header">
+            <tr>
+              <th rowspan="2" class="text-center">Dia</th>
+              <ng-container *ngFor="let month of months; let i = index">
+                <th colspan="3" class="text-center">{{ month }}</th>
+              </ng-container>
+            </tr>
+            <tr>
+              <ng-container *ngFor="let month of months; let i = index">
+                <th class="text-center">H.T</th>
+                <th class="text-center">H.E</th>
+                <th class="text-center">H.F</th>
+              </ng-container>
+            </tr>
+          </ng-template>
+  
+          <ng-template pTemplate="body" let-day>
+            <tr>
+              <td class="font-bold text-center">{{ day }}</td>
+              <ng-container *ngFor="let month of months; let k = index">
+                <ng-container *ngIf="isHoliday(day, month); else second">
+                  <td colspan="3" class="bg-green-400 text-white text-center font-bold">{{ getHolidayName(day, month) }}</td>
+                </ng-container>
+                <ng-template #second>
+                  <ng-container *ngIf="isWeekend(day, month); else notHoliday">
+                    <td colspan="3" class="bg-primary text-center font-bold">Fim de Semana</td>
+                  </ng-container>
+                </ng-template>
+                <ng-template #notHoliday>
+                  <td class="text-center">{{ timeMaps[k][day]?.workedHours }}</td>
+                  <td class="text-center">{{ timeMaps[k][day]?.extraHours }}</td>
+                  <td class="text-center">{{ timeMaps[k][day]?.absenceHours }}</td>
+                </ng-template>
+              </ng-container>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+  

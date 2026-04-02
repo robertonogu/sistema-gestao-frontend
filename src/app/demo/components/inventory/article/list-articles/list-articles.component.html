@@ -1,0 +1,171 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <p-tabView (onChange)="handleChange($event)">
+                <p-tabPanel header="Entrada">
+
+                    <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                        <div class="text-900 text-xl font-semibold">Entrada de Artigos</div>
+                        <div class="flex sm:ml-auto">
+                            <button 
+                                class="p-button-rounded"
+                                icon="pi pi-download" 
+                                pTooltip="Exportar" 
+                                tooltipPosition="bottom" 
+                                pButton 
+                                type="button" 
+                            ></button>
+                        </div>
+                    </div>
+
+                    <p-table
+                        [paginator]="true"
+                        [rows]="5"
+                        [showCurrentPageReport]="true"
+                        [tableStyle]="{ 'min-width': '50rem' }"
+                        currentPageReportTemplate="{first} de {last} de {totalRecords} registos totais"
+                        [rowsPerPageOptions]="[5, 10, 20]"
+                        styleClass="p-datatable-striped" 
+                        [totalRecords]="totalRecords"
+                        [value]="articles"
+                    >
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Data</th>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Quantidade</th>
+                                <th>Unidade</th>
+                                <th>Valor Unitário</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-article>
+                            <tr>
+                                <td>{{ article.entryDate | date: 'dd/MM/yyyy' }}</td>
+                                <td>{{ article.code }}</td>
+                                <td>{{ article.name }}</td>
+                                <td>{{ article.quantity }}</td>
+                                <td>{{ article.unit }}</td>
+                                <td>{{ article.unitValue | currency: 'EUR' }}</td>
+                                <td>{{ article.totalValue | currency: 'EUR' }}</td>
+                                
+                            </tr>
+                        </ng-template>
+                        
+                    </p-table>
+
+                </p-tabPanel>
+
+                <p-tabPanel header="Saída">
+
+                    <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                        <div class="text-900 text-xl font-semibold">Saída de Artigos</div>
+                        <div class="flex sm:ml-auto">
+                            <button label="Novo" (click)="issueArticle()" type="button" pButton icon="pi pi-plus" class="p-button-rounded p-button-outlined"></button>
+                        </div>
+                    </div>
+
+                    <p-table
+                        [paginator]="true"
+                        [rows]="5"
+                        [showCurrentPageReport]="true"
+                        [tableStyle]="{ 'min-width': '50rem' }"
+                        currentPageReportTemplate="{first} de {last} de {totalRecords} registos totais"
+                        [rowsPerPageOptions]="[5, 10, 20]"
+                        styleClass="p-datatable-striped" 
+                        [totalRecords]="totalRecords"
+                        [value]="issuedArticles"
+                    >
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Data</th>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Quantidade</th>
+                                <th>Unidade</th>
+                                <th>Valor Unitário</th>
+                                <th>Valor Total</th>
+                                <th>Obra</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-article>
+                            <tr>
+                                <td>{{ article.date | date: 'dd/MM/yyyy' }}</td>
+                                <td>{{ article.code }}</td>
+                                <td>{{ article.name }}</td>
+                                <td>{{ article.quantity }}</td>
+                                <td>{{ article.unit }}</td>
+                                <td>{{ article.unitValue | currency: 'EUR' }}</td>
+                                <td>{{ article.totalValue | currency: 'EUR' }}</td>
+                                <td>{{ article.construction }}</td>
+                            </tr>
+                        </ng-template>
+                        
+                    </p-table>
+                </p-tabPanel>
+
+                <p-tabPanel header="Atual">
+
+                    <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                        <div class="text-900 text-xl font-semibold">Stock</div>
+                        <div class="flex gap-2 sm:ml-auto">
+                            <p-calendar 
+                                (onSelect)="getStockAsOfDate()"
+                                [(ngModel)]="date"
+                                dateFormat="dd/mm/yy"
+                                [iconDisplay]="'input'" 
+                                [showIcon]="true" 
+                                inputId="icondisplay" 
+                            />
+                            <button type="button" pButton pTooltip="Exportar" tooltipPosition="bottom" icon="pi pi-download" class="p-button-rounded"></button>
+                        </div>
+                    </div>
+
+                    <p-table
+                        [paginator]="true"
+                        [rows]="5"
+                        [showCurrentPageReport]="true"
+                        [tableStyle]="{ 'min-width': '50rem' }"
+                        currentPageReportTemplate="{first} de {last} de {totalRecords} registos totais"
+                        [rowsPerPageOptions]="[5, 10, 20]"
+                        styleClass="p-datatable-striped" 
+                        [totalRecords]="totalRecords"
+                        [value]="articlesStock"
+                    >
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Quantidade em Stock</th>
+                                <th>Unidade</th>
+                                <th>Valor Unitário</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-article>
+                            <tr>
+                                <td>{{ article.code }}</td>
+                                <td>{{ article.name }}</td>
+                                <td>{{ article.quantity }}</td>
+                                <td>{{ article.unit }}</td>
+                                <td>{{ article.unitValue | currency: 'EUR' }}</td>
+                                <td>{{ article.totalValue | currency: 'EUR' }}</td>
+                            </tr>
+                        </ng-template>
+                        
+                    </p-table>
+                </p-tabPanel>
+
+            </p-tabView>
+
+		</div>
+	</div>
+</div>

@@ -1,0 +1,121 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+			
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+				<div class="text-900 text-xl font-semibold">Nova Venda</div>
+				<div class="flex gap-2 sm:ml-auto">
+                    <button 
+						class="p-button-rounded p-button-outlined"
+						(click)="back()" 
+						icon="pi pi-arrow-left" 
+						pButton 
+						pTooltip="Voltar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded bg-red-500 border-red-500"
+						icon="pi pi-trash" 
+						pButton 
+						pTooltip="Apagar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded"
+						(click)="newSale()" 
+						icon="pi pi-save" 
+						label="Guardar" 
+						pButton 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+                </div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+
+				<div class="field col-12 md:col-4">
+                    <label>Data</label>
+					<p-calendar 
+						dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+						inputId="icondisplay" 
+						[(ngModel)]="date"
+                        [showIcon]="true" 
+                    />
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Cliente</label>
+					<p-dropdown 
+						[(ngModel)]="selectedClient"
+						(onChange)="getConstructions()"
+                        [options]="clientNames" 
+                        optionLabel="name" 
+						optionValue="id"
+                        placeholder="Selecione um Cliente" 
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Obra</label>
+					<p-dropdown 
+						emptyMessage="Nenhum resultado"
+						[(ngModel)]="selectedConstruction"
+                        [options]="constructionNames" 
+                        optionLabel="name" 
+						optionValue="constructionId"
+                        placeholder="Selecione uma Obra" 
+					/>
+				</div>
+
+                <div class="field col-12 md:col-4">
+                    <label>Número de Documento</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-file"></i>
+						<input 
+							[(ngModel)]="documentNumber"
+							pInputText 
+							type="text" 
+						/>
+					</span>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Valor</label>
+					<p-inputNumber 
+						autocomplete="off"
+						currency="EUR" 
+						inputId="currency-germany"
+                        locale="de-DE" 
+						mode="currency"
+						[(ngModel)]="value"
+					/> 
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>IVA</label>
+					<p-dropdown 
+						[(ngModel)]="iva"
+                        [options]="validIvaRates | keyvalue" 
+                        optionLabel="value" 
+						optionValue="value"
+                        placeholder="Selecione uma Taxa" 
+					>
+						<ng-template let-option pTemplate="item">
+							{{ option.value }}%
+						</ng-template>
+						<ng-template let-option pTemplate="selectedItem">
+							{{ option !== undefined && option !== null ? option.value + '%' : '' }}
+						</ng-template>
+					</p-dropdown>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-toast />

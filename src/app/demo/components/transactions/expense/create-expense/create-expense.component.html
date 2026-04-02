@@ -1,0 +1,454 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+			<div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+				<div class="text-900 text-xl font-semibold">Nova Despesa</div>
+				<div class="flex gap-2 sm:ml-auto">
+                    <button 
+						class="p-button-rounded p-button-outlined"
+						(click)="back()" 
+						icon="pi pi-arrow-left" 
+						pButton 
+						pTooltip="Voltar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded bg-red-500 border-red-500"
+						icon="pi pi-trash" 
+						pButton 
+						pTooltip="Apagar" 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+					<button 
+						class="p-button-rounded"
+						(click)="newExpense()" 
+						icon="pi pi-save" 
+						label="Guardar" 
+						pButton 
+						tooltipPosition="bottom" 
+						type="button" 
+					></button>
+                </div>
+            </div>
+
+			<div class="p-fluid p-formgrid grid">
+
+				<div class="field col-12 md:col-3">
+                    <label>Data</label>
+					<p-calendar 
+						[(ngModel)]="date"
+						dateFormat="dd/mm/yy"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay" 
+                    />
+				</div>
+
+                <div class="field col-12 md:col-3">
+                    <label>Categoria</label>
+					<p-dropdown
+                        [options]="categories" 
+                        [(ngModel)]="selectedCategory" 
+                        placeholder="Selecione uma Categoria" 
+                        [group]="true"
+                        [filter]="true"
+                        filterBy="label"
+                        optionLabel="label"
+                        optionValue="value"
+					>
+                        <ng-template let-group pTemplate="group">
+                            <div class="flex align-items-center">
+                                <span>{{ group.label }}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+				</div>
+
+				<div class="field col-12 md:col-3">
+					<label>Origem</label>
+					<p-dropdown
+                        [options]="origins" 
+                        [(ngModel)]="selectedOrigin" 
+                        placeholder="Selecione uma origem" 
+                        [group]="true"
+                        [filter]="true"
+                        filterBy="label"
+                        optionLabel="label"
+                        optionValue="value"
+					>
+                        <ng-template let-group pTemplate="group">
+                            <div class="flex align-items-center">
+                                <span>{{ group.label }}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+				</div>
+
+				<!--<div class="field col-12 md:col-3">
+					<label>Destino</label>
+					<p-dropdown
+                        [options]="targets" 
+                        [(ngModel)]="selectedTarget" 
+                        placeholder="Selecione um Destino" 
+                        [group]="true"
+                        [filter]="true"
+                        filterBy="label"
+                        optionLabel="label"
+                        optionValue="value"
+					>
+                        <ng-template let-group pTemplate="group">
+                            <div class="flex align-items-center">
+                                <span>{{ group.label }}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+				</div>-->
+
+                <div class="field col-12 md:col-4">
+                    <label>Tipo de Documento</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-id-card"></i>
+						<p-dropdown 
+							[(ngModel)]="selectedDocumentType"
+							[options]="documentTypes | keyvalue" 
+							optionLabel="value" 
+							optionValue="key"
+							placeholder="Selecione um Tipo de Documento" 
+							[ngClass]="{ 'ng-dirty ng-invalid': !selectedDocumentType }"
+						/>
+					</span>
+				</div>
+
+				<div class="field col-12 md:col-4">
+                    <label>Número de Documento</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-id-card"></i>
+						<input 
+							[(ngModel)]="documentNumber"
+							type="text" 
+							pInputText 
+						/>
+					</span>
+				</div>
+
+				<div class="field col-12 md:col-4">
+                    <label>Data Limite de Pagamento</label>
+					<p-calendar 
+						dateFormat="dd/mm/yy"
+						[(ngModel)]="paymentDeadline"
+                        [iconDisplay]="'input'" 
+                        [showIcon]="true" 
+                        inputId="icondisplay" 
+						[disabled]="disablePaymentDeadline"
+                    />
+				</div>
+
+
+				<div class="field col-12 md:col-3">
+					<label>Valor</label>
+					<p-inputNumber 
+						(onBlur)="changePaidValue()"
+						[(ngModel)]="value"
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+					/> 
+				</div>
+
+				<div class="field col-12 md:col-3">
+					<label>IVA</label>
+					<p-dropdown 
+						(onChange)="changeIvaRate()"
+						[(ngModel)]="iva"
+                        [options]="validIvaRates | keyvalue" 
+                        optionLabel="value" 
+						optionValue="value"
+                        placeholder="Selecione uma Taxa" 
+					>
+						<ng-template let-option pTemplate="item">
+							{{ option.value }}%
+						</ng-template>
+						<ng-template let-option pTemplate="selectedItem">
+							{{ option !== undefined && option !== null ? option.value + '%' : '' }}
+						</ng-template>
+					</p-dropdown>
+				</div>
+
+                <div class="col-12 md:col-3 flex align-items-center gap-3">
+					<p-checkbox 
+						(onChange)="onCheckboxChange()"
+                        [binary]="true" 
+                        [(ngModel)]="isIntegralPayment"
+                    />
+					<label>Pagamento Integral</label>
+				</div>
+
+                <div class="field col-12 md:col-3">
+					<label>Valor Pago</label>
+					<p-inputNumber
+						[(ngModel)]="paymentValue" 
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR" 
+                        locale="de-DE" 
+						[disabled]="disablePaidValue"
+					/> 
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Conta</label>
+					<p-dropdown 
+						[(ngModel)]="selectedAccount"
+                        [options]="accountNames" 
+                        optionLabel="name" 
+						optionValue="objectId"
+                        placeholder="Selecione uma Conta" 
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedAccount }"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Método de Pagamento</label>
+					<p-dropdown 
+						[(ngModel)]="selectedPaymentMethod"
+                        [options]="paymentMethods | keyvalue" 
+                        optionLabel="value" 
+						optionValue="key"
+                        placeholder="Selecione um Método de Pagamento" 
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaymentMethod }"
+					/>
+				</div>
+
+                <div class="field col-12 md:col-2">
+					<label>Detalhes</label>
+					<p-splitButton 
+						icon="pi pi-plus"
+                        label="Adicionar" 
+                        [model]="items" 
+                    />
+				</div>
+
+				<div *ngIf="lunchVisible" class="col-12 grid">
+
+					<p-divider class="col-12" />
+
+					<div>
+						<h4>Almoços</h4>
+					</div>
+
+					<div class="field col-12 md:col-3">
+						<label>Quantidade de Pessoas</label>
+						<input type="text" pInputText />
+					</div>
+
+					<div class="field col-12 md:col-2">
+						<label>Ações</label>
+						<div>
+							<p-button
+								severity="danger"
+								icon="pi pi-trash" 
+								(click)="disableLunch()" 
+							/> 
+						</div>
+					</div>
+
+				</div>
+
+				<p-divider class="col-12" *ngIf="inputs.length != 0" />
+		
+				<form [formGroup]="dynamicForm" class="col-12">
+					<div *ngIf="inputs.length != 0">
+						<h4>Serviços Externos</h4>
+					</div>
+					<div formArrayName="inputs" class="grid p-fluid p-formgrid">
+						<ng-container *ngFor="let input of inputs.controls; let i = index" [formGroupName]="i">
+	
+							<div class="field col-12 md:col-3">
+								<label>Obra</label>
+								<p-dropdown 
+									formControlName="constructionId"
+									[options]="constructionNames" 
+									optionLabel="name" 
+									optionValue="constructionId"
+									placeholder="Selecione uma Obra" 
+									(onChange)="onConstructionChange($event.value, i)" 
+								/>
+							</div>
+							
+							<div class="field col-12 md:col-3">
+								<label>Sub-Item</label>
+								<p-dropdown 
+									formControlName="budgetSubItemId"
+									[options]="subItemOptions[i]" 
+									optionLabel="name" 
+									optionValue="id"
+									placeholder="Selecione um Sub-Item" 
+								/>
+							</div>
+
+							<div class="field col-12 md:col-3">
+								<label>Descrição</label>
+								<span class="p-input-icon-left">
+									<i class="pi pi-id-card"></i>
+									<input 
+										type="text" 
+										pInputText 
+										formControlName="description" 
+									/>
+								</span>
+							</div>
+		
+							<div class="field col-12 md:col-2">
+								<label>Valor</label>
+								<p-inputNumber
+									formControlName="value"
+									autocomplete="off" 
+									mode="currency"
+									inputId="currency-germany"
+									currency="EUR" 
+									locale="de-DE" 
+								/> 
+							</div>
+		
+							<!--<div class="field col-12 md:col-2">
+								<label>IVA</label>
+								<p-dropdown 
+									formControlName="iva"
+									[options]="validIvaRates | keyvalue" 
+									optionLabel="value" 
+									optionValue="value"
+									placeholder="Selecione uma Taxa" 
+								>
+									<ng-template let-option pTemplate="item">
+										{{ option.value }}%
+									</ng-template>
+									<ng-template let-option pTemplate="selectedItem">
+										{{ option?.value ? option.value + '%' : '' }}
+									</ng-template>
+								</p-dropdown>
+							</div>-->
+
+							<div class="field col-12 md:col-1">
+								<label>Ações</label>
+								<div>
+									<p-button
+										class="mr-1"
+										severity="info"
+										icon="pi pi-plus" 
+										(click)="addInput()" 
+									/> 
+									<p-button
+										severity="danger"
+										icon="pi pi-trash" 
+										(click)="removeInput(i)" 
+									/> 
+								</div>
+							</div>
+	
+						</ng-container>
+					</div>
+				</form>
+		
+				<p-divider class="col-12" *ngIf="articleInputs.length != 0" />
+
+				<form [formGroup]="dynamicArticleForm" class="col-12">
+					<div *ngIf="articleInputs.length != 0">
+						<h4>Artigos</h4>
+					</div>
+					<div formArrayName="articleInputs" class="grid p-fluid p-formgrid">
+						<ng-container *ngFor="let articleInput of articleInputs.controls; let j = index" [formGroupName]="j">
+	
+							<div class="field col-12 md:col-2">
+								<label>Família</label>
+								<p-dropdown 
+									formControlName="family"
+									[options]="articleFamilies | keyvalue" 
+									optionLabel="value" 
+									optionValue="key"
+									placeholder="Selecione uma Família" 
+								/>
+							</div>
+
+							<div class="field col-12 md:col-2">
+								<label>Nome</label>
+								<span class="p-input-icon-left">
+									<i class="pi pi-id-card"></i>
+									<input 
+										type="text" 
+										pInputText 
+										formControlName="name" 
+									/>
+								</span>
+							</div>
+
+							<div class="field col-12 md:col-2">
+								<label>Quantidade</label>
+								<span class="p-input-icon-left">
+									<i class="pi pi-id-card"></i>
+									<p-inputNumber
+										formControlName="quantity"
+										inputId="integeronly" 
+									/> 
+								</span>
+							</div>
+
+							<div class="field col-12 md:col-2">
+								<label>Unidade</label>
+								<p-dropdown 
+									formControlName="unit"
+									[options]="units | keyvalue" 
+									optionLabel="value" 
+									optionValue="key"
+									placeholder="Selecione uma Unidade" 
+								/>
+							</div>
+
+							<div class="field col-12 md:col-2">
+								<label>Valor</label>
+								<p-inputNumber
+									formControlName="value" 
+									mode="currency"
+									inputId="currency-germany"
+									currency="EUR" 
+									locale="de-DE" 
+								/> 
+							</div>
+
+							<div class="field col-12 md:col-2">
+								<label>Ações</label>
+								<div class="flex gap-2">
+									<button 
+										class="p-button-rounded"
+										icon="pi pi-plus" 
+										pButton 
+										tooltipPosition="bottom" 
+										type="button" 
+										(click)="addArticleInput()" 
+									></button>
+									<button 
+										class="p-button-rounded bg-red-500 border-red-500"
+										icon="pi pi-trash" 
+										pButton 
+										tooltipPosition="bottom" 
+										type="button" 
+										(click)="removeArticleInput(j)" 
+								></button>
+								
+								</div>
+							</div>
+	
+	
+						</ng-container>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-toast />

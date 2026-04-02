@@ -1,0 +1,82 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                <div class="text-900 text-xl font-semibold">Movimentos</div>
+                <div class="flex gap-2 sm:ml-auto">
+                    <button 
+                        class="p-button-rounded p-button-outlined"
+                        (click)="newMovement()" 
+                        icon="pi pi-plus" 
+                        label="Nova"
+                        pButton 
+                        type="button" 
+                    ></button>
+                    <button 
+                        class="p-button-rounded"
+                        icon="pi pi-download" 
+                        pTooltip="Exportar" 
+                        tooltipPosition="bottom" 
+                        pButton 
+                        type="button" 
+                    ></button>
+                </div>
+            </div>
+
+			<p-table 
+                currentPageReportTemplate="{first} de {last} de {totalRecords} movimentos totais"
+                [lazy]="true"
+                [loading]="loading"
+                (onLazyLoad)="nextPage($event)"
+                [paginator]="true"
+                [rows]="5"
+                [rowsPerPageOptions]="[5, 10, 20]"
+                styleClass="p-datatable-striped" 
+                [showCurrentPageReport]="true"
+                [totalRecords]="totalRecords"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                [value]="movements"
+            >
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Data</th>
+                        <th>De</th>
+                        <th>Para</th>
+                        <th>Valor</th>
+                        <th>Ações</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-movement>
+                    <tr>
+                        <td>{{ movement.date | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ movement.originAccount }}</td>
+                        <td>{{ movement.targetAccount }}</td>
+                        <td>{{ movement.value | currency: 'EUR' }}</td>
+                        <td>
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-pencil" 
+                                class="mr-2" 
+                                [rounded]="true" 
+                                [text]="true" 
+                                severity="success" 
+                            />
+                            <p-button 
+                                pRipple 
+                                icon="pi pi-trash" 
+                                severity="danger" 
+                                [rounded]="true" 
+                                [text]="true" 
+                            />
+                        </td>
+                    </tr>
+                </ng-template>
+                
+            </p-table>
+
+		</div>
+	</div>
+</div>
