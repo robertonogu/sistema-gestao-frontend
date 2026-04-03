@@ -4,7 +4,7 @@
     "scripts": {
         "ng": "ng",
         "build": "ng build",
-        "start": "ng serve",
+        "start": "serve -s dist/apollo-ng -l $PORT",
         "watch": "ng build --watch --configuration production",
         "test": "ng test",
         "lint": "ng lint"
