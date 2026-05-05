@@ -16,69 +16,69 @@ export const environment = {
 
   company: {
     account: {
-      accountsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/accounts',
-      accountNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/accountNames',
+      accountsUrl: 'http://localhost:8080/accounts',
+      accountNamesUrl: 'http://localhost:8080/accountNames',
     },
 
     client: {
-      clientsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/clients',
-      clientNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/clientNames',
-      createClientUrl: "https://sistema-gestao-api-production-9366.up.railway.app/clients",
-      deleteClient: 'https://sistema-gestao-api-production-9366.up.railway.app/clients/',
+      clientsUrl: 'http://localhost:8080/clients',
+      clientNamesUrl: 'http://localhost:8080/clientNames',
+      createClientUrl: "http://localhost:8080/clients",
+      deleteClient: 'http://localhost:8080/clients/',
     },
 
     externalEntity: {
-      deleteExternalEntity: 'https://sistema-gestao-api-production-9366.up.railway.app/externalEntities/',
-      externalEntitiesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/externalEntities',
+      deleteExternalEntity: 'http://localhost:8080/externalEntities/',
+      externalEntitiesUrl: 'http://localhost:8080/externalEntities',
     },
 
     origin: {
-      originNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/originNames",
-      originsGroupedUrl: "https://sistema-gestao-api-production-9366.up.railway.app/originsGrouped",
+      originNamesUrl: "http://localhost:8080/originNames",
+      originsGroupedUrl: "http://localhost:8080/originsGrouped",
     },
 
     supplier: {
-      suppliersUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/suppliers',
-      supplierNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/supplierNames',
+      suppliersUrl: 'http://localhost:8080/suppliers',
+      supplierNamesUrl: 'http://localhost:8080/supplierNames',
     }
   },
 
   construction: {
     construction: {
-      budgetSubItemsForConstruction: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/budgetSubItems/",
-      constructionsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions",
-      markAsFavouriteUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/favourite/",
-      constructionDetailsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/details/",
-      constructionNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructionNames",
-      constructionNamesForClientUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructionNames/",
-      constructionsOngoingUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructionsOngoing",
+      budgetSubItemsForConstruction: "http://localhost:8080/constructions/budgetSubItems/",
+      constructionsUrl: "http://localhost:8080/constructions",
+      markAsFavouriteUrl: "http://localhost:8080/constructions/favourite/",
+      constructionDetailsUrl: "http://localhost:8080/constructions/details/",
+      constructionNamesUrl: "http://localhost:8080/constructionNames",
+      constructionNamesForClientUrl: "http://localhost:8080/constructionNames/",
+      constructionsOngoingUrl: "http://localhost:8080/constructionsOngoing",
     },
 
     costEmployeeHour: {
-      deleteCostEmployeeHoursUrl: "https://sistema-gestao-api-production-9366.up.railway.app/costEmployeeHours/",
-      costEmployeeHoursUrl: "https://sistema-gestao-api-production-9366.up.railway.app/costEmployeeHours",
-      createCostEmployeeHoursUrl: "https://sistema-gestao-api-production-9366.up.railway.app/costEmployeeHours",
+      deleteCostEmployeeHoursUrl: "http://localhost:8080/costEmployeeHours/",
+      costEmployeeHoursUrl: "http://localhost:8080/costEmployeeHours",
+      createCostEmployeeHoursUrl: "http://localhost:8080/costEmployeeHours",
     },
 
     externalService: {
-      externalServicesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/externalServices",
+      externalServicesUrl: "http://localhost:8080/externalServices",
     },
 
     vehicleCost: {
-      deleteVehicleCostUrL: "https://sistema-gestao-api-production-9366.up.railway.app/vehicleCosts/",
-      vehicleCostsUrL: "https://sistema-gestao-api-production-9366.up.railway.app/vehicleCosts"
+      deleteVehicleCostUrL: "http://localhost:8080/vehicleCosts/",
+      vehicleCostsUrL: "http://localhost:8080/vehicleCosts"
     }
   },
 
   dashboard: {
-    dashboardDataUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/dashboard'
+    dashboardDataUrl: 'http://localhost:8080/dashboard'
   },
 
   inventory: {
     article: {
-      articlesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/articles",
-      stockArticles: "https://sistema-gestao-api-production-9366.up.railway.app/articles/stock",
-      issuedArticlesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/issuedArticles"
+      articlesUrl: "http://localhost:8080/articles",
+      stockArticles: "http://localhost:8080/articles/stock",
+      issuedArticlesUrl: "http://localhost:8080/issuedArticles"
     },
 
     equipment: {
@@ -90,25 +90,25 @@ export const environment = {
     },
 
     vehicle: {
-      deleteVehicleUrl: "https://sistema-gestao-api-production-9366.up.railway.app/vehicles/",
-      vehiclesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/vehicles",
-      activeVehicleNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/activeVehicleNames",
-      updateVehicleStatus: "https://sistema-gestao-api-production-9366.up.railway.app/vehicles/status/",
+      deleteVehicleUrl: "http://localhost:8080/vehicles/",
+      vehiclesUrl: "http://localhost:8080/vehicles",
+      activeVehicleNamesUrl: "http://localhost:8080/activeVehicleNames",
+      updateVehicleStatus: "http://localhost:8080/vehicles/status/",
     }
   },
 
   people: {
     absence: {
-      absencesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/absences',
-      deleteAbsence: 'https://sistema-gestao-api-production-9366.up.railway.app/absences/',
+      absencesUrl: 'http://localhost:8080/absences',
+      deleteAbsence: 'http://localhost:8080/absences/',
     },
     
     employee: {
-      createEmployeeUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employees",
-      employeesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employees?",
-      employeeNamesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employeeNames",
-      employeeNamesInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employeeNamesInCostEmployeeHourForConstruction/",
-      employeeNamesNotInCostEmployeeHourForConstructionUrl: "https://sistema-gestao-api-production-9366.up.railway.app/employeeNamesNotInCostEmployeeHourForConstruction/"
+      createEmployeeUrl: "http://localhost:8080/employees",
+      employeesUrl: "http://localhost:8080/employees?",
+      employeeNamesUrl: "http://localhost:8080/employeeNames",
+      employeeNamesInCostEmployeeHourForConstructionUrl: "http://localhost:8080/employeeNamesInCostEmployeeHourForConstruction/",
+      employeeNamesNotInCostEmployeeHourForConstructionUrl: "http://localhost:8080/employeeNamesNotInCostEmployeeHourForConstruction/"
     },
 
     timemap: {
@@ -116,50 +116,50 @@ export const environment = {
     },
 
     worklog: {
-      workLogsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/worklogs',
-      timemapUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/worklogs/summary/'
+      workLogsUrl: 'http://localhost:8080/worklogs',
+      timemapUrl: 'http://localhost:8080/worklogs/summary/'
     }
   },
 
   queries: {
     accountLogs: {
-      accountLogsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/accountLogs/',
-      bankAccountNamesUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/bankAccountNames',
+      accountLogsUrl: 'http://localhost:8080/accountLogs/',
+      bankAccountNamesUrl: 'http://localhost:8080/bankAccountNames',
     },
 
     cashLogs: {
-      cashAccountLogsUrl: 'https://sistema-gestao-api-production-9366.up.railway.app/cashAccountLogs',
+      cashAccountLogsUrl: 'http://localhost:8080/cashAccountLogs',
     },
 
     currentAccountLogs: {
-      currentAccountLogsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/currentAccountLogs/",
+      currentAccountLogsUrl: "http://localhost:8080/currentAccountLogs/",
     },
 
     debts: {
-      expensesInDebtUrl: "https://sistema-gestao-api-production-9366.up.railway.app/expensesInDebt",
+      expensesInDebtUrl: "http://localhost:8080/expensesInDebt",
     }
   },
 
   transactions: {
     expense: {
-      expensesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/expenses",
+      expensesUrl: "http://localhost:8080/expenses",
     },
 
     movement: {
-      movementsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/movements",
+      movementsUrl: "http://localhost:8080/movements",
     },
 
     payment: {
-      paymentUrl: "https://sistema-gestao-api-production-9366.up.railway.app/payments",
+      paymentUrl: "http://localhost:8080/payments",
     },
 
     revenue: {
-      revenuesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/revenues"
+      revenuesUrl: "http://localhost:8080/revenues"
     },
 
     sale: {
-      deleteSale: 'https://sistema-gestao-api-production-9366.up.railway.app/sales/',
-      salesUrl: "https://sistema-gestao-api-production-9366.up.railway.app/sales"
+      deleteSale: 'http://localhost:8080/sales/',
+      salesUrl: "http://localhost:8080/sales"
     }
   }
 };

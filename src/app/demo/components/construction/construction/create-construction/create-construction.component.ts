@@ -1,9 +1,10 @@
 import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
+import { Unit } from 'src/app/demo/data/enum/unit';
 import { BudgetItemCreation } from 'src/app/demo/data/model/budgetItemCreation.model';
 import { BudgetSubItemCreation } from 'src/app/demo/data/model/budgetSubItemCreation.model';
 import { ConstructionCreation } from 'src/app/demo/data/model/constructionCreation.model';
@@ -31,6 +32,8 @@ export class CreateConstructionComponent {
   adjudicationDate!: Date;
   distance!: number;
 
+    units = Unit;
+
   construction!: ConstructionCreation;
 
   constructor(
@@ -56,6 +59,10 @@ export class CreateConstructionComponent {
     this._location.back();
   }
 
+  asFormGroup(control: AbstractControl): FormGroup {
+  return control as FormGroup;
+}
+
   get inputs(): FormArray {
     return (this.dynamicForm.get('inputs') as FormArray);
   }
@@ -63,10 +70,16 @@ export class CreateConstructionComponent {
   addInput() {
     let input = this.fb.group({
       name: ['', Validators.required],
+      quantity: ['', Validators.required],
       value: ['', Validators.required],
+      unit:['', Validators.required],
       subInputs: this.fb.array([])
     });
     this.inputs.push(input);
+
+    (input.get('subInputs') as FormArray).valueChanges.subscribe(() => {
+      this.updateItemValue(input as FormGroup);
+    });
   }
 
   removeInput(index: number): void {
@@ -87,41 +100,73 @@ export class CreateConstructionComponent {
     }));*/
     this.getSubInputs(index).push(this.fb.group({
       subName: '',
+      subQuantity: '',
+      subUnit: '',
       subValue: ''
     }));
   }
 
   removeSubInput(index: number, subIndex: number): void {
     this.getSubInputs(index).removeAt(subIndex);
+    this.updateItemValue(this.inputs.at(index) as FormGroup);
+  }
+
+  updateItemValue(itemGroup: FormGroup): void {
+    const subInputs = itemGroup.get('subInputs') as FormArray;
+    const valueControl = itemGroup.get('value')!;
+
+    if (subInputs.length > 0) {
+      const sum = subInputs.controls.reduce((acc, ctrl) => {
+        return acc + (parseFloat(ctrl.get('subValue')?.value) || 0);
+      }, 0);
+      valueControl.setValue(sum, { emitEvent: false });
+      valueControl.disable({ emitEvent: false });
+    } else {
+      valueControl.enable({ emitEvent: false });
+    }
+
+    this.cdr.markForCheck();
   }
 
   newConstruction() {
-    console.log(this.inputs.controls);
-    /*let budgetItems: BudgetItemCreation[] = [];
-    let budgetSubItems: BudgetSubItemCreation[];
-    let budgetItem: BudgetItemCreation;
-    let budgetSubItem: BudgetSubItemCreation;
-    
-    this.inputs.controls.forEach((input) => {
-      budgetSubItems = [];
-      input.value.subInputs.forEach((subInput) => {
-        budgetSubItem = { name: subInput.name, value: subInput.value };
-        budgetSubItems.push(budgetSubItem);
-      });
-      budgetItem = { name: input.value.name, budgetSubItems: budgetSubItems };
-      budgetItems.push(budgetItem);
+    const budgetItems: BudgetItemCreation[] = this.inputs.controls.map(input => {
+      const raw = (input as FormGroup).getRawValue();
+      const subItems: BudgetSubItemCreation[] = (input.get('subInputs') as FormArray).controls.map(subInput => ({
+        name: subInput.value.subName,
+        quantity: subInput.value.subQuantity,
+        unit: subInput.value.subUnit,
+        value: subInput.value.subValue
+      }));
+      return {
+        name: raw.name,
+        quantity: raw.quantity,
+        unit: raw.unit,
+        value: raw.value,
+        budgetSubItems: subItems
+      };
     });
 
-    this.construction = { name: this.name, local: this.local, clientId: this.selectedClient, adjudicationDate: this.adjudicationDate, distance: this.distance, budgetItems: budgetItems } as ConstructionCreation;
+    console.log(budgetItems);
 
-    if (this.construction != null) {
-      this.constructionService.createConstruction(this.construction).subscribe(newConstruction => {
+    this.construction = {
+      name: this.name,
+      local: this.local,
+      clientId: this.selectedClient,
+      adjudicationDate: this.adjudicationDate,
+      distance: this.distance,
+      budgetItems: budgetItems
+    } as ConstructionCreation;
+
+    console.log(this.construction);
+
+    this.constructionService.createConstruction(this.construction).subscribe({
+      next: () => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Construção adicionada com sucesso.' });
-      })      
-    }
-    else {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
-    }*/
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
+      }
+    });
   }
   
 }

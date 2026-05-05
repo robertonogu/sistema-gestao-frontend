@@ -29,8 +29,8 @@ export class CreateExpenseComponent implements OnInit {
 
   categoriesAndSubCategories = {
     [CategoryType.BANK]: [SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.IMMEDIATE_TRANSFERS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS, SubCategoryType.CREDIT],
-    [CategoryType.TAXES]: [SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.FEES, SubCategoryType.IES, SubCategoryType.FONT_RETENTION, SubCategoryType.INSTALLMENT_PLAN],
-    [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE, SubCategoryType.SAFETY, SubCategoryType.SAFETY],
+    [CategoryType.TAXES]: [SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.FEES, SubCategoryType.IES, SubCategoryType.FONT_RETENTION],
+    [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE, SubCategoryType.SAFETY],
     [CategoryType.OPERATION]: [SubCategoryType.ELECTRICITY, SubCategoryType.COMMUNICATIONS, SubCategoryType.CONSUMABLES],
     [CategoryType.VEHICLES]: [SubCategoryType.INSURANCE, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE, SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS],
     [CategoryType.EQUIPMENTS]: [SubCategoryType.MAINTENANCE_EQUIPMENTS],

@@ -15,6 +15,7 @@ export class ClientService {
     constructor(private http: HttpClient) { }
 
     getClients(currentPage: number, pageSize: number, sortBy: string, sortOrder: string) : Observable<ObjectList> {
+                console.log(environment.company.client.clientsUrl)
         let url = environment.company.client.clientsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize + "&sortBy=" + sortBy + "&sortDirection=" + sortOrder;
         return this.http.get<ObjectList>(url);
     }

@@ -14,7 +14,6 @@ export enum SubCategoryType {
     IRC = 'IRC',
     IES = 'IES',
     FONT_RETENTION = 'Retenção de Fonte',
-    INSTALLMENT_PLAN = 'Installment Plan',
   
     // PEOPLE
 
@@ -44,7 +43,7 @@ export enum SubCategoryType {
   
     // EQUIPMENTS
 
-    MAINTENANCE_EQUIPMENTS = 'Manutenção de Equipmentos',
+    MAINTENANCE_EQUIPMENTS = 'Manutenção de Equipamentos',
   
     // INVENTORY
 

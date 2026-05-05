@@ -148,7 +148,7 @@
 
 
 				<div class="field col-12 md:col-3">
-					<label>Valor</label>
+					<label>Valor sem IVA</label>
 					<p-inputNumber 
 						(onBlur)="changePaidValue()"
 						[(ngModel)]="value"
@@ -361,7 +361,7 @@
 					</div>
 					<div formArrayName="articleInputs" class="grid p-fluid p-formgrid">
 						<ng-container *ngFor="let articleInput of articleInputs.controls; let j = index" [formGroupName]="j">
-	
+							
 							<div class="field col-12 md:col-2">
 								<label>Família</label>
 								<p-dropdown 
