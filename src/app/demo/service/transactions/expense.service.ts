@@ -12,31 +12,34 @@ import { Expense } from '../../api/expense';
 })
 export class ExpenseService {
 
+    private expensesUrl = `${environment.apiUrl}/expenses`;
+    private expensesInDebtUrl = `${environment.apiUrl}/expensesInDebt`;
+
     constructor(private http: HttpClient) { }
 
     getExpenses(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.transactions.expense.expensesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+        let url = this.expensesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     getExpenseById(expenseId: number) : Observable<Expense> {
-        let url = environment.transactions.expense.expensesUrl + "/" + expenseId;
+        let url = this.expensesUrl + "/" + expenseId;
         console.log(this.http.get<Expense>(url));
         return this.http.get<Expense>(url);
     }
 
     getExpensesInDebt(currentPage: number, pageSize: number) : Observable<ExpenseInDebt[]> {
-        let url = environment.queries.debts.expensesInDebtUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize + "&sortBy=paymentDeadline&sortDirection=DESC";
+        let url = this.expensesInDebtUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize + "&sortBy=paymentDeadline&sortDirection=DESC";
         return this.http.get<ExpenseInDebt[]>(url);
     }
 
     getExpensesFromOrigin(originId: number) : Observable<ExpenseInDebt[]> {
-        let url = environment.queries.debts.expensesInDebtUrl + "/" + originId;
+        let url = this.expensesInDebtUrl + "/" + originId;
         return this.http.get<ExpenseInDebt[]>(url);
     }
-    
+
     createExpense(expense: ExpenseCreation) : Observable<Expense> {
-        return this.http.post<Expense>(environment.transactions.expense.expensesUrl, expense, environment.httpOptions);
+        return this.http.post<Expense>(this.expensesUrl, expense, environment.httpOptions);
     }
 
 }

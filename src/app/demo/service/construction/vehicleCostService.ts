@@ -11,20 +11,23 @@ import { VehicleCost } from '../../api/vehicleCost';
 })
 export class VehicleCostService {
 
+    private vehicleCostsUrl = `${environment.apiUrl}/vehicleCosts`;
+    private deleteVehicleCostUrl = `${environment.apiUrl}/vehicleCosts/`;
+
     constructor(private http: HttpClient) { }
 
     getVehicleCosts(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.construction.vehicleCost.vehicleCostsUrL + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.vehicleCostsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     createVehicleCost(vehicleCost: VehicleCostCreation) : Observable<VehicleCost> {
-        return this.http.post<VehicleCost>(environment.construction.vehicleCost.vehicleCostsUrL, vehicleCost, environment.httpOptions);
+        return this.http.post<VehicleCost>(this.vehicleCostsUrl, vehicleCost, environment.httpOptions);
     }
 
     deleteVehicleCost(vehicleCostId: number) {
-        let url = environment.construction.vehicleCost.deleteVehicleCostUrL + vehicleCostId;
+        let url = this.deleteVehicleCostUrl + vehicleCostId;
         return this.http.delete(url);
     }
-    
+
 }

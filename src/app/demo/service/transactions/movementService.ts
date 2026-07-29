@@ -11,14 +11,16 @@ import { Movement } from '../../api/movement';
 })
 export class MovementService {
 
+    private movementsUrl = `${environment.apiUrl}/movements`;
+
     constructor(private http: HttpClient) { }
 
     getMovements(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.transactions.movement.movementsUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+        let url = this.movementsUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     createMovement(newMovement: MovementCreation) : Observable<Movement> {
-        return this.http.post<Movement>(environment.transactions.movement.movementsUrl, newMovement, environment.httpOptions);
+        return this.http.post<Movement>(this.movementsUrl, newMovement, environment.httpOptions);
     }
 }

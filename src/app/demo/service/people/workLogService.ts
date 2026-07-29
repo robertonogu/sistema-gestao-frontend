@@ -12,19 +12,22 @@ import { TimeMap } from '../../api/timemap';
 })
 export class WorkLogService {
 
+    private workLogsUrl = `${environment.apiUrl}/worklogs`;
+    private timemapUrl = `${environment.apiUrl}/worklogs/summary/`;
+
     constructor(private http: HttpClient) { }
 
     getWorkLogs(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.people.worklog.workLogsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.workLogsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     createWorkLog(worklog: WorkLogCreation) : Observable<WorkLog> {
-        return this.http.post<WorkLog>(environment.people.worklog.workLogsUrl, worklog, environment.httpOptions);
+        return this.http.post<WorkLog>(this.workLogsUrl, worklog, environment.httpOptions);
     }
 
     getTimeMap(employeeId: number) : Observable<TimeMap[]> {
-        let url = environment.people.worklog.timemapUrl + employeeId;
+        let url = this.timemapUrl + employeeId;
         return this.http.get<TimeMap[]>(url);
     }
 

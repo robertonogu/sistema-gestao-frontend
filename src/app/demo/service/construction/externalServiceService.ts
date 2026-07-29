@@ -10,11 +10,13 @@ import { ObjectList } from '../../api/objectList';
 })
 export class ExternalServiceService {
 
+    private externalServicesUrl = `${environment.apiUrl}/externalServices`;
+
     constructor(private http: HttpClient) { }
 
     getExternalServices(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.construction.externalService.externalServicesUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.externalServicesUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
-    
+
 }

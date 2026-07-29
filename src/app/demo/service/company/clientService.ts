@@ -12,25 +12,30 @@ import { Client } from '../../api/client';
 })
 export class ClientService {
 
+    private clientsUrl = `${environment.apiUrl}/clients`;
+    private clientNamesUrl = `${environment.apiUrl}/clientNames`;
+    private createClientUrl = `${environment.apiUrl}/clients`;
+    private deleteClientUrl = `${environment.apiUrl}/clients/`;
+
     constructor(private http: HttpClient) { }
 
     getClients(currentPage: number, pageSize: number, sortBy: string, sortOrder: string) : Observable<ObjectList> {
-                console.log(environment.company.client.clientsUrl)
-        let url = environment.company.client.clientsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize + "&sortBy=" + sortBy + "&sortDirection=" + sortOrder;
+                console.log(this.clientsUrl)
+        let url = this.clientsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize + "&sortBy=" + sortBy + "&sortDirection=" + sortOrder;
         return this.http.get<ObjectList>(url);
     }
 
     getClientNames() : Observable<ItemName[]> {
-        let url = environment.company.client.clientNamesUrl;
+        let url = this.clientNamesUrl;
         return this.http.get<ItemName[]>(url);
     }
 
     createClient(client: ClientCreation) : Observable<Client> {
-        return this.http.post<Client>(environment.company.client.createClientUrl, client, environment.httpOptions);
+        return this.http.post<Client>(this.createClientUrl, client, environment.httpOptions);
     }
 
     deleteClient(clientId: number) {
-        let url = environment.company.client.deleteClient + clientId;
+        let url = this.deleteClientUrl + clientId;
         return this.http.delete(url);
     }
 }

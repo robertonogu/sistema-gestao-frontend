@@ -11,29 +11,35 @@ import { ItemName } from '../../api/itemName';
 })
 export class EmployeeService {
 
+    private employeesUrl = `${environment.apiUrl}/employees?`;
+    private employeeNamesUrl = `${environment.apiUrl}/employeeNames`;
+    private employeeNamesNotInCostEmployeeHourForConstructionUrl = `${environment.apiUrl}/employeeNamesNotInCostEmployeeHourForConstruction/`;
+    private employeeNamesInCostEmployeeHourForConstructionUrl = `${environment.apiUrl}/employeeNamesInCostEmployeeHourForConstruction/`;
+    private createEmployeeUrl = `${environment.apiUrl}/employees`;
+
     constructor(private http: HttpClient) { }
 
     getEmployees(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.people.employee.employeesUrl + "pageSize=" + pageSize + "&pageNo=" + currentPage + "&sortBy=baseSalary&sortDirection=DESC";
+        let url = this.employeesUrl + "pageSize=" + pageSize + "&pageNo=" + currentPage + "&sortBy=baseSalary&sortDirection=DESC";
         return this.http.get<ObjectList>(url);
     }
 
     getEmployeeNames() : Observable<ItemName[]> {
-        let url = environment.people.employee.employeeNamesUrl;
+        let url = this.employeeNamesUrl;
         return this.http.get<ItemName[]>(url);
     }
 
     getEmployeeNamesNotInCostEmployeeHourForConstruction(constructionId: number) : Observable<ItemName[]> {
-        let url = environment.people.employee.employeeNamesNotInCostEmployeeHourForConstructionUrl + constructionId;
+        let url = this.employeeNamesNotInCostEmployeeHourForConstructionUrl + constructionId;
         return this.http.get<ItemName[]>(url);
     }
 
     getEmployeeNamesInCostEmployeeHourForConstruction(constructionId: number) : Observable<ItemName[]> {
-        let url = environment.people.employee.employeeNamesInCostEmployeeHourForConstructionUrl + constructionId;
+        let url = this.employeeNamesInCostEmployeeHourForConstructionUrl + constructionId;
         return this.http.get<ItemName[]>(url);
     }
-    
+
     createEmployee(employee: Employee) : Observable<Employee> {
-        return this.http.post<Employee>(environment.people.employee.createEmployeeUrl, employee, environment.httpOptions);
+        return this.http.post<Employee>(this.createEmployeeUrl, employee, environment.httpOptions);
     }
 }

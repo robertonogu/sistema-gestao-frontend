@@ -11,15 +11,17 @@ import { RevenueList } from '../../api/revenueList';
 })
 export class RevenueService {
 
+    private revenuesUrl = `${environment.apiUrl}/revenues`;
+
     constructor(private http: HttpClient) { }
 
     getRevenues(currentPage: number, pageSize: number) : Observable<RevenueList> {
-        let url = environment.transactions.revenue.revenuesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+        let url = this.revenuesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
         return this.http.get<RevenueList>(url);
     }
 
     createRevenue(newRevenue: RevenueCreation) : Observable<Revenue> {
-        return this.http.post<Revenue>(environment.transactions.revenue.revenuesUrl, newRevenue, environment.httpOptions);
+        return this.http.post<Revenue>(this.revenuesUrl, newRevenue, environment.httpOptions);
     }
 
 }

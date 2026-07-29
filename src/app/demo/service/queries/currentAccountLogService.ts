@@ -9,10 +9,12 @@ import { environment } from 'src/environments/environment';
 })
 export class CurrentAccountLogService {
 
+    private currentAccountLogsUrl = `${environment.apiUrl}/currentAccountLogs/`;
+
     constructor(private http: HttpClient) { }
 
     getCurrentAccountLogs(currentPage: number, pageSize: number, originId: number) : Observable<ObjectList> {
-        let url = environment.queries.currentAccountLogs.currentAccountLogsUrl + originId + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.currentAccountLogsUrl + originId + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 

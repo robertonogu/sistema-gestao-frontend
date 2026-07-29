@@ -11,21 +11,24 @@ import { SaleCreation } from '../../api/saleCreation';
 })
 export class SaleService {
 
+    private salesUrl = `${environment.apiUrl}/sales`;
+    private deleteSaleUrl = `${environment.apiUrl}/sales/`;
+
     constructor(private http: HttpClient) { }
 
     getSales(currentPage: number, pageSize: number) : Observable<ObjectList> {
-      let url = environment.transactions.sale.salesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+      let url = this.salesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
       return this.http.get<ObjectList>(url);
     }
 
     createSale(newSale: SaleCreation) : Observable<Sale> {
-      return this.http.post<Sale>(environment.transactions.sale.salesUrl, newSale, environment.httpOptions).pipe(
+      return this.http.post<Sale>(this.salesUrl, newSale, environment.httpOptions).pipe(
         catchError(this.handleError)
       );;
     }
 
     deleteSale(saleId: number) {
-      let url = environment.transactions.sale.deleteSale + saleId;
+      let url = this.deleteSaleUrl + saleId;
       return this.http.delete(url);
     }
 

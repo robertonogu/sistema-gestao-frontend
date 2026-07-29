@@ -11,19 +11,22 @@ import { Absence } from '../../api/absence';
 })
 export class AbsenceService {
 
+    private absencesUrl = `${environment.apiUrl}/absences`;
+    private deleteAbsenceUrl = `${environment.apiUrl}/absences/`;
+
     constructor(private http: HttpClient) { }
 
     getAbsences(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.people.absence.absencesUrl + "?pageSize=" + pageSize + "&pageNo=" + currentPage;
+        let url = this.absencesUrl + "?pageSize=" + pageSize + "&pageNo=" + currentPage;
         return this.http.get<ObjectList>(url);
     }
-    
+
     createAbsence(newAbsence: AbsenceCreation) : Observable<Absence> {
-        return this.http.post<Absence>(environment.people.absence.absencesUrl, newAbsence, environment.httpOptions);
+        return this.http.post<Absence>(this.absencesUrl, newAbsence, environment.httpOptions);
     }
 
     deleteAbsence(absenceId: number) {
-        let url = environment.people.absence.deleteAbsence + absenceId;
+        let url = this.deleteAbsenceUrl + absenceId;
         return this.http.delete(url);
     }
 }

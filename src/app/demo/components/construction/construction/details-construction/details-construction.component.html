@@ -2,114 +2,64 @@
 
   <!-- ========== Header ========== -->
   <header class="obra-header">
-  <!-- ===== Foto ===== -->
-  <div class="obra-photo">
-    <img *ngIf="constructionDetails.name; else fotoPlaceholder"
-         [src]="constructionDetails.name"
-         [alt]="constructionDetails.name" />
-    <ng-template #fotoPlaceholder>
-      <div class="obra-photo-placeholder">
-        <i class="pi pi-image"></i>
-        <span>foto da obra</span>
-      </div>
-    </ng-template>
-    <p-tag value="Em curso"
-           severity="info"
-           styleClass="obra-photo-tag"></p-tag>
-  </div>
-
-  <!-- ===== Bloco principal ===== -->
-  <div class="obra-main">
-    <div class="obra-id">
-      <span class="mono code">{{ constructionDetails.constructionNumber }}</span>
-      <span class="muted">·</span>
-      <span class="muted">{{ constructionDetails.client }}</span>
+    <!-- ===== Foto (fora da caixa branca) ===== -->
+    <div class="obra-photo">
+      <img *ngIf="constructionDetails.name; else fotoPlaceholder"
+           [src]="constructionDetails.name"
+           [alt]="constructionDetails.name" />
+      <ng-template #fotoPlaceholder>
+        <div class="obra-photo-placeholder">[ FOTO ]</div>
+      </ng-template>
     </div>
 
-    <h1 class="obra-name">{{ constructionDetails.name }}</h1>
+    <!-- ===== Caixa branca ===== -->
+    <div class="obra-card">
+      <div class="obra-main">
+        <div class="obra-id">
+          <p-tag value="Em curso" severity="warning"></p-tag>
+          <span class="muted mono">{{ constructionDetails.constructionNumber }}</span>
+        </div>
 
-    <div class="obra-morada">
-      <i class="pi pi-map-marker"></i>
-      {{ constructionDetails.address }}
-    </div>
+        <h1 class="obra-name">{{ constructionDetails.name }}</h1>
 
-    <!-- ===== Progresso temporal ===== -->
-    <div class="obra-progress">
-      <div class="progress-head">
-        <span class="muted">Progresso temporal</span>
-        <span class="mono"
-              [class.late]="diasRestantes() < 0">
-          <strong>{{ pctTempo() }}%</strong>
-          <span class="muted">·
-            {{ diasRestantes() < 0
-                ? (-diasRestantes()) + ' dias em atraso'
-                : diasRestantes() + ' dias restantes' }}
-          </span>
-        </span>
+        <div class="obra-morada muted">
+          {{ constructionDetails.client }} · {{ constructionDetails.address }}
+        </div>
+
+        <!-- ===== Progresso temporal ===== -->
+        <div class="obra-progress">
+          <div class="progress-head">
+            <span>Progresso temporal · {{ constructionDetails.daysElapsed }}/{{ constructionDetails.totalDays }} dias</span>
+            <span class="mono">{{ constructionDetails.timeProgress | number:'1.0-0' }}%</span>
+          </div>
+
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="constructionDetails.timeProgress"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="progress-track">
-        <div class="progress-fill"
-             [class.late]="diasRestantes() < 0"
-             [style.width.%]="pctTempo()"></div>
-        <div class="progress-today"
-             [style.left.%]="pctTempo()"
-             pTooltip="Hoje"></div>
+      <!-- ===== Meta lateral (datas + valores) ===== -->
+      <div class="obra-meta">
+        <div class="meta-row">
+          <span class="meta-label">Adjudicação</span>
+          <span class="meta-value mono">{{ constructionDetails.adjudicationDate | date:'dd-MM-yyyy' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Início</span>
+          <span class="meta-value mono">{{ constructionDetails.initialDate | date:'dd-MM-yyyy' }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Margem Actual</span>
+          <span class="meta-value mono success">{{ constructionDetails.margin }}%</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Lucro</span>
+          <span class="meta-value mono">{{ fmtEUR(constructionDetails.profit) }}</span>
+        </div>
       </div>
-
-      <div class="progress-foot mono">
-        <span>{{ constructionDetails.adjudicationDate | date:'dd/MM/yy' }}</span>
-        <span>{{ constructionDetails.endDate | date:'dd/MM/yy' }}</span>
-      </div>
     </div>
-  </div>
-
-  <!-- ===== Meta lateral (datas + valores) ===== -->
-  <div class="obra-meta">
-    <div class="meta-row">
-      <span class="meta-label">Adjudicação</span>
-      <span class="meta-value mono">{{ constructionDetails.adjudicationDate | date:'dd/MM/yyyy' }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Início</span>
-      <span class="meta-value mono">{{ constructionDetails.adjudicationDate | date:'dd/MM/yyyy' }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Prazo</span>
-      <span class="meta-value mono">{{ constructionDetails.endDate | date:'dd/MM/yyyy' }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Duração</span>
-      <span class="meta-value mono">{{ duracaoMeses() }} meses</span>
-    </div>
-
-    <div class="meta-divider"></div>
-
-    <div class="meta-row strong">
-      <span class="meta-label">Valor adjudicado</span>
-      <span class="meta-value mono">{{ fmtEUR(constructionDetails.initialBudget) }}</span>
-    </div>
-    <div class="meta-row">
-      <span class="meta-label">Responsável</span>
-      <span class="meta-value">{{ constructionDetails.name }}</span>
-    </div>
-  </div>
-
-  <!-- ===== Ações ===== -->
-  <div class="obra-actions">
-    <p-button icon="pi pi-pencil"
-              [text]="true"
-              [rounded]="true"
-              pTooltip="Editar"></p-button>
-    <p-button icon="pi pi-download"
-              [text]="true"
-              [rounded]="true"
-              pTooltip="Exportar"></p-button>
-    <p-button icon="pi pi-ellipsis-v"
-              [text]="true"
-              [rounded]="true"></p-button>
-  </div>
-</header>
+  </header>
 
   <!-- ========== KPIs ========== -->
   <section class="kpi-grid">
@@ -118,7 +68,7 @@
       <div class="kpi-value">{{ k.value }}</div>
       <div class="kpi-foot">
         <span class="kpi-sub">{{ k.sub }}</span>
-        <span *ngIf="k.delta !== undefined"
+        <!--<span *ngIf="k.delta !== undefined"
               class="kpi-delta"
               [class.up]="k.delta > 0"
               [class.down]="k.delta < 0">
@@ -127,7 +77,7 @@
              [class.pi-arrow-down]="k.delta < 0"></i>
           {{ k.delta > 0 ? '+' : '' }}{{ k.delta }}%
           <small class="muted">{{ k.deltaLabel }}</small>
-        </span>
+        </span>-->
       </div>
     </div>
   </section>
@@ -190,7 +140,7 @@
   </section>-->
 
   <!-- ========== Custos por item · 3 colunas por fonte ========== -->
-  <h3 class="section-title">Custos por item · por fonte</h3>
+  <h3 class="section-title">Custos por item</h3>
 
   <section class="source-grid">
     <p-card *ngFor="let col of sourceCols" styleClass="source-card">
@@ -248,40 +198,4 @@
       </div>
     </p-card>
   </section>
-
-  <!-- ========== Donuts ========== -->
-  <!--<section class="row-3">
-    <p-card>
-      <ng-template pTemplate="header">
-        <div class="card-title"><i class="pi pi-box"></i> Materiais — categorias</div>
-      </ng-template>
-      <div class="chart-host sm">
-        <p-chart type="doughnut"
-                 [data]="donutMateriais().data"
-                 [options]="donutMateriais().options"></p-chart>
-      </div>
-    </p-card>
-
-    <p-card>
-      <ng-template pTemplate="header">
-        <div class="card-title"><i class="pi pi-users"></i> Mão-de-obra — funções</div>
-      </ng-template>
-      <div class="chart-host sm">
-        <p-chart type="doughnut"
-                 [data]="donutMaoObra().data"
-                 [options]="donutMaoObra().options"></p-chart>
-      </div>
-    </p-card>
-
-    <p-card>
-      <ng-template pTemplate="header">
-        <div class="card-title"><i class="pi pi-wrench"></i> Serviços — fornecedores</div>
-      </ng-template>
-      <div class="chart-host sm">
-        <p-chart type="doughnut"
-                 [data]="donutServicos().data"
-                 [options]="donutServicos().options"></p-chart>
-      </div>
-    </p-card>
-  </section>-->
 </div>

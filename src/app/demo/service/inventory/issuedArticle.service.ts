@@ -10,14 +10,16 @@ import { ListIssuedArticlesCreation } from '../../data/model/listIssuedArticlesC
 })
 export class IssuedArticleService {
 
+    private issuedArticlesUrl = `${environment.apiUrl}/issuedArticles`;
+
     constructor(private http: HttpClient) { }
 
     issueArticles(list: ListIssuedArticlesCreation) : Observable<any> {
-        return this.http.post<any>(environment.inventory.article.issuedArticlesUrl, list);
+        return this.http.post<any>(this.issuedArticlesUrl, list);
     }
 
     getIssuedArticles(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        return this.http.get<ObjectList>(environment.inventory.article.issuedArticlesUrl);
+        return this.http.get<ObjectList>(this.issuedArticlesUrl);
     }
-    
+
 }

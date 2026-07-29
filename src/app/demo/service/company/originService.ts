@@ -10,13 +10,16 @@ import { ItemName } from '../../api/itemName';
 })
 export class OriginService {
 
+    private originsGroupedUrl = `${environment.apiUrl}/originsGrouped`;
+    private originNamesUrl = `${environment.apiUrl}/originNames`;
+
     constructor(private http: HttpClient) { }
 
     getOriginsGrouped() : Observable<Origin[]> {
-        return this.http.get<Origin[]>(environment.company.origin.originsGroupedUrl);
+        return this.http.get<Origin[]>(this.originsGroupedUrl);
     }
 
     getOriginNames() : Observable<ItemName[]> {
-        return this.http.get<ItemName[]>(environment.company.origin.originNamesUrl);
+        return this.http.get<ItemName[]>(this.originNamesUrl);
     }
 }

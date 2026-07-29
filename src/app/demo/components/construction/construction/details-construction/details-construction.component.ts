@@ -40,22 +40,17 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 }
 
 .obra-header {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  display: grid;
-  grid-template-columns: 180px 1fr 260px auto;
-  gap: 20px;
+  display: flex;
+  gap: 0;
   align-items: stretch;
 }
 
-// ===== Foto =====
+// ===== Foto (encostada à caixa branca) =====
 .obra-photo {
   position: relative;
-  width: 180px;
-  height: 130px;
-  border-radius: 8px;
+  width: 130px;
+  flex-shrink: 0;
+  border-radius: var(--radius) 0 0 var(--radius);
   overflow: hidden;
   background: var(--surface-2);
 
@@ -63,9 +58,7 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 }
 .obra-photo-placeholder {
   width: 100%; height: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 4px;
+  display: flex; align-items: center; justify-content: center;
   color: var(--text-3);
   background-image:
     repeating-linear-gradient(-45deg,
@@ -74,15 +67,23 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
       oklch(0.94 0.01 250)  8px,
       oklch(0.94 0.01 250)  16px);
   font-family: var(--font-mono);
-  font-size: 11px;
-  i { font-size: 22px; opacity: 0.7; }
-}
-:host ::ng-deep .obra-photo-tag {
-  position: absolute;
-  top: 8px; left: 8px;
+  font-size: 10px;
 }
 
-// ===== Bloco principal =====
+// ===== Caixa branca (nome, status, morada, progresso, meta) =====
+.obra-card {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: center;
+  min-width: 0;
+}
+
 .obra-main {
   display: flex;
   flex-direction: column;
@@ -91,21 +92,13 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 }
 
 .obra-id {
-  display: flex; gap: 6px; align-items: center;
+  display: flex; gap: 8px; align-items: center;
   font-size: 12px; color: var(--text-2);
-  .code {
-    background: var(--accent-soft);
-    color: var(--accent);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 11px;
-  }
 }
 
 .obra-name {
   margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
@@ -113,94 +106,65 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 }
 
 .obra-morada {
-  display: flex; gap: 6px; align-items: center;
   color: var(--text-2);
   font-size: 13px;
-  i { color: var(--text-3); font-size: 12px; }
 }
 
 // ===== Progresso =====
-.obra-progress { margin-top: 8px; }
+.obra-progress { margin-top: 4px; }
 
-.progress-head, .progress-foot {
+.progress-head {
   display: flex; justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-2);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+  margin-bottom: 6px;
 }
-.progress-head { margin-bottom: 6px; }
-.progress-head strong { color: var(--text); font-weight: 600; }
-.progress-head .late strong { color: var(--danger); }
 
 .progress-track {
   position: relative;
-  height: 8px;
+  height: 6px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 999px;
-  overflow: visible;
+  overflow: hidden;
 }
 .progress-fill {
   position: absolute; inset: 0 auto 0 0;
-  background: var(--success);
+  background: var(--accent);
   border-radius: 999px;
   transition: width 0.3s;
-  &.late { background: var(--danger); }
-}
-.progress-today {
-  position: absolute;
-  top: -3px; bottom: -3px;
-  width: 2px;
-  background: var(--text);
-  transform: translateX(-1px);
-  border-radius: 2px;
-}
-
-.progress-foot {
-  margin-top: 4px;
-  font-size: 11px;
-  color: var(--text-3);
 }
 
 // ===== Meta lateral =====
 .obra-meta {
-  display: flex; flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 28px;
   padding-left: 20px;
   border-left: 1px solid var(--border);
 }
 .meta-row {
-  display: flex; justify-content: space-between; align-items: baseline;
-  font-size: 13px;
-  &.strong { font-weight: 600; padding-top: 4px; }
-}
-.meta-label { color: var(--text-3); font-size: 12px; }
-.meta-value { color: var(--text); }
-.meta-divider { height: 1px; background: var(--border); margin: 4px 0; }
-
-// ===== Ações =====
-.obra-actions {
   display: flex; flex-direction: column;
-  gap: 4px;
-  align-items: flex-end;
+  gap: 2px;
 }
+.meta-label {
+  color: var(--text-3); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.meta-value { color: var(--text); font-size: 13px; font-weight: 600; }
+.meta-value.success { color: var(--success); }
 
 // ===== Helpers =====
 .muted { color: var(--text-3); }
 .mono  { font-family: var(--font-mono); }
 
 // ===== Responsivo =====
-@media (max-width: 1100px) {
-  .obra-header {
-    grid-template-columns: 160px 1fr;
-    grid-template-areas:
-      "photo main"
-      "meta  meta"
-      "actions actions";
-  }
-  .obra-photo   { grid-area: photo; }
-  .obra-main    { grid-area: main; }
-  .obra-meta    { grid-area: meta; padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: 12px; }
-  .obra-actions { grid-area: actions; flex-direction: row; align-items: center; }
+@media (max-width: 900px) {
+  .obra-header { flex-direction: column; }
+  .obra-card   { grid-template-columns: 1fr; }
+  .obra-meta   { padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: 12px; }
 }
    :host {
   --bg: #f7f8fa;
@@ -411,28 +375,6 @@ export class DetailsConstructionComponent implements OnInit {
   private ms(iso: string): number { return new Date(iso).getTime(); }
   private hoje(): number { return Date.now(); }
 
-  // === progresso temporal ===
-  pctTempo = computed(() => {
-    const ini = this.ms(this.constructionDetails.adjudicationDate);
-    const fim = this.ms(this.constructionDetails.endDate);
-    const now = this.hoje();
-    if (fim <= ini) return 0;
-    const raw = ((now - ini) / (fim - ini)) * 100;
-    return Math.max(0, Math.min(100, Math.round(raw)));
-  });
-
-  diasRestantes = computed(() => {
-    const fim = this.ms(this.constructionDetails.endDate);
-    const now = this.hoje();
-    return Math.round((fim - now) / (1000 * 60 * 60 * 24));
-  });
-
-  duracaoMeses = computed(() => {
-    const ini = this.ms(this.constructionDetails.adjudicationDate);
-    const fim = this.ms(this.constructionDetails.endDate);
-    return Math.round((fim - ini) / (1000 * 60 * 60 * 24 * 30));
-  });
-
   back(): void { this.location.back(); }
 
   readonly sourceCols: { key: SourceKey; title: string; icon: string; color: string; soft: string }[] = [
@@ -442,16 +384,15 @@ export class DetailsConstructionComponent implements OnInit {
   ];
 
   // ===== Computados =====
-  margem      = computed(() => this.constructionDetails.invoicedValue - this.constructionDetails.costValueWorks);
   pctFaturado = computed(() => Math.round((this.constructionDetails.invoicedValue / this.constructionDetails.initialBudget) * 100));
   pctPago     = computed(() => Math.round((this.constructionDetails.paymentValue     / this.constructionDetails.initialBudget)  * 100));
 
   kpis = computed(() => [
     { label: 'Orçamento',    value: this.fmtEUR(this.constructionDetails.initialBudget), accent: 'oklch(0.85 0.07 250)', sub: 'valor adjudicado' },
-    { label: 'Faturado',     value: this.fmtEUR(this.constructionDetails.invoicedValue),  accent: 'oklch(0.65 0.13 250)', sub: `${this.pctFaturado()}% do orçado`,  delta:  12, deltaLabel: 'vs. mês ant.' },
+    { label: 'Faturado',     value: this.fmtEUR(this.constructionDetails.invoicedValue),  accent: 'oklch(0.65 0.13 250)', sub: `${this.pctFaturado()}% do orçamentado`,  delta:  12, deltaLabel: 'vs. mês ant.' },
     { label: 'Pago',         value: this.fmtEUR(this.constructionDetails.paymentValue),      accent: 'oklch(0.5 0.13 155)',  sub: `${this.pctPago()}% do faturado`,    delta:   8, deltaLabel: 'vs. mês ant.' },
     { label: 'Custos reais', value: this.fmtEUR(this.constructionDetails.costValueWorks),    accent: 'oklch(0.62 0.18 25)',  sub: 'acumulado',                          delta:  -3, deltaLabel: 'abaixo do plano' },
-    { label: 'Lucro',        value: this.fmtEUR(this.margem()),       accent: 'oklch(0.55 0.15 75)',  sub: `margem ${((this.margem() / this.constructionDetails.initialBudget) * 100).toFixed(1)}%`, delta: 14, deltaLabel: 'vs. estimado' },
+    { label: 'Lucro',        value: this.fmtEUR(this.constructionDetails.profit),       accent: 'oklch(0.55 0.15 75)',  sub: `margem ${((this.constructionDetails.profit / this.constructionDetails.initialBudget) * 100).toFixed(1)}%`, delta: 14, deltaLabel: 'vs. estimado' },
   ]);
 
   execSegments = computed(() => {
@@ -494,28 +435,6 @@ export class DetailsConstructionComponent implements OnInit {
       x: { ticks: { font: { size: 10 } }, grid: { display: false } },
     },
   };
-
-  private donutFor(items: CatItem[], baseHue: number) {
-    return {
-      data: {
-        labels: items.map(i => i.name),
-        datasets: [{
-          data: items.map(i => i.value),
-          backgroundColor: items.map((_, i) => `oklch(${0.7 - i * 0.06} 0.13 ${baseHue})`),
-          borderWidth: 0,
-        }],
-      },
-      options: {
-        maintainAspectRatio: false,
-        cutout: '65%',
-        plugins: { legend: { position: 'right' as const, labels: { boxWidth: 10, font: { size: 11 } } } },
-      },
-    };
-  }
-
-  //donutMateriais = computed(() => this.donutFor(COSTS_BY_CAT.materiais, 250));
-  //donutMaoObra   = computed(() => this.donutFor(COSTS_BY_CAT.maoObra,   155));
-  //donutServicos  = computed(() => this.donutFor(COSTS_BY_CAT.servicos,   75));
 
   // ===== Helpers usados no template =====
   fmtEUR(n: number): string {

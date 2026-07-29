@@ -11,19 +11,21 @@ import { ExternalEntityCreation } from '../../data/model/externalEntityCreation.
 })
 export class ExternalEntityService {
 
+    private externalEntitiesUrl = `${environment.apiUrl}/externalEntities`;
+
     constructor(private http: HttpClient) { }
 
     getExternalEntities(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.company.externalEntity.externalEntitiesUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.externalEntitiesUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     createExternalEntity(externalEntity: ExternalEntityCreation) : Observable<ExternalEntity> {
-        return this.http.post<ExternalEntity>(environment.company.externalEntity.externalEntitiesUrl, externalEntity, environment.httpOptions);
+        return this.http.post<ExternalEntity>(this.externalEntitiesUrl, externalEntity, environment.httpOptions);
     }
 
     deleteExternalEntity(externalEntityId: number) {
-        let url = environment.company.externalEntity.externalEntitiesUrl + externalEntityId;
+        let url = this.externalEntitiesUrl + externalEntityId;
         return this.http.delete(url);
     }
 }

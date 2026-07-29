@@ -15,50 +15,59 @@ import { BudgetItem } from '../../api/budgetItem';
 })
 export class ConstructionService {
 
+    private constructionNamesUrl = `${environment.apiUrl}/constructionNames`;
+    private constructionNamesForClientUrl = `${environment.apiUrl}/constructionNames/`;
+    private constructionsUrl = `${environment.apiUrl}/constructions`;
+    private constructionsOngoingUrl = `${environment.apiUrl}/constructionsOngoing`;
+    private budgetSubItemsForConstruction = `${environment.apiUrl}/constructions/budgetSubItems/`;
+    private budgetItemsForConstruction = `${environment.apiUrl}/constructions/budgetTree/`;
+    private constructionDetailsUrl = `${environment.apiUrl}/constructions/details/`;
+    private markAsFavouriteUrl = `${environment.apiUrl}/constructions/favourite/`;
+
     constructor(private http: HttpClient) { }
 
     getConstructionNames() : Observable<ConstructionNames[]> {
-        return this.http.get<ConstructionNames[]>(environment.construction.construction.constructionNamesUrl);
+        return this.http.get<ConstructionNames[]>(this.constructionNamesUrl);
     }
 
     getConstructionNamesForClient(clientId: number) : Observable<ConstructionNames[]> {
-        let url = environment.construction.construction.constructionNamesForClientUrl + clientId;
+        let url = this.constructionNamesForClientUrl + clientId;
         return this.http.get<ConstructionNames[]>(url);
     }
 
     getConstructions(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.construction.construction.constructionsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.constructionsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     getConstructionsOnGoing(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.construction.construction.constructionsOngoingUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.constructionsOngoingUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
-    
+
     getBudgetSubItemsForConstruction(constructionId: number) : Observable<ItemName[]> {
-        let url = environment.construction.construction.budgetSubItemsForConstruction + constructionId;
+        let url = this.budgetSubItemsForConstruction + constructionId;
         return this.http.get<ItemName[]>(url);
     }
 
     getBudgetItemsForConstruction(constructionId: number) : Observable<BudgetItem[]> {
-        let url = environment.construction.construction.budgetItemsForConstruction + constructionId;
+        let url = this.budgetItemsForConstruction + constructionId;
         return this.http.get<BudgetItem[]>(url);
     }
 
     getConstructionDetails(constructionId: number) : Observable<ConstructionDetails>{
-        let url = environment.construction.construction.constructionDetailsUrl + constructionId;
+        let url = this.constructionDetailsUrl + constructionId;
         return this.http.get<ConstructionDetails>(url);
       }
 
     createConstruction(construction: ConstructionCreation) : Observable<Construction> {
-        return this.http.post<Construction>(environment.construction.construction.constructionsUrl, construction, environment.httpOptions);
+        return this.http.post<Construction>(this.constructionsUrl, construction, environment.httpOptions);
     }
 
     markAsFavourite(constructionId: number, isFavourite: boolean) : Observable<Construction> {
         const params = new HttpParams().set('isFavourite', isFavourite.toString());
-        let url = environment.construction.construction.markAsFavouriteUrl + constructionId;
+        let url = this.markAsFavouriteUrl + constructionId;
         return this.http.patch<Construction>(url, null, { params });
     }
-    
+
 }

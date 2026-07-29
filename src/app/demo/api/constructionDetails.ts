@@ -7,7 +7,6 @@ export interface ConstructionDetails {
     paymentValue: number;
     initialBudget: number;
     costValueWorks: number;
-    differential: number;
     workItemsCost: ItemCost[];
     externalServiceItemsCost: ItemCost[];
     articlesItemsCost: ItemCost[];
@@ -16,13 +15,14 @@ export interface ConstructionDetails {
     status: string;
     client: string;
     address: string;
+    initialDate: string;
     adjudicationDate: string;
     endDate: string;
     margin: number;
     invoicedValue: number;
-    estimatedProfit: number;
-    daysElapsed: number;
-    totalDays: number;
+    daysElapsed: number; 
+    totalDays: number; 
+    timeProgress: number;
     cashflowData: CashflowMonth[];
     calendarEvents: ConstructionCalendarEvent[];
 }

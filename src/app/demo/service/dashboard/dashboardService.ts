@@ -9,15 +9,17 @@ import { DashboardData } from '../../api/dashboardData';
 })
 export class DashboardService {
 
+    private dashboardDataUrl = `${environment.apiUrl}/dashboard`;
+
     constructor(private http: HttpClient) { }
 
     getDashboardData() : Observable<DashboardData> {
         const params = new HttpParams().set('year', "2025");
 
         return this.http.get<DashboardData>(
-            environment.dashboard.dashboardDataUrl,
+            this.dashboardDataUrl,
             { params }
         );
     }
-    
+
 }

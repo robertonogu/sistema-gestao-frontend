@@ -12,30 +12,35 @@ import { VehicleCreation } from '../../data/model/vehicleCreation.model';
 })
 export class VehicleService {
 
+    private activeVehicleNamesUrl = `${environment.apiUrl}/activeVehicleNames`;
+    private vehiclesUrl = `${environment.apiUrl}/vehicles`;
+    private updateVehicleStatusUrl = `${environment.apiUrl}/vehicles/status/`;
+    private deleteVehicleUrl = `${environment.apiUrl}/vehicles/`;
+
     constructor(private http: HttpClient) { }
 
     getActiveVehicleNames() : Observable<ItemName[]> {
-        return this.http.get<ItemName[]>(environment.inventory.vehicle.activeVehicleNamesUrl);
+        return this.http.get<ItemName[]>(this.activeVehicleNamesUrl);
     }
 
     getVehicles(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        return this.http.get<ObjectList>(environment.inventory.vehicle.vehiclesUrl);
+        return this.http.get<ObjectList>(this.vehiclesUrl);
     }
 
     createVehicle(vehicle: VehicleCreation) : Observable<Vehicle> {
-        return this.http.post<Vehicle>(environment.inventory.vehicle.vehiclesUrl, vehicle, environment.httpOptions);
+        return this.http.post<Vehicle>(this.vehiclesUrl, vehicle, environment.httpOptions);
     }
-    
+
     updateVehicleStatus(vehicleId: number, isActive: boolean) : Observable<Vehicle> {
         const params = new HttpParams().set('isActive', isActive.toString());
         console.log(params)
-        let url = environment.inventory.vehicle.updateVehicleStatus + vehicleId;
+        let url = this.updateVehicleStatusUrl + vehicleId;
         return this.http.patch<Vehicle>(url, null, { params });
     }
 
     deleteVehicle(vehicleId: number) {
-        let url = environment.inventory.vehicle.deleteVehicleUrl + vehicleId;
+        let url = this.deleteVehicleUrl + vehicleId;
         return this.http.delete(url);
     }
-    
+
 }

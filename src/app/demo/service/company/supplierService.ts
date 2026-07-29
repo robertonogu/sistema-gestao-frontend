@@ -12,20 +12,23 @@ import { Supplier } from '../../api/supplier';
 })
 export class SupplierService {
 
+    private suppliersUrl = `${environment.apiUrl}/suppliers`;
+    private supplierNamesUrl = `${environment.apiUrl}/supplierNames`;
+
     constructor(private http: HttpClient) { }
 
     getSuppliers(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.company.supplier.suppliersUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.suppliersUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     getSupplierNames() : Observable<ItemName[]> {
-        let url = environment.company.supplier.supplierNamesUrl;
+        let url = this.supplierNamesUrl;
         return this.http.get<ItemName[]>(url);
     }
 
     createSupplier(supplier: SupplierCreation) : Observable<Supplier> {
-        return this.http.post<Supplier>(environment.company.supplier.suppliersUrl, supplier, environment.httpOptions);
+        return this.http.post<Supplier>(this.suppliersUrl, supplier, environment.httpOptions);
     }
 
 }

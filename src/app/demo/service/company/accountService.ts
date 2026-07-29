@@ -12,22 +12,26 @@ import { Account } from '../../api/account';
 })
 export class AccountService {
 
+    private bankAccountNamesUrl = `${environment.apiUrl}/bankAccountNames`;
+    private accountNamesUrl = `${environment.apiUrl}/accountNames`;
+    private accountsUrl = `${environment.apiUrl}/accounts`;
+
     constructor(private http: HttpClient) { }
 
     getBankAccountNames() : Observable<ObjectName[]> {
-        return this.http.get<ObjectName[]>(environment.queries.accountLogs.bankAccountNamesUrl);
+        return this.http.get<ObjectName[]>(this.bankAccountNamesUrl);
     }
 
     getAccountNames() : Observable<ObjectName[]> {
-        return this.http.get<ObjectName[]>(environment.company.account.accountNamesUrl);
+        return this.http.get<ObjectName[]>(this.accountNamesUrl);
     }
-    
+
     getAccounts(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = environment.company.account.accountsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        let url = this.accountsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
     }
 
     createAccount(account: AccountCreation) : Observable<Account> {
-        return this.http.post<Account>(environment.company.account.accountsUrl, account, environment.httpOptions);
+        return this.http.post<Account>(this.accountsUrl, account, environment.httpOptions);
     }
 }

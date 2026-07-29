@@ -11,14 +11,16 @@ import { Payment } from '../../api/payment';
 })
 export class PaymentService {
 
+    private paymentUrl = `${environment.apiUrl}/payments`;
+
     constructor(private http: HttpClient) { }
 
     getPayments(currentPage: number, pageSize: number) : Observable<PaymentList> {
-        let url = environment.transactions.payment.paymentUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+        let url = this.paymentUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
         return this.http.get<PaymentList>(url);
     }
 
     createPayment(listPayments: ListPaymentCreation) : Observable<Payment[]> {
-        return this.http.post<Payment[]>(environment.transactions.payment.paymentUrl, listPayments, environment.httpOptions);
+        return this.http.post<Payment[]>(this.paymentUrl, listPayments, environment.httpOptions);
     }
 }
