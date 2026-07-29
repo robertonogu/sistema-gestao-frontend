@@ -1,6 +1,7 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { MessageService, TreeNode } from 'primeng/api';
+import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { WorkLogCreation } from 'src/app/demo/data/model/worklogCreation.model';
@@ -15,7 +16,7 @@ import { WorkLogService } from 'src/app/demo/service/people/workLogService';
 export class CreateWorklogComponent implements OnInit {
 
   constructionNames!: ConstructionNames[];
-  budgetSubItemNames!: ItemName[];
+  budgetTree: TreeNode[] = [];
   employeeNames!: ItemName[];
 
   date!: Date;
@@ -23,7 +24,7 @@ export class CreateWorklogComponent implements OnInit {
   hours!: number;
   workOnConstruction!: boolean;
   selectedConstruction!: number;
-  selectedBudgetSubItem!: number;
+  selectedBudgetNode!: TreeNode;
   selectedEmployee!: number;
 
   constructor(
@@ -45,16 +46,26 @@ export class CreateWorklogComponent implements OnInit {
   }
 
   getBudgetItemsAndEmployees() {
+    this.selectedBudgetNode = undefined as unknown as TreeNode;
     this.employeeService.getEmployeeNamesInCostEmployeeHourForConstruction(this.selectedConstruction).subscribe((employeeNames) => {
       this.employeeNames = employeeNames;
     });
-    this.constructionService.getBudgetSubItemsForConstruction(this.selectedConstruction).subscribe((budgetSubItemNames) => {
-      this.budgetSubItemNames = budgetSubItemNames;
+    this.constructionService.getBudgetItemsForConstruction(this.selectedConstruction).subscribe((budgetItems) => {
+      this.budgetTree = this.mapBudgetItemsToTreeNodes(budgetItems);
     });
   }
 
+  private mapBudgetItemsToTreeNodes(budgetItems: BudgetItem[]): TreeNode[] {
+    return budgetItems.map((budgetItem) => ({
+      key: budgetItem.id.toString(),
+      label: budgetItem.name,
+      data: budgetItem.id,
+      children: budgetItem.children?.length ? this.mapBudgetItemsToTreeNodes(budgetItem.children) : undefined
+    }));
+  }
+
   createWorkLog() {
-    let workLogCreation = { date: this.date, hours: this.hours, workOnConstruction: this.workOnConstruction, constructionId: this.selectedConstruction, budgetSubItemId: this.selectedBudgetSubItem, employeeId: this.selectedEmployee } as WorkLogCreation;
+    let workLogCreation = { date: this.date, hours: this.hours, workOnConstruction: this.workOnConstruction, constructionId: this.selectedConstruction, budgetItemId: this.selectedBudgetNode?.data, employeeId: this.selectedEmployee } as WorkLogCreation;
     
     if (workLogCreation != null) {
       this.workLogService.createWorkLog(workLogCreation).subscribe(newWorkLog => {

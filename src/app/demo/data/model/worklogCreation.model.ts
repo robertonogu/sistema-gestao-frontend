@@ -3,6 +3,6 @@ export interface WorkLogCreation {
     hours: number;
     workOnConstruction: boolean;
     constructionId: number;
-    budgetSubItemId: number;
+    budgetItemId: number;
     employeeId: number;
 }

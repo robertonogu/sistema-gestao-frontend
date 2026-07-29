@@ -8,6 +8,7 @@ import { ItemName } from '../../api/itemName';
 import { ConstructionCreation } from '../../data/model/constructionCreation.model';
 import { Construction } from '../../api/construction';
 import { ConstructionDetails } from '../../api/constructionDetails';
+import { BudgetItem } from '../../api/budgetItem';
 
 @Injectable({
     providedIn: 'root'
@@ -38,6 +39,11 @@ export class ConstructionService {
     getBudgetSubItemsForConstruction(constructionId: number) : Observable<ItemName[]> {
         let url = environment.construction.construction.budgetSubItemsForConstruction + constructionId;
         return this.http.get<ItemName[]>(url);
+    }
+
+    getBudgetItemsForConstruction(constructionId: number) : Observable<BudgetItem[]> {
+        let url = environment.construction.construction.budgetItemsForConstruction + constructionId;
+        return this.http.get<BudgetItem[]>(url);
     }
 
     getConstructionDetails(constructionId: number) : Observable<ConstructionDetails>{

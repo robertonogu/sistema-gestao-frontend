@@ -46,6 +46,7 @@ export const environment = {
   construction: {
     construction: {
       budgetSubItemsForConstruction: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/budgetSubItems/",
+      budgetItemsForConstruction: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/budgetTree/",
       constructionsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions",
       markAsFavouriteUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/favourite/",
       constructionDetailsUrl: "https://sistema-gestao-api-production-9366.up.railway.app/constructions/details/",

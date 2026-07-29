@@ -21,7 +21,7 @@ export enum SubCategoryType {
     SOCIAL_SECURITY_CONTRIBUTIONS = 'Contribuições Segurança Social',
     IRS = 'IRS',
     COMPENSATION_FUNDS = 'Fundos de Compensação',
-    INSURANCES = 'Seguro',
+    INSURANCE_PEOPLE = 'Seguros',
     SAFETY = 'Segurança',
     HYGIENE = 'Higiene',
   
@@ -33,10 +33,10 @@ export enum SubCategoryType {
   
     // VEHICLES
 
-    INSURANCE = 'Seguro',
+    INSURANCE_VEHICLES = 'Seguro',
     IUC = 'IUC',
     FUEL = 'Abastecimento',
-    MAINTENANCE = 'Manutenção',
+    MAINTENANCE_VEHICLES = 'Manutenção de Veículos',
     INSPECTION = 'Inspeção',
     PARKING = 'Parques de Estacionamentos',
     TOLLS = 'Portagens',
@@ -48,6 +48,11 @@ export enum SubCategoryType {
     // INVENTORY
 
     FEEDSTOCK = 'Matéria-Prima',
+    WOOD = 'Madeiras', 
+    GLASS_MIRRORS  = 'Vidros e Espelhos', 
+    PLUMBING = 'Pichelaria', 
+    CIVIL_CONSTRUCTION = 'Construção Civil', 
+    COATINGS = 'Revestimentos',
   
     // ASSOCIATION
 

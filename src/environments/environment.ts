@@ -46,6 +46,7 @@ export const environment = {
   construction: {
     construction: {
       budgetSubItemsForConstruction: "http://localhost:8080/constructions/budgetSubItems/",
+      budgetItemsForConstruction: "http://localhost:8080/constructions/budgetTree/",
       constructionsUrl: "http://localhost:8080/constructions",
       markAsFavouriteUrl: "http://localhost:8080/constructions/favourite/",
       constructionDetailsUrl: "http://localhost:8080/constructions/details/",

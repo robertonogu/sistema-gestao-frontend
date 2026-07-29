@@ -11,6 +11,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CreateExpenseRoutingModule } from './create-expense-routing.module';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { DividerModule } from 'primeng/divider';
+import { DialogModule } from 'primeng/dialog';
+import { TreeSelectModule } from 'primeng/treeselect';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
@@ -24,6 +26,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     DropdownModule,
     CheckboxModule,
     DividerModule,
+    DialogModule,
+    TreeSelectModule,
     FormsModule,
     ReactiveFormsModule,
     SplitButtonModule,

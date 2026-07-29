@@ -43,7 +43,7 @@ export class ListSalesComponent {
 
   deleteSale(sale: Sale) {
     this.confirmationService.confirm({
-      header: 'Tem a certeza?',
+      header: `Tem a certeza que pretende apagar a venda com o número ${sale.documentNumber}?`,
       message: 'Confirme para prosseguir.',
       accept: () => {
         this.saleService.deleteSale(sale.saleId).subscribe((data) => {
@@ -51,7 +51,7 @@ export class ListSalesComponent {
         });
       },
       reject: () => {
-        this.messageService.add({ severity: 'error', summary: 'Rejeição', detail: 'Operação rejeitada.', life: 3000 });
+        this.messageService.add({ severity: 'warn', summary: 'Rejeição', detail: 'Operação rejeitada.', life: 3000 });
       }
     });
   }

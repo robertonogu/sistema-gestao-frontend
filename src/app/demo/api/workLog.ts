@@ -5,6 +5,6 @@ export interface WorkLog {
     employee: string;
     hours: number;
     construction: string;
-    budgetSubitem: string;
+    budgetItem: string;
     workOnConstruction: boolean;
 }

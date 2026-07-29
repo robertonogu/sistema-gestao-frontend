@@ -11,11 +11,11 @@
 			<div class="flex flex-column">
 				<div class="flex justify-content-between align-items-center mb-2">
 					<span class="font-semibold mr-6">Data</span>
-					<span>30/08/2019</span>
+					<span>{{ expense.date | date:'dd/MM/yyyy' }}</span>
 				</div>
 				<div class="flex justify-content-between align-items-center mb-2">
 					<span class="font-semibold mr-6">Número de Fatura #</span>
-					<span>8523</span>
+					<span>{{ expense.documentNumber }}</span>
 				</div>
 				<div class="flex justify-content-between align-items-center">
 					<span class="font-semibold mr-6">CUSTOMER ID</span>
@@ -35,49 +35,38 @@
 		<table class="w-full" style="border-collapse: collapse; table-layout: auto">
 			<thead>
 				<tr>
-					<th class="text-left font-semibold py-3 border-bottom-1 surface-border white-space-nowrap">Description</th>
-					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Quantity</th>
-					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Unit Price</th>
+					<th class="text-left font-semibold py-3 border-bottom-1 surface-border white-space-nowrap">Nome</th>
+					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Quantidade</th>
+					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Preço</th>
+					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">IVA</th>
 					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap">Line Total</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td class="text-left py-3 border-bottom-1 surface-border white-space-nowrap">Green T-Shirt</td>
-					<td class="text-right py-3 border-bottom-1 surface-border px-3">1</td>
-					<td class="text-right py-3 border-bottom-1 surface-border px-3">$49.00</td>
-					<td class="text-right py-3 border-bottom-1 surface-border">$49.00</td>
-				</tr>
-				<tr>
-					<td class="text-left py-3 border-bottom-1 surface-border white-space-nowrap">Game Controller</td>
-					<td class="text-right py-3 border-bottom-1 surface-border px-3">2</td>
-					<td class="text-right py-3 border-bottom-1 surface-border px-3">$99.00</td>
-					<td class="text-right py-3 border-bottom-1 surface-border">$198.00</td>
-				</tr>
-				<tr>
-					<td class="text-left py-3 border-bottom-1 surface-border white-space-nowrap">Mini Speakers</td>
-					<td class="text-right py-3 border-bottom-1 surface-border px-3">1</td>
-					<td class="text-right py-3 border-bottom-1 surface-border px-3">$85.00</td>
-					<td class="text-right py-3 border-bottom-1 surface-border">$85.00</td>
+				<tr *ngFor="let item of expense.itemList">
+					<td class="text-left py-3 border-bottom-1 surface-border white-space-nowrap">{{ item.name }}</td>
+					<td class="text-right py-3 border-bottom-1 surface-border px-3">{{ item.quantity }} {{ item.unit }}</td>
+					<td class="text-right py-3 border-bottom-1 surface-border px-3">{{ fmt(item.unitValue) }}</td>
+					<td class="text-right py-3 border-bottom-1 surface-border px-3">{{ item.iva }}%</td>
+					<td class="text-right py-3 border-bottom-1 surface-border">{{ fmt(item.totalValue) }}</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 
 	<div class="flex flex-column md:flex-row md:align-items-start md:justify-content-between mt-8">
-		<div class="font-semibold mb-3 md:mb-0">NOTES</div>
 		<div class="flex flex-column">
 			<div class="flex justify-content-between align-items-center mb-2">
 				<span class="font-semibold mr-6">SUBTOTAL</span>
-				<span>$332.00</span>
+				<span>{{ expense.totalValue }}</span>
 			</div>
 			<div class="flex justify-content-between align-items-center mb-2">
 				<span class="font-semibold mr-6">VAT #</span>
-				<span>0</span>
+				<span>{{ expense.iva }}</span>
 			</div>
 			<div class="flex justify-content-between align-items-center">
 				<span class="font-semibold mr-6">TOTAL</span>
-				<span>$332.00</span>
+				<span>{{ expense.totalValue }}</span>
 			</div>
 		</div>
 	</div>

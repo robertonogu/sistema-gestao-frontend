@@ -1,28 +1,158 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MenuItem, MessageService } from 'primeng/api';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MenuItem, MessageService, TreeNode } from 'primeng/api';
+import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
-import { ArticleFamily } from 'src/app/demo/data/enum/articleFamily';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
 import { Unit } from 'src/app/demo/data/enum/unit';
-import { ArticleCreation } from 'src/app/demo/data/model/articleCreation.model';
+import { CostAllocationCreation } from 'src/app/demo/data/model/costAllocationCreation.model';
 import { ExpenseCreation } from 'src/app/demo/data/model/expenseCreation.model';
-import { ExternalServiceCreation } from 'src/app/demo/data/model/externalServiceCreation.model';
+import { ItemCreation } from 'src/app/demo/data/model/itemCreation.model';
 import { AccountService } from 'src/app/demo/service/company/accountService';
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
+import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 
 @Component({
   templateUrl: './create-expense.component.html',
-  providers: [MessageService]
+  providers: [MessageService],
+  styles: [`:host {
+  --bg: #fff;
+  --surface-2: #fafbfc;
+  --border: #e6e8ec;
+  --text-3: #8a8f99;
+  --accent: oklch(0.62 0.13 250);
+  --accent-soft: oklch(0.96 0.025 250);
+  --accent-border: oklch(0.85 0.07 250);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}
+
+.item-tbl {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--bg);
+  font-size: 14px;
+}
+
+.item-head, .item-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 300px 90px 130px 130px 130px 130px 76px;
+  align-items: center;
+  column-gap: 8px;
+  min-width: fit-content;
+}
+
+.item-head {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  > div { padding: 10px 12px; }
+}
+
+.item-row {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  transition: background 0.1s;
+
+  &:hover { background: var(--surface-2); }
+
+  > div { padding: 6px 12px; }
+}
+
+.item-row:last-child { border-bottom: none; }
+
+.item-col-num { text-align: right; font-family: var(--font-mono); }
+.item-col-total { font-weight: 600; }
+.item-col-actions { display: flex; justify-content: center; }
+
+:host ::ng-deep .item-row {
+  input.p-inputtext,
+  .p-inputnumber input,
+  .p-dropdown {
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  input.p-inputtext { padding: 6px 8px !important; }
+
+  input.p-inputtext:hover,
+  .p-inputnumber input:hover,
+  .p-dropdown:hover {
+    border-color: var(--border) !important;
+    background: var(--bg) !important;
+  }
+  input.p-inputtext:focus,
+  .p-inputnumber input:focus,
+  .p-dropdown.p-focus {
+    border-color: var(--accent) !important;
+    background: var(--bg) !important;
+    box-shadow: 0 0 0 3px var(--accent-soft) !important;
+  }
+
+  input.p-inputtext:disabled {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit;
+    opacity: 1 !important;
+  }
+
+  .item-col-num input { text-align: right; font-family: var(--font-mono); }
+  .p-dropdown { min-height: 32px; }
+}
+
+.item-foot {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+}
+
+.totals-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 32px;
+  padding: 12px 4px;
+  font-family: var(--font-mono);
+}
+
+.totals-bar .t-block { text-align: right; }
+.totals-bar .t-label {
+  font-size: 11px; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.totals-bar .t-value { font-size: 13px; font-weight: 500; }
+.totals-bar .t-value.t-total { font-size: 18px; font-weight: 700; }
+
+.btn-dashed {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500;
+  color: var(--accent);
+  background: transparent;
+  border: 1px dashed var(--accent-border);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  &:hover { background: var(--accent-soft); }
+  i { font-size: 11px; }
+}`]
 })
 
 export class CreateExpenseComponent implements OnInit {
@@ -30,12 +160,14 @@ export class CreateExpenseComponent implements OnInit {
   categoriesAndSubCategories = {
     [CategoryType.BANK]: [SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.IMMEDIATE_TRANSFERS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS, SubCategoryType.CREDIT],
     [CategoryType.TAXES]: [SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.FEES, SubCategoryType.IES, SubCategoryType.FONT_RETENTION],
-    [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE, SubCategoryType.SAFETY],
+    [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE_PEOPLE, SubCategoryType.SAFETY],
     [CategoryType.OPERATION]: [SubCategoryType.ELECTRICITY, SubCategoryType.COMMUNICATIONS, SubCategoryType.CONSUMABLES],
-    [CategoryType.VEHICLES]: [SubCategoryType.INSURANCE, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE, SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS],
+    [CategoryType.VEHICLES]: [SubCategoryType.INSURANCE_VEHICLES, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE_VEHICLES, SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS],
     [CategoryType.EQUIPMENTS]: [SubCategoryType.MAINTENANCE_EQUIPMENTS],
     [CategoryType.TOOLS]: [],
-    [CategoryType.INVENTORY]: [SubCategoryType.FEEDSTOCK],
+    [CategoryType.INVENTORY]: [SubCategoryType.FEEDSTOCK, SubCategoryType.WOOD, SubCategoryType.GLASS_MIRRORS, SubCategoryType.PLUMBING, SubCategoryType
+      .CIVIL_CONSTRUCTION, SubCategoryType.COATINGS
+    ],
     [CategoryType.ASSOCIATIONS]: [SubCategoryType.DUES],
     [CategoryType.CONSTRUCTIONS]: [SubCategoryType.EXTERNAL_SERVICES],
   };
@@ -50,15 +182,12 @@ export class CreateExpenseComponent implements OnInit {
   paymentMethods = PaymentMethod;
 
   date!: Date;
-  selectedCategory!: SubCategoryType;
   selectedOrigin!: number;
   selectedDocumentType!: DocumentType;
   documentNumber!: string;
   paymentDeadline!: Date;
-  value: number = 0;
-  iva: number = 0;
   isIntegralPayment: boolean = false;
-  paymentValue: number = 0;
+  private _paymentValue: number = 0;
   selectedAccount!: number;
   selectedPaymentMethod!: PaymentMethod;
 
@@ -66,25 +195,31 @@ export class CreateExpenseComponent implements OnInit {
 
   lunchVisible: boolean = false;
   dynamicForm: FormGroup;
-  dynamicArticleForm: FormGroup;
+  dynamicItemForm: FormGroup;
 
   constructionNames!: ConstructionNames[];
   subItemOptions: ItemName[][] = [];
 
-  articleFamilies = ArticleFamily;
   units = Unit;
 
   expenseCreation!: ExpenseCreation;
 
+  linkDialogVisible: boolean = false;
+  linkDialogIndex: number | null = null;
+  linkBudgetTree: TreeNode[] = [];
+  selectedLinkBudgetNode?: TreeNode;
+  vehicleNames: ItemName[] = [];
+
   constructor(
     private originService: OriginService,
     private accountService: AccountService,
-    private constructionService: ConstructionService, 
+    private constructionService: ConstructionService,
+    private vehicleService: VehicleService,
     private expenseService: ExpenseService,
     private messageService: MessageService,
     private fb: FormBuilder,
     private _location: Location
-  ) { 
+  ) {
     this.originService.getOriginsGrouped().subscribe((origins) => {
       this.origins = origins;
     });
@@ -99,23 +234,17 @@ export class CreateExpenseComponent implements OnInit {
       inputs: this.fb.array([])
     });
 
-    this.dynamicArticleForm = this.fb.group({
-      articleInputs: this.fb.array([])
+    this.dynamicItemForm = this.fb.group({
+      itemInputs: this.fb.array([this.buildItemInput()])
     });
   }
 
   ngOnInit() {
     this.items = [
       {
-        label: 'Artigo',
-        command: () => {
-          this.addArticleInput();
-        }
-      },
-      {
         label: 'Item',
         command: () => {
-
+          this.addItemInput();
         }
       },
       {
@@ -150,25 +279,15 @@ export class CreateExpenseComponent implements OnInit {
     }));
   }
 
-  changePaidValue() {
-    if (this.isIntegralPayment) this.paymentValue = this.value + this.value * this.iva / 100;
-  }
-
-  changeIvaRate() {
-    this.paymentValue = this.value + this.value * this.iva / 100;
-  }
-
   onCheckboxChange() {
     if (this.isIntegralPayment) {
       this.disablePaidValue = true;
       this.disablePaymentDeadline = true;
-      this.paymentDeadline ;
-      this.paymentValue = this.value + this.value * this.iva / 100;
     }
     else {
       this.disablePaidValue = false;
       this.disablePaymentDeadline = false;
-      this.paymentValue = 0;
+      this._paymentValue = this.totalValue;
     }
   }
 
@@ -201,59 +320,259 @@ export class CreateExpenseComponent implements OnInit {
     }));
   }
 
+  addExternalServiceInput() {
+    this.addInput();
+    this.getConstructionNames();
+  }
+
   removeInput(index: number) {
     this.inputs.removeAt(index);
   }
 
-  get articleInputs(): FormArray {
-    return this.dynamicArticleForm.get('articleInputs') as FormArray;
+  get itemInputs(): FormArray {
+    return this.dynamicItemForm.get('itemInputs') as FormArray;
   }
 
-  addArticleInput() {
-    this.articleInputs.push(this.fb.group({
-      family: [null, Validators.required],
+  private buildItemInput(): FormGroup {
+    return this.fb.group({
+      subCategoryType: [null, Validators.required],
       name: [null, Validators.required],
       quantity: [null, Validators.required],
       unit: [null, Validators.required],
       value: [null, Validators.required],
+      iva: [0, Validators.required],
+      constructionId: [null],
+      budgetItemId: [null],
+      allocationQuantity: [null],
+      vehicleId: [null],
+    });
+  }
+
+  addItemInput() {
+    this.itemInputs.push(this.buildItemInput());
+  }
+
+  removeItemInput(index: number) {
+    this.itemInputs.removeAt(index);
+  }
+
+  asFormGroup(c: AbstractControl): FormGroup {
+    return c as FormGroup;
+  }
+
+  private categoryOf(subCategoryType: SubCategoryType | null): CategoryType | undefined {
+    const entry = Object.entries(this.categoriesAndSubCategories)
+      .find(([, subs]) => (subs as SubCategoryType[]).includes(subCategoryType as SubCategoryType));
+    return entry ? entry[0] as CategoryType : undefined;
+  }
+
+  showConstructionLink(subCategoryType: SubCategoryType | null): boolean {
+    return subCategoryType === SubCategoryType.EXTERNAL_SERVICES || this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
+  }
+
+  showVehicleLink(subCategoryType: SubCategoryType | null): boolean {
+    return this.categoryOf(subCategoryType) === CategoryType.VEHICLES;
+  }
+
+  showToolEquipmentLink(subCategoryType: SubCategoryType | null): boolean {
+    const category = this.categoryOf(subCategoryType);
+    return category === CategoryType.TOOLS || category === CategoryType.EQUIPMENTS;
+  }
+
+  canOpenLinkDialog(subCategoryType: SubCategoryType | null): boolean {
+    return this.showConstructionLink(subCategoryType) || this.showVehicleLink(subCategoryType) || this.showToolEquipmentLink(subCategoryType);
+  }
+
+  get linkRowGroup(): FormGroup | null {
+    return this.linkDialogIndex !== null ? this.asFormGroup(this.itemInputs.at(this.linkDialogIndex)) : null;
+  }
+
+  get linkRowSubCategory(): SubCategoryType | null {
+    return this.linkDialogIndex !== null ? this.itemInputs.at(this.linkDialogIndex).value.subCategoryType : null;
+  }
+
+  private mapBudgetItemsToTreeNodes(budgetItems: BudgetItem[]): TreeNode[] {
+    return budgetItems.map((budgetItem) => ({
+      key: budgetItem.id.toString(),
+      label: budgetItem.name,
+      data: budgetItem.id,
+      children: budgetItem.children?.length ? this.mapBudgetItemsToTreeNodes(budgetItem.children) : undefined
     }));
   }
 
-  removeArticleInput(index: number) {
-    this.articleInputs.removeAt(index);
+  private findBudgetTreeNode(nodes: TreeNode[], budgetItemId?: number | null): TreeNode | undefined {
+    for (const node of nodes) {
+      if (node.data === budgetItemId) return node;
+      if (node.children?.length) {
+        const found = this.findBudgetTreeNode(node.children, budgetItemId);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  }
+
+  onLinkBudgetNodeChange(node: TreeNode | undefined) {
+    if (this.linkDialogIndex === null) return;
+    this.itemInputs.at(this.linkDialogIndex).patchValue({ budgetItemId: node?.data ?? null });
+  }
+
+  openLinkDialog(index: number) {
+    this.linkDialogIndex = index;
+    this.linkDialogVisible = true;
+    this.linkValidationAttempted = false;
+    this.linkBudgetTree = [];
+    this.selectedLinkBudgetNode = undefined;
+
+    const row = this.itemInputs.at(index).value;
+    const subCategoryType = row.subCategoryType;
+
+    if (this.showConstructionLink(subCategoryType)) {
+      this.getConstructionNames();
+      if (row.constructionId) this.onLinkConstructionChange(row.constructionId, false);
+      if (row.allocationQuantity == null) {
+        this.itemInputs.at(index).patchValue({ allocationQuantity: row.quantity });
+      }
+    }
+
+    if (this.showVehicleLink(subCategoryType) && this.vehicleNames.length === 0) {
+      this.vehicleService.getActiveVehicleNames().subscribe(names => this.vehicleNames = names);
+    }
+  }
+
+  closeLinkDialog() {
+    this.linkDialogVisible = false;
+    this.linkDialogIndex = null;
+  }
+
+  linkValidationAttempted: boolean = false;
+
+  get linkItemRequired(): boolean {
+    return !!this.linkRowGroup?.value.constructionId;
+  }
+
+  get linkAllocationQuantityInvalid(): boolean {
+    const row = this.linkRowGroup?.value;
+    if (!row) return false;
+    const allocationQuantity = Number(row.allocationQuantity);
+    return !(allocationQuantity > 0 && allocationQuantity <= Number(row.quantity));
+  }
+
+  saveLinkDialog() {
+    const row = this.linkRowGroup?.value;
+    if (row && this.linkItemRequired) {
+      if (!row.budgetItemId) {
+        this.linkValidationAttempted = true;
+        this.messageService.add({ severity: 'warn', summary: 'Item obrigatório', detail: 'Selecione o Item da obra antes de guardar.' });
+        return;
+      }
+      if (this.linkAllocationQuantityInvalid) {
+        this.linkValidationAttempted = true;
+        this.messageService.add({ severity: 'warn', summary: 'Quantidade inválida', detail: 'A quantidade alocada tem de ser maior que 0 e no máximo igual à quantidade do item.' });
+        return;
+      }
+    }
+    this.closeLinkDialog();
+  }
+
+  clearLinkFields() {
+    if (this.linkDialogIndex === null) return;
+    this.linkValidationAttempted = false;
+    this.itemInputs.at(this.linkDialogIndex).patchValue({
+      constructionId: null,
+      budgetItemId: null,
+      allocationQuantity: null,
+      vehicleId: null,
+    });
+    this.linkBudgetTree = [];
+    this.selectedLinkBudgetNode = undefined;
+  }
+
+  onLinkConstructionChange(constructionId: number, resetChildren: boolean = true) {
+    const row = this.linkRowGroup?.value;
+    if (resetChildren && this.linkDialogIndex !== null) {
+      this.itemInputs.at(this.linkDialogIndex).patchValue({ budgetItemId: null });
+      this.selectedLinkBudgetNode = undefined;
+    }
+    this.constructionService.getBudgetItemsForConstruction(constructionId).subscribe(budgetItems => {
+      this.linkBudgetTree = this.mapBudgetItemsToTreeNodes(budgetItems);
+      this.selectedLinkBudgetNode = resetChildren
+        ? undefined
+        : this.findBudgetTreeNode(this.linkBudgetTree, row?.budgetItemId);
+    });
+  }
+
+  itemTotal(index: number): number {
+    const raw = this.itemInputs.at(index).value;
+    const quantity = Number(raw.quantity) || 0;
+    const value = Number(raw.value) || 0;
+    const iva = Number(raw.iva) || 0;
+    const subtotal = value * quantity;
+    return subtotal + subtotal * iva / 100;
+  }
+
+  fmt(n: number): string {
+    return (n || 0).toLocaleString('de-DE', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2,
+    }) + ' €';
+  }
+
+  fmtItemTotal(index: number): string {
+    return this.fmt(this.itemTotal(index));
+  }
+
+  get valueWithoutIva(): number {
+    const servicesTotal = this.inputs.controls.reduce((sum, c) => sum + (Number(c.value.value) || 0), 0);
+    const itemsTotal = this.itemInputs.controls.reduce((sum, c) => sum + (Number(c.value.value) || 0) * (Number(c.value.quantity) || 0), 0);
+    return servicesTotal + itemsTotal;
+  }
+
+  get ivaAmount(): number {
+    return this.itemInputs.controls.reduce((sum, c, index) => sum + (this.itemTotal(index) - (Number(c.value.value) || 0) * (Number(c.value.quantity) || 0)), 0);
+  }
+
+  get totalValue(): number {
+    return this.valueWithoutIva + this.ivaAmount;
+  }
+
+  get paymentValue(): number {
+    return this.isIntegralPayment ? this.totalValue : this._paymentValue;
+  }
+
+  set paymentValue(v: number) {
+    this._paymentValue = v;
+  }
+
+  private subCategoryKey(value: SubCategoryType): string {
+    return Object.keys(SubCategoryType)[Object.values(SubCategoryType).indexOf(value)];
   }
 
   newExpense() {
-    let subCategory = Object.keys(SubCategoryType)[Object.values(SubCategoryType).indexOf(this.selectedCategory)];
-    
-    const externalServiceList: ExternalServiceCreation[] = [];
-    const articleList: ArticleCreation[] = [];
-    let externalService: ExternalServiceCreation;
-    let article: ArticleCreation;
+    const itemList: ItemCreation[] = [];
+    let item: ItemCreation;
 
-    this.inputs.controls.forEach((control) => {
-      externalService = { 
-        constructionId: control.value.constructionId, budgetSubItemId: control.value.budgetSubItemId, 
-        description: control.value.description, value: control.value.value 
-      } as ExternalServiceCreation;
-      externalServiceList.push(externalService);
-    });
+    this.itemInputs.controls.forEach((control, index) => {
+      const costAllocations: CostAllocationCreation[] = control.value.budgetItemId
+        ? [{ budgetItemId: control.value.budgetItemId, quantity: control.value.allocationQuantity }]
+        : [];
 
-    this.articleInputs.controls.forEach((control) => {
-      article = { 
-        articleFamily: control.value.family,
+      item = {
+        subCategoryType: this.subCategoryKey(control.value.subCategoryType),
         name: control.value.name,
         quantity: control.value.quantity,
         unit: control.value.unit,
-        unitValue: control.value.value
-      } as ArticleCreation;
-      articleList.push(article);
+        unitValue: control.value.value,
+        iva: control.value.iva,
+        totalValue: this.itemTotal(index),
+        costAllocations: costAllocations,
+        vehicleId: control.value.vehicleId
+      } as ItemCreation;
+      itemList.push(item);
     });
 
-    this.expenseCreation = { 
-      date: this.date, subCategoryType: subCategory, originId: this.selectedOrigin, documentType: this.selectedDocumentType, documentNumber: this.documentNumber, 
-      paymentDeadline: this.paymentDeadline, value: this.value, iva: this.iva, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue, 
-      accountId: this.selectedAccount, paymentMethod: this.selectedPaymentMethod, externalServiceList: externalServiceList, articleList: articleList
+    this.expenseCreation = {
+      date: this.date, originId: this.selectedOrigin, documentType: this.selectedDocumentType, documentNumber: this.documentNumber,
+      paymentDeadline: this.paymentDeadline, value: this.valueWithoutIva, iva: this.ivaAmount, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
+      accountId: this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList
     } as ExpenseCreation;
 
     console.log(this.expenseCreation)

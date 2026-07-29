@@ -19,6 +19,12 @@ export class ExpenseService {
         return this.http.get<ObjectList>(url);
     }
 
+    getExpenseById(expenseId: number) : Observable<Expense> {
+        let url = environment.transactions.expense.expensesUrl + "/" + expenseId;
+        console.log(this.http.get<Expense>(url));
+        return this.http.get<Expense>(url);
+    }
+
     getExpensesInDebt(currentPage: number, pageSize: number) : Observable<ExpenseInDebt[]> {
         let url = environment.queries.debts.expensesInDebtUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize + "&sortBy=paymentDeadline&sortDirection=DESC";
         return this.http.get<ExpenseInDebt[]>(url);

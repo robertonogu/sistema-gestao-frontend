@@ -17,27 +17,31 @@ import { DetailsConstructionRoutingModule } from './details-construction-routing
 import { TimelineModule } from 'primeng/timeline';
 import { TooltipModule } from 'primeng/tooltip';
 import { ChartModule } from 'primeng/chart';
+import { CardModule } from "primeng/card";
+import { TagModule } from "primeng/tag";
 
 @NgModule({
 	imports: [
-		CommonModule,
-		FormsModule,
-		TableModule,
-		RatingModule,
-		ButtonModule,
-		SliderModule,
-		InputTextModule,
-		ToggleButtonModule,
-		RippleModule,
-		MultiSelectModule,
-		TooltipModule,
-		TimelineModule,
-		DropdownModule,
-		ProgressBarModule,
-		ChartModule,
-		ToastModule,
-		DetailsConstructionRoutingModule
-	],
+    CommonModule,
+    FormsModule,
+    TableModule,
+    RatingModule,
+    ButtonModule,
+    SliderModule,
+    InputTextModule,
+    ToggleButtonModule,
+    RippleModule,
+    MultiSelectModule,
+    TooltipModule,
+    TimelineModule,
+    DropdownModule,
+    ProgressBarModule,
+    ChartModule,
+    ToastModule,
+    DetailsConstructionRoutingModule,
+    CardModule,
+    TagModule
+],
 	declarations: [DetailsConstructionComponent]
 })
 export class DetailsConstructionModule { }

@@ -72,14 +72,13 @@
 				</div>
 
                 <div class="field col-12 md:col-4">
-					<label>Sub-Item</label>
-                    <p-dropdown 
-                        [(ngModel)]="selectedBudgetSubItem"
-                        [options]="budgetSubItemNames" 
-                        optionLabel="name" 
-                        optionValue="id"
-                        placeholder="Selecione um Sub-Item" 
-                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedEmployee }"
+					<label>Item</label>
+                    <p-treeSelect
+                        [(ngModel)]="selectedBudgetNode"
+                        [options]="budgetTree"
+                        containerStyleClass="w-full"
+                        placeholder="Selecione um Item"
+                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedBudgetNode }"
 					/>
 				</div>
 

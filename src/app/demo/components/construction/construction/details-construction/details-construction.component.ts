@@ -1,88 +1,554 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
+import { Component, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CashflowMonth } from 'src/app/demo/api/cashflowMonth';
+import { ConstructionCalendarEvent } from 'src/app/demo/api/constructionCalendarEvent';
 import { ConstructionDetails } from 'src/app/demo/api/constructionDetails';
 import { ItemCost } from 'src/app/demo/api/itemCost';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 
+interface CostBucket { budgeted: number; actual: number; }
+
+interface CostsByItemSplit {
+  name: string;
+  materials: CostBucket;
+  workLog: CostBucket;
+  externalServices: CostBucket;
+}
+
+interface CatItem { name: string; value: number; }
+
+type SourceKey = 'materials' | 'workLog' | 'externalServices';
+
 @Component({
   templateUrl: './details-construction.component.html',
+  styles: [`
+  :host {
+  --bg: #ffffff;
+  --surface-2: #fafbfc;
+  --border: #e6e8ec;
+  --text: #1a1d23;
+  --text-2: #555a63;
+  --text-3: #8a8f99;
+  --accent: oklch(0.62 0.13 250);
+  --accent-soft: oklch(0.96 0.025 250);
+  --success: oklch(0.55 0.13 155);
+  --danger:  oklch(0.62 0.18 25);
+  --radius: 10px;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  display: block;
+}
+
+.obra-header {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 180px 1fr 260px auto;
+  gap: 20px;
+  align-items: stretch;
+}
+
+// ===== Foto =====
+.obra-photo {
+  position: relative;
+  width: 180px;
+  height: 130px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-2);
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+.obra-photo-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px;
+  color: var(--text-3);
+  background-image:
+    repeating-linear-gradient(-45deg,
+      oklch(0.96 0.005 250),
+      oklch(0.96 0.005 250) 8px,
+      oklch(0.94 0.01 250)  8px,
+      oklch(0.94 0.01 250)  16px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  i { font-size: 22px; opacity: 0.7; }
+}
+:host ::ng-deep .obra-photo-tag {
+  position: absolute;
+  top: 8px; left: 8px;
+}
+
+// ===== Bloco principal =====
+.obra-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.obra-id {
+  display: flex; gap: 6px; align-items: center;
+  font-size: 12px; color: var(--text-2);
+  .code {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+  }
+}
+
+.obra-name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.obra-morada {
+  display: flex; gap: 6px; align-items: center;
+  color: var(--text-2);
+  font-size: 13px;
+  i { color: var(--text-3); font-size: 12px; }
+}
+
+// ===== Progresso =====
+.obra-progress { margin-top: 8px; }
+
+.progress-head, .progress-foot {
+  display: flex; justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.progress-head { margin-bottom: 6px; }
+.progress-head strong { color: var(--text); font-weight: 600; }
+.progress-head .late strong { color: var(--danger); }
+
+.progress-track {
+  position: relative;
+  height: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: visible;
+}
+.progress-fill {
+  position: absolute; inset: 0 auto 0 0;
+  background: var(--success);
+  border-radius: 999px;
+  transition: width 0.3s;
+  &.late { background: var(--danger); }
+}
+.progress-today {
+  position: absolute;
+  top: -3px; bottom: -3px;
+  width: 2px;
+  background: var(--text);
+  transform: translateX(-1px);
+  border-radius: 2px;
+}
+
+.progress-foot {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+// ===== Meta lateral =====
+.obra-meta {
+  display: flex; flex-direction: column;
+  gap: 6px;
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+}
+.meta-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 13px;
+  &.strong { font-weight: 600; padding-top: 4px; }
+}
+.meta-label { color: var(--text-3); font-size: 12px; }
+.meta-value { color: var(--text); }
+.meta-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+// ===== Ações =====
+.obra-actions {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+// ===== Helpers =====
+.muted { color: var(--text-3); }
+.mono  { font-family: var(--font-mono); }
+
+// ===== Responsivo =====
+@media (max-width: 1100px) {
+  .obra-header {
+    grid-template-columns: 160px 1fr;
+    grid-template-areas:
+      "photo main"
+      "meta  meta"
+      "actions actions";
+  }
+  .obra-photo   { grid-area: photo; }
+  .obra-main    { grid-area: main; }
+  .obra-meta    { grid-area: meta; padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: 12px; }
+  .obra-actions { grid-area: actions; flex-direction: row; align-items: center; }
+}
+   :host {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #fafbfc;
+  --border: #e6e8ec;
+  --text: #1a1d23;
+  --text-2: #555a63;
+  --text-3: #8a8f99;
+  --danger: oklch(0.62 0.18 25);
+  --success: oklch(0.55 0.13 155);
+  --radius: 10px;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  display: block;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.dash { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.muted { color: var(--text-3); }
+.mono  { font-family: var(--font-mono); }
+
+// ===== Header =====
+.dash-header {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  h1 { margin: 4px 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+}
+
+// ===== KPIs =====
+.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent, var(--border));
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
+  .kpi-value { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
+  .kpi-foot  { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-top: 2px; }
+  .kpi-sub   { color: var(--text-3); }
+  .kpi-delta {
+    display: inline-flex; gap: 4px; align-items: center;
+    font-family: var(--font-mono); font-weight: 600;
+    &.up   { color: var(--success); }
+    &.down { color: var(--danger); }
+    small { font-weight: 400; }
+  }
+}
+
+// ===== Execução financeira =====
+:host ::ng-deep .exec-card .p-card-body { padding: 16px; }
+.exec-head { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+.seg-bar {
+  display: flex; height: 20px; border-radius: 6px; overflow: hidden;
+  background: var(--surface-2); border: 1px solid var(--border);
+  .seg { transition: width 0.3s; }
+}
+.seg-legend {
+  display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; font-size: 12px;
+  .legend-item { display: inline-flex; gap: 6px; align-items: center; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+}
+
+// ===== Layout rows =====
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.source-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+
+.section-title {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-3); margin: 8px 0 0 0;
+  display: flex; align-items: center; gap: 8px;
+  &::before { content: ''; width: 3px; height: 14px; background: oklch(0.62 0.13 250); border-radius: 2px; }
+}
+
+// ===== Card titles =====
+.card-title {
+  display: flex; gap: 8px; align-items: center;
+  font-weight: 600; font-size: 13px; padding: 14px 16px 0;
+  i { color: var(--text-3); }
+}
+:host ::ng-deep .p-card {
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 2px rgba(15,20,30,0.04) !important;
+  border-radius: var(--radius) !important;
+}
+:host ::ng-deep .p-card .p-card-body { padding: 14px 16px; }
+
+// ===== Source columns =====
+.source-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px 4px;
+  .source-title { display: flex; gap: 8px; align-items: center; font-weight: 600; }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+}
+.source-totals {
+  display: flex; justify-content: space-between;
+  padding: 0 16px 12px;
+  font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.04em;
+  strong { font-size: 13px; color: var(--text); margin-left: 4px; }
+  strong.over { color: var(--danger); }
+}
+
+.bars { display: flex; flex-direction: column; gap: 12px; }
+.bar-row-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px;
+  .bar-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-pct  { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); font-weight: 600; flex-shrink: 0; }
+  .bar-pct.over { color: var(--danger); }
+}
+.bar-track {
+  position: relative; height: 14px; background: var(--surface-2);
+  border-radius: 4px; overflow: hidden;
+  .bar-orcado { position: absolute; inset: 0 auto 0 0; border-radius: 4px; }
+  .bar-real   { position: absolute; top: 3px; bottom: 3px; left: 0; border-radius: 3px; }
+}
+.bar-foot {
+  display: flex; justify-content: space-between; font-size: 10px; color: var(--text-3); margin-top: 3px;
+  .over { color: var(--danger); }
+}
+
+// ===== Payments =====
+.month-block + .month-block { margin-top: 14px; }
+.month-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.pay-row {
+  display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  &:last-child { border-bottom: none; }
+  .pay-date   { color: var(--text-3); font-size: 11px; }
+  .pay-amount { font-weight: 600; }
+  &.in  .pay-amount { color: var(--success); }
+  &.out .pay-amount { color: var(--danger); }
+}
+
+// ===== Charts =====
+.chart-host { height: 240px; padding: 8px 16px 16px; }
+.chart-host.sm { height: 180px; }
+  `]
 })
-export class DetailsConstructionComponent implements OnInit, AfterViewInit {
+export class DetailsConstructionComponent implements OnInit {
+
+  get itemsSplit(): CostsByItemSplit[] {
+    if (!this.constructionDetails) return [];
+
+    const byName = new Map<string, CostsByItemSplit>();
+    const ensure = (name: string): CostsByItemSplit => {
+      let entry = byName.get(name);
+      if (!entry) {
+        entry = {
+          name,
+          materials: { budgeted: 0, actual: 0 },
+          workLog: { budgeted: 0, actual: 0 },
+          externalServices: { budgeted: 0, actual: 0 },
+        };
+        byName.set(name, entry);
+      }
+      return entry;
+    };
+
+    for (const item of this.constructionDetails.articlesItemsCost ?? []) {
+      ensure(item.name).materials = { budgeted: item.budgetValue, actual: item.value };
+    }
+    for (const item of this.constructionDetails.workItemsCost ?? []) {
+      ensure(item.name).workLog = { budgeted: item.budgetValue, actual: item.value };
+    }
+    for (const item of this.constructionDetails.externalServiceItemsCost ?? []) {
+      ensure(item.name).externalServices = { budgeted: item.budgetValue, actual: item.value };
+    }
+
+    return Array.from(byName.values());
+  }
 
   constructionDetails!: ConstructionDetails;
-  constructionSumValue!: number;
+  cashflowChartData: any;
+  cashflowChartOptions: any;
 
-  paymentValueVersusCostValueWorksData: any;
-  itemsValue: any;
-  options: any;
+  calendarYear: number = new Date().getFullYear();
+  calendarMonth: number = new Date().getMonth();
+  calendarWeeks: (number | null)[][] = [];
 
-  route: ActivatedRoute = inject(ActivatedRoute);
-  
+  activeTab: 'item' | 'source' = 'item';
+
+  readonly WEEK_DAYS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+  readonly MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
   constructionId = -1;
 
   constructor(
-    private constructionService: ConstructionService
+    private constructionService: ConstructionService,
+    private route: ActivatedRoute,
+    private location: Location
   ) {}
-  
 
   ngOnInit(): void {
     this.constructionId = Number(this.route.snapshot.params['constructionId']);
-  
-    this.constructionService.getConstructionDetails(this.constructionId).subscribe((constructionDetails) => {
-      this.constructionDetails = constructionDetails;
+    this.constructionService.getConstructionDetails(this.constructionId).subscribe((data) => {
+      this.constructionDetails = data;
+          console.log(data)
     });
+    console.log(this.constructionDetails)
   }
 
-  ngAfterViewInit(): void {
-    const labels = this.getLabels(this.constructionDetails.workItemsCost);
-    const values = this.getValues(this.constructionDetails.workItemsCost);
+  private ms(iso: string): number { return new Date(iso).getTime(); }
+  private hoje(): number { return Date.now(); }
 
-    const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
+  // === progresso temporal ===
+  pctTempo = computed(() => {
+    const ini = this.ms(this.constructionDetails.adjudicationDate);
+    const fim = this.ms(this.constructionDetails.endDate);
+    const now = this.hoje();
+    if (fim <= ini) return 0;
+    const raw = ((now - ini) / (fim - ini)) * 100;
+    return Math.max(0, Math.min(100, Math.round(raw)));
+  });
 
-    this.paymentValueVersusCostValueWorksData = {
-      labels: ['Pagamentos', 'Custos de Obra'],
-      datasets: [
-        {
-          data: [this.constructionDetails.paymentValue, this.constructionDetails.costValueWorks],
-          backgroundColor: [documentStyle.getPropertyValue('--blue-500'), documentStyle.getPropertyValue('--yellow-500'), documentStyle.getPropertyValue('--green-500')],
-          hoverBackgroundColor: [documentStyle.getPropertyValue('--blue-400'), documentStyle.getPropertyValue('--yellow-400'), documentStyle.getPropertyValue('--green-400')]
-        }
-      ]
+  diasRestantes = computed(() => {
+    const fim = this.ms(this.constructionDetails.endDate);
+    const now = this.hoje();
+    return Math.round((fim - now) / (1000 * 60 * 60 * 24));
+  });
+
+  duracaoMeses = computed(() => {
+    const ini = this.ms(this.constructionDetails.adjudicationDate);
+    const fim = this.ms(this.constructionDetails.endDate);
+    return Math.round((fim - ini) / (1000 * 60 * 60 * 24 * 30));
+  });
+
+  back(): void { this.location.back(); }
+
+  readonly sourceCols: { key: SourceKey; title: string; icon: string; color: string; soft: string }[] = [
+    { key: 'materials',        title: 'Materiais',         icon: 'pi pi-box',    color: 'oklch(0.62 0.13 250)', soft: 'oklch(0.92 0.03 250)' },
+    { key: 'workLog',          title: 'Mão-de-obra',       icon: 'pi pi-users',  color: 'oklch(0.55 0.13 155)', soft: 'oklch(0.92 0.04 155)' },
+    { key: 'externalServices', title: 'Serviços externos', icon: 'pi pi-wrench', color: 'oklch(0.55 0.15 75)',  soft: 'oklch(0.94 0.04 75)'  },
+  ];
+
+  // ===== Computados =====
+  margem      = computed(() => this.constructionDetails.invoicedValue - this.constructionDetails.costValueWorks);
+  pctFaturado = computed(() => Math.round((this.constructionDetails.invoicedValue / this.constructionDetails.initialBudget) * 100));
+  pctPago     = computed(() => Math.round((this.constructionDetails.paymentValue     / this.constructionDetails.initialBudget)  * 100));
+
+  kpis = computed(() => [
+    { label: 'Orçamento',    value: this.fmtEUR(this.constructionDetails.initialBudget), accent: 'oklch(0.85 0.07 250)', sub: 'valor adjudicado' },
+    { label: 'Faturado',     value: this.fmtEUR(this.constructionDetails.invoicedValue),  accent: 'oklch(0.65 0.13 250)', sub: `${this.pctFaturado()}% do orçado`,  delta:  12, deltaLabel: 'vs. mês ant.' },
+    { label: 'Pago',         value: this.fmtEUR(this.constructionDetails.paymentValue),      accent: 'oklch(0.5 0.13 155)',  sub: `${this.pctPago()}% do faturado`,    delta:   8, deltaLabel: 'vs. mês ant.' },
+    { label: 'Custos reais', value: this.fmtEUR(this.constructionDetails.costValueWorks),    accent: 'oklch(0.62 0.18 25)',  sub: 'acumulado',                          delta:  -3, deltaLabel: 'abaixo do plano' },
+    { label: 'Lucro',        value: this.fmtEUR(this.margem()),       accent: 'oklch(0.55 0.15 75)',  sub: `margem ${((this.margem() / this.constructionDetails.initialBudget) * 100).toFixed(1)}%`, delta: 14, deltaLabel: 'vs. estimado' },
+  ]);
+
+  execSegments = computed(() => {
+    const pago        = this.constructionDetails.paymentValue;
+    const naoPago     = this.constructionDetails.invoicedValue - this.constructionDetails.paymentValue;
+    const porFaturar  = this.constructionDetails.initialBudget - this.constructionDetails.invoicedValue;
+    const max         = this.constructionDetails.initialBudget || 1;
+    return [
+      { label: 'Pago',              value: pago,       color: 'oklch(0.5 0.13 155)',  pct: (pago       / max) * 100 },
+      { label: 'Faturado não pago', value: naoPago,    color: 'oklch(0.65 0.13 250)', pct: (naoPago    / max) * 100 },
+      { label: 'Por faturar',       value: porFaturar, color: 'oklch(0.92 0.03 250)', pct: (porFaturar / max) * 100 },
+    ];
+  });
+
+  paymentsByMonth = computed(() => {
+    /*const map = new Map<string, typeof this.payments>();
+    for (const p of this.payments) {
+      const k = p.data.slice(0, 7);
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(p);
+    }
+    return Array.from(map.entries()).map(([month, items]) => ({ month, items }));*/
+  });
+
+  // ===== Charts =====
+  cashflowData = computed(() => ({
+    /*labels: this.cashflow.map(c => c.month),
+    datasets: [
+      { label: 'Faturado', data: this.cashflow.map(c => c.faturado), borderColor: 'oklch(0.65 0.13 250)', backgroundColor: 'oklch(0.92 0.03 250 / 0.6)', tension: 0.35, fill: true },
+      { label: 'Pago',     data: this.cashflow.map(c => c.pago),     borderColor: 'oklch(0.5 0.13 155)',  backgroundColor: 'transparent', tension: 0.35 },
+      { label: 'Custos',   data: this.cashflow.map(c => c.custos),   borderColor: 'oklch(0.62 0.18 25)',  backgroundColor: 'transparent', borderDash: [4, 4], tension: 0.35 },
+    ],*/
+  }));
+
+  cashflowOptions = {
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom' as const, labels: { boxWidth: 10, font: { size: 11 } } } },
+    scales: {
+      y: { ticks: { callback: (v: any) => (Number(v) / 1000) + 'k', font: { size: 10 } }, grid: { color: '#eef0f3' } },
+      x: { ticks: { font: { size: 10 } }, grid: { display: false } },
+    },
+  };
+
+  private donutFor(items: CatItem[], baseHue: number) {
+    return {
+      data: {
+        labels: items.map(i => i.name),
+        datasets: [{
+          data: items.map(i => i.value),
+          backgroundColor: items.map((_, i) => `oklch(${0.7 - i * 0.06} 0.13 ${baseHue})`),
+          borderWidth: 0,
+        }],
+      },
+      options: {
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: { legend: { position: 'right' as const, labels: { boxWidth: 10, font: { size: 11 } } } },
+      },
     };
-
-    this.itemsValue = {
-      labels: labels,
-      datasets: [
-        {
-          data: values,
-          backgroundColor: [documentStyle.getPropertyValue('--purple-500'), documentStyle.getPropertyValue('--yellow-500'), documentStyle.getPropertyValue('--green-500')],
-          hoverBackgroundColor: [documentStyle.getPropertyValue('--orange-400'), documentStyle.getPropertyValue('--yellow-400'), documentStyle.getPropertyValue('--green-400')]
-        }
-      ]
-    };
-
-    this.options = {
-      cutout: '80%',
-      plugins: {
-        legend: {
-          labels: {
-            color: textColor
-          }
-        }
-      }
-    };
   }
 
-  getLabels(items: ItemCost[]): string[] {
-    return items.map(item => item.name);
+  //donutMateriais = computed(() => this.donutFor(COSTS_BY_CAT.materiais, 250));
+  //donutMaoObra   = computed(() => this.donutFor(COSTS_BY_CAT.maoObra,   155));
+  //donutServicos  = computed(() => this.donutFor(COSTS_BY_CAT.servicos,   75));
+
+  // ===== Helpers usados no template =====
+  fmtEUR(n: number): string {
+    const abs = Math.abs(n || 0).toLocaleString('pt-PT', { maximumFractionDigits: 0 });
+    return abs + ' €';
   }
 
-  getValues(items: ItemCost[]): number[] {
-    return items.map(item => item.value);
+  pctOf(actual: number, budgeted: number): number {
+    return budgeted ? Math.round((actual / budgeted) * 100) : 0;
   }
 
-  getItemsSum(items: ItemCost[]): number {
-    return items.reduce((acc, item) => acc + item.value, 0);
+  isOverrun(actual: number, budgeted: number): boolean {
+    return actual > budgeted;
+  }
+
+  bucket(item: CostsByItemSplit, key: SourceKey): CostBucket {
+    return item[key];
+  }
+
+  widthPct(value: number, max: number): number {
+    return max ? Math.min((value / max) * 100, 100) : 0;
+  }
+
+  realWidthPct(item: CostsByItemSplit, key: SourceKey): number {
+    const { budgeted, actual } = this.bucket(item, key);
+    return this.widthPct(actual, budgeted);
+  }
+
+  totalBudgeted(key: SourceKey): number {
+    return this.itemsSplit.reduce((s, it) => s + it[key].budgeted, 0);
+  }
+
+  totalActual(key: SourceKey): number {
+    return this.itemsSplit.reduce((s, it) => s + it[key].actual, 0);
   }
 }

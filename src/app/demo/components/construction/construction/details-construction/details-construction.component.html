@@ -1,199 +1,287 @@
-<div class="grid nested-grid">
-    <div class="col-12 lg:col-6 xl:col-10">
-        <div class="card mb-0">
-            <h5>Calendário</h5>
-            <p-timeline  layout="horizontal" align="alternate">
-                <ng-template pTemplate="content" let-event>
-                    <small class="p-text-secondary">{{ event.date }}</small>
-                </ng-template>
-                <ng-template pTemplate="opposite" let-event>
-                    {{ event.status }}
-                </ng-template>
-            </p-timeline>                
-        </div>
+<div class="dash">
+
+  <!-- ========== Header ========== -->
+  <header class="obra-header">
+  <!-- ===== Foto ===== -->
+  <div class="obra-photo">
+    <img *ngIf="constructionDetails.name; else fotoPlaceholder"
+         [src]="constructionDetails.name"
+         [alt]="constructionDetails.name" />
+    <ng-template #fotoPlaceholder>
+      <div class="obra-photo-placeholder">
+        <i class="pi pi-image"></i>
+        <span>foto da obra</span>
+      </div>
+    </ng-template>
+    <p-tag value="Em curso"
+           severity="info"
+           styleClass="obra-photo-tag"></p-tag>
+  </div>
+
+  <!-- ===== Bloco principal ===== -->
+  <div class="obra-main">
+    <div class="obra-id">
+      <span class="mono code">{{ constructionDetails.constructionNumber }}</span>
+      <span class="muted">·</span>
+      <span class="muted">{{ constructionDetails.client }}</span>
     </div>
 
-    <div class="col-12 lg:col-6 xl:col-2">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3" pTooltip="Lucro = Valor Pago - Custos Totais de Obra" tooltipPosition="left">
-                <div>
-                    <span class="block text-900 font-bold mb-3">Lucro</span>
-                    <div class="font-bold text-xl" [ngClass]="constructionDetails.profit > 0 ? 'text-green-500' : 'text-red-500'">{{ constructionDetails.profit | currency: 'EUR' }}</div>
-                </div>
-        
-            </div>
-            <div class="flex justify-content-between">
-                <div>
-                    <span class="block text-900 font-bold mb-3">Valor Pago</span>
-                    <div class="text-600 font-bold text-xl">{{ constructionDetails.paymentValue | currency: 'EUR' }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <h1 class="obra-name">{{ constructionDetails.name }}</h1>
 
-<div class="grid">
-    <div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <h5 class="text-900 font-bold text-xl">Orçamento Inicial</h5>
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Valor Orçamentado</span>
-                    <div class="text-900 font-bold text-xl">{{ constructionDetails.initialBudget | currency: 'EUR' }}</div>
-                </div>
-            </div>
-
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Valor Custos de Obra</span>
-                    <div class="text-900 font-bold text-xl">{{ constructionDetails.costValueWorks  | currency: 'EUR' }}</div>
-                </div>
-            </div>
-
-            <div class="flex justify-content-between">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Diferencial</span>
-                    <div class="font-bold text-xl" [ngClass]="constructionDetails.differential > 0 ? 'text-green-500' : 'text-red-500'">{{ constructionDetails.differential | currency: 'EUR' }}</div>
-                </div>
-            </div>  
-        </div>
-    </div>
-    
-    <!--<div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <h5 class="text-900 font-bold text-xl">Orçamento Extra</h5>
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Valor Orçamentado</span>
-                    <div class="text-900 font-bold text-xl">{{ initialBudget | currency: 'EUR' }}</div>
-                </div>
-                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
-                </div>
-            </div>
-
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Valor Custos de Obra</span>
-                    <div class="text-900 font-bold text-xl">{{ constructionCosts | currency: 'EUR' }}</div>
-                </div>
-                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
-                </div>
-            </div>
-
-            <div class="flex justify-content-between">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Diferencial</span>
-                    <div class="text-900 font-bold text-xl">{{ differential | currency: 'EUR' }}</div>
-                </div>
-                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
-                </div>
-            </div>  
-        </div>
-    </div>-->
-
-    <div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <p-chart type="doughnut" [data]="paymentValueVersusCostValueWorksData" [options]="options" />
-        </div>
+    <div class="obra-morada">
+      <i class="pi pi-map-marker"></i>
+      {{ constructionDetails.address }}
     </div>
 
-    <div class="col-12 lg:col-6 xl:col-3">
-        <div class="card mb-0">
-            <p-chart type="doughnut" [data]="itemsValue" [options]="options" />
-        </div>
+    <!-- ===== Progresso temporal ===== -->
+    <div class="obra-progress">
+      <div class="progress-head">
+        <span class="muted">Progresso temporal</span>
+        <span class="mono"
+              [class.late]="diasRestantes() < 0">
+          <strong>{{ pctTempo() }}%</strong>
+          <span class="muted">·
+            {{ diasRestantes() < 0
+                ? (-diasRestantes()) + ' dias em atraso'
+                : diasRestantes() + ' dias restantes' }}
+          </span>
+        </span>
+      </div>
+
+      <div class="progress-track">
+        <div class="progress-fill"
+             [class.late]="diasRestantes() < 0"
+             [style.width.%]="pctTempo()"></div>
+        <div class="progress-today"
+             [style.left.%]="pctTempo()"
+             pTooltip="Hoje"></div>
+      </div>
+
+      <div class="progress-foot mono">
+        <span>{{ constructionDetails.adjudicationDate | date:'dd/MM/yy' }}</span>
+        <span>{{ constructionDetails.endDate | date:'dd/MM/yy' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Meta lateral (datas + valores) ===== -->
+  <div class="obra-meta">
+    <div class="meta-row">
+      <span class="meta-label">Adjudicação</span>
+      <span class="meta-value mono">{{ constructionDetails.adjudicationDate | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="meta-row">
+      <span class="meta-label">Início</span>
+      <span class="meta-value mono">{{ constructionDetails.adjudicationDate | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="meta-row">
+      <span class="meta-label">Prazo</span>
+      <span class="meta-value mono">{{ constructionDetails.endDate | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="meta-row">
+      <span class="meta-label">Duração</span>
+      <span class="meta-value mono">{{ duracaoMeses() }} meses</span>
     </div>
 
-    <div class="col-12 lg:col-6 xl:col-4">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Materiais</span>
-                    <div class="text-900 font-bold text-xl">{{ getItemsSum(constructionDetails.articlesItemsCost) | currency: 'EUR' }}</div>
-                </div>
-                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-search text-blue-500 text-xl"></i>
-                </div>
-            </div>
-            <p-table [value]="constructionDetails.articlesItemsCost">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Nome</th>
-                        <th>Inicial</th>
-                        <th>Extra</th>
-                    </tr> 
-                </ng-template>
-                <ng-template pTemplate="body" let-itemCost>
-                    <tr>
-                        <td>{{ itemCost.name }}</td>
-                        <td>{{ itemCost.value | currency: 'EUR' }}</td>
-                        <td>{{ 0 | currency: 'EUR' }}</td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
+    <div class="meta-divider"></div>
+
+    <div class="meta-row strong">
+      <span class="meta-label">Valor adjudicado</span>
+      <span class="meta-value mono">{{ fmtEUR(constructionDetails.initialBudget) }}</span>
+    </div>
+    <div class="meta-row">
+      <span class="meta-label">Responsável</span>
+      <span class="meta-value">{{ constructionDetails.name }}</span>
+    </div>
+  </div>
+
+  <!-- ===== Ações ===== -->
+  <div class="obra-actions">
+    <p-button icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              pTooltip="Editar"></p-button>
+    <p-button icon="pi pi-download"
+              [text]="true"
+              [rounded]="true"
+              pTooltip="Exportar"></p-button>
+    <p-button icon="pi pi-ellipsis-v"
+              [text]="true"
+              [rounded]="true"></p-button>
+  </div>
+</header>
+
+  <!-- ========== KPIs ========== -->
+  <section class="kpi-grid">
+    <div *ngFor="let k of kpis()" class="kpi" [style.--accent]="k.accent">
+      <div class="kpi-label">{{ k.label }}</div>
+      <div class="kpi-value">{{ k.value }}</div>
+      <div class="kpi-foot">
+        <span class="kpi-sub">{{ k.sub }}</span>
+        <span *ngIf="k.delta !== undefined"
+              class="kpi-delta"
+              [class.up]="k.delta > 0"
+              [class.down]="k.delta < 0">
+          <i class="pi"
+             [class.pi-arrow-up]="k.delta > 0"
+             [class.pi-arrow-down]="k.delta < 0"></i>
+          {{ k.delta > 0 ? '+' : '' }}{{ k.delta }}%
+          <small class="muted">{{ k.deltaLabel }}</small>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== Execução financeira ========== -->
+  <p-card styleClass="exec-card">
+    <div class="exec-head">
+      <strong>Execução financeira</strong>
+      <span class="muted">
+        Orçamentado: <strong class="mono">{{ fmtEUR(constructionDetails.initialBudget) }}</strong>
+      </span>
     </div>
 
-    <div class="col-12 lg:col-6 xl:col-4">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Mão-de-Obra</span>
-                    <div class="text-900 font-bold text-xl">{{ getItemsSum(constructionDetails.workItemsCost) | currency: 'EUR' }}</div>
-                </div>
-                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-search text-blue-500 text-xl"></i>
-                </div>
-            </div>
-            <p-table [value]="constructionDetails.workItemsCost">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Nome</th>
-                        <th>Inicial</th>
-                        <th>Extra</th>
-                    </tr> 
-                </ng-template>
-                <ng-template pTemplate="body" let-itemCost>
-                    <tr>
-                        <td>{{ itemCost.name }}</td>
-                        <td>{{ itemCost.value | currency: 'EUR' }}</td>
-                        <td>{{ 0 | currency: 'EUR' }}</td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
+    <div class="seg-bar">
+      <div *ngFor="let s of execSegments()"
+           class="seg"
+           [style.width.%]="s.pct"
+           [style.background]="s.color"
+           [pTooltip]="s.label + ': ' + fmtEUR(s.value)"></div>
     </div>
 
-    <div class="col-12 lg:col-6 xl:col-4">
-        <div class="card mb-0">
-            <div class="flex justify-content-between mb-3">
-                <div>
-                    <span class="block text-500 font-medium mb-3">Serviços Externos</span>
-                    <div class="text-900 font-bold text-xl">{{ getItemsSum(constructionDetails.externalServiceItemsCost) | currency: 'EUR' }}</div>
-                </div>
-                <div class="flex align-items-center justify-content-center bg-blue-100 border-round" [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
-                    <i class="pi pi-search text-blue-500 text-xl"></i>
-                </div>
-            </div>
-            <p-table [value]="constructionDetails.externalServiceItemsCost">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Nome</th>
-                        <th>Inicial</th>
-                        <th>Extra</th>
-                    </tr> 
-                </ng-template>
-                <ng-template pTemplate="body" let-itemCost>
-                    <tr>
-                        <td>{{ itemCost.name }}</td>
-                        <td>{{ itemCost.value | currency: 'EUR' }}</td>
-                        <td>{{ 0 | currency: 'EUR' }}</td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
+    <div class="seg-legend">
+      <span *ngFor="let s of execSegments()" class="legend-item">
+        <span class="dot" [style.background]="s.color"></span>
+        {{ s.label }} <strong class="mono">{{ fmtEUR(s.value) }}</strong>
+      </span>
     </div>
+  </p-card>
 
+  <!-- ========== Pagamentos + Cashflow ========== -->
+  <!--<section class="row-2">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-title"><i class="pi pi-calendar"></i> Calendário de pagamentos</div>
+      </ng-template>
+
+      <div *ngFor="let g of paymentsByMonth()" class="month-block">
+        <div class="month-label mono">{{ g.month }}</div>
+        <div *ngFor="let p of g.items"
+             class="pay-row"
+             [class.in]="p.valor > 0"
+             [class.out]="p.valor < 0">
+          <div class="pay-date mono">{{ p.data | date:'dd MMM' }}</div>
+          <div class="pay-label">{{ p.label }}</div>
+          <div class="pay-amount mono">
+            {{ p.valor > 0 ? '+' : '' }}{{ fmtEUR(p.valor) }}
+          </div>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-title"><i class="pi pi-chart-line"></i> Cashflow mensal</div>
+      </ng-template>
+      <div class="chart-host">
+        <p-chart type="line" [data]="cashflowData()" [options]="cashflowOptions"></p-chart>
+      </div>
+    </p-card>
+  </section>-->
+
+  <!-- ========== Custos por item · 3 colunas por fonte ========== -->
+  <h3 class="section-title">Custos por item · por fonte</h3>
+
+  <section class="source-grid">
+    <p-card *ngFor="let col of sourceCols" styleClass="source-card">
+      <ng-template pTemplate="header">
+        <div class="source-head">
+          <div class="source-title">
+            <span class="swatch" [style.background]="col.color"></span>
+            <i [class]="col.icon"></i>
+            {{ col.title }}
+          </div>
+          <p-tag [value]="itemsSplit.length + ' itens'"
+                 [style.background]="col.soft"
+                 [style.color]="col.color"></p-tag>
+        </div>
+        <div class="source-totals mono">
+          <span>Real
+            <strong [class.over]="totalActual(col.key) > totalBudgeted(col.key)">
+              {{ fmtEUR(totalActual(col.key)) }}
+            </strong>
+          </span>
+          <span>Orçamentado
+            <strong>{{ fmtEUR(totalBudgeted(col.key)) }}</strong>
+          </span>
+        </div>
+      </ng-template>
+
+      <div class="bars">
+        <div *ngFor="let it of itemsSplit" class="bar-row">
+          <div class="bar-row-head">
+            <span class="bar-name">{{ it.name }}</span>
+            <span class="bar-pct"
+                  [class.over]="isOverrun(bucket(it, col.key).actual, bucket(it, col.key).budgeted)">
+              {{ pctOf(bucket(it, col.key).actual, bucket(it, col.key).budgeted) }}%
+            </span>
+          </div>
+
+          <div class="bar-track">
+            <div class="bar-orcado"
+                 [style.width.%]="100"
+                 [style.background]="col.soft"></div>
+            <div class="bar-real"
+                 [style.width.%]="realWidthPct(it, col.key)"
+                 [style.background]="isOverrun(bucket(it, col.key).actual, bucket(it, col.key).budgeted)
+                                       ? 'oklch(0.62 0.18 25)'
+                                       : col.color"></div>
+          </div>
+
+          <div class="bar-foot mono">
+            <span [class.over]="isOverrun(bucket(it, col.key).actual, bucket(it, col.key).budgeted)">
+              {{ fmtEUR(bucket(it, col.key).actual) }}
+            </span>
+            <span class="muted">{{ fmtEUR(bucket(it, col.key).budgeted) }}</span>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- ========== Donuts ========== -->
+  <!--<section class="row-3">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-title"><i class="pi pi-box"></i> Materiais — categorias</div>
+      </ng-template>
+      <div class="chart-host sm">
+        <p-chart type="doughnut"
+                 [data]="donutMateriais().data"
+                 [options]="donutMateriais().options"></p-chart>
+      </div>
+    </p-card>
+
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-title"><i class="pi pi-users"></i> Mão-de-obra — funções</div>
+      </ng-template>
+      <div class="chart-host sm">
+        <p-chart type="doughnut"
+                 [data]="donutMaoObra().data"
+                 [options]="donutMaoObra().options"></p-chart>
+      </div>
+    </p-card>
+
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-title"><i class="pi pi-wrench"></i> Serviços — fornecedores</div>
+      </ng-template>
+      <div class="chart-host sm">
+        <p-chart type="doughnut"
+                 [data]="donutServicos().data"
+                 [options]="donutServicos().options"></p-chart>
+      </div>
+    </p-card>
+  </section>-->
 </div>

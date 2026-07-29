@@ -44,11 +44,7 @@ export class ListExpensesComponent {
   selectedExpense!: Expense;
 
   onRowSelect(event: any) {
-    console.log(event.data.name)
-    console.log(this.selectedExpense)
-    let expense = this.selectedExpense;
-    console.log(expense)
-    this.router.navigate(["pages/invoice", { expense: JSON.stringify(expense) }]);
+    this.router.navigate(["pages/invoice", { expenseId: event.data.expenseId }]);
   }
 
   newExpense() {

@@ -10,6 +10,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TreeSelectModule } from 'primeng/treeselect';
 
 @NgModule({
 	imports: [
@@ -20,6 +21,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 		ToastModule,
 		DropdownModule,
 		CheckboxModule,
+		TreeSelectModule,
 		CalendarModule,
 		FormsModule,
         CreateWorklogRoutingModule
