@@ -6,7 +6,7 @@ import { HttpHeaders } from "@angular/common/http";
 
 export const environment = {
   production: true,
-  apiUrl: 'https://sistema-gestao-api-production.up.railway.app:8080',
+  apiUrl: 'https://sistema-gestao-api-production.up.railway.app',
 
   httpOptions: {
     headers: new HttpHeaders({
