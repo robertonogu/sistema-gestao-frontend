@@ -229,7 +229,7 @@ export class AppMenuComponent implements OnInit {
                     }
                 ]
             },
-            {
+            /*{
                 label: 'Apps',
                 icon: 'pi pi-th-large',
                 items: [
@@ -678,7 +678,7 @@ export class AppMenuComponent implements OnInit {
                         routerLink: ['/documentation']
                     }
                 ]
-            }
+            }*/
         ];
     }
 }

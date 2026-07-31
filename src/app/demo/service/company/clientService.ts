@@ -34,6 +34,11 @@ export class ClientService {
         return this.http.post<Client>(this.createClientUrl, client, environment.httpOptions);
     }
 
+    updateClient(clientId: number, client: ClientCreation) : Observable<Client> {
+        let url = this.clientsUrl + "/" + clientId;
+        return this.http.put<Client>(url, client, environment.httpOptions);
+    }
+
     deleteClient(clientId: number) {
         let url = this.deleteClientUrl + clientId;
         return this.http.delete(url);

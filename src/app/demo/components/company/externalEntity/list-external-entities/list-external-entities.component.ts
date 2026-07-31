@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { ExternalEntity } from 'src/app/demo/api/externalEntity';
+import { ExternalEntityCreation } from 'src/app/demo/data/model/externalEntityCreation.model';
 import { ExternalEntityService } from 'src/app/demo/service/company/externalEntityService';
 
 @Component({
@@ -17,19 +17,22 @@ export class ListExternalEntitiesComponent {
   currentPage: number = 0;
   pageSize: number = 5;
 
+  externalEntityDialog: boolean = false;
+  submitted: boolean = false;
+  externalEntity: Partial<ExternalEntity> = {};
+
   constructor(
-    private externalEntityService: ExternalEntityService, 
-    private router: Router,
+    private externalEntityService: ExternalEntityService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}
 
   nextPage(event: any) {
     this.loading = true;
-    
+
     this.currentPage = event.first / event.rows;
     this.pageSize = event.rows;
-    
+
     this.externalEntityService.getExternalEntities(this.currentPage, this.pageSize).subscribe((externalEntities) => {
       this.externalEntities = externalEntities.objectList;
       this.totalRecords = externalEntities.totalElements;
@@ -37,8 +40,44 @@ export class ListExternalEntitiesComponent {
     });
   }
 
-  newExternalEntity() {
-    this.router.navigate(['./company/externalEntities/create-externalEntity']);
+  openNew() {
+    this.externalEntity = {};
+    this.submitted = false;
+    this.externalEntityDialog = true;
+  }
+
+  editExternalEntity(externalEntity: ExternalEntity) {
+    this.externalEntity = { ...externalEntity };
+    this.externalEntityDialog = true;
+  }
+
+  hideDialog() {
+    this.externalEntityDialog = false;
+    this.submitted = false;
+  }
+
+  saveExternalEntity() {
+    this.submitted = true;
+
+    if (this.externalEntity.name?.trim()) {
+      const externalEntityCreation = { name: this.externalEntity.name, nif: this.externalEntity.nif } as ExternalEntityCreation;
+
+      if (this.externalEntity.originId) {
+        this.externalEntityService.updateExternalEntity(this.externalEntity.originId, externalEntityCreation).subscribe(() => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Entidade Externa atualizada com sucesso.' });
+          this.externalEntityDialog = false;
+          this.externalEntity = {};
+          this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+        });
+      } else {
+        this.externalEntityService.createExternalEntity(externalEntityCreation).subscribe(() => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Entidade Externa adicionada com sucesso.' });
+          this.externalEntityDialog = false;
+          this.externalEntity = {};
+          this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+        });
+      }
+    }
   }
 
   deleteExternalEntity(externalEntity: ExternalEntity) {
@@ -46,7 +85,7 @@ export class ListExternalEntitiesComponent {
       header: 'Tem a certeza?',
       message: 'Confirme para prosseguir.',
       accept: () => {
-        this.externalEntityService.deleteExternalEntity(externalEntity.externalEntityId).subscribe((data) => {
+        this.externalEntityService.deleteExternalEntity(externalEntity.originId).subscribe((data) => {
           this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Entidade Externa eliminada com sucesso.' });
         });
       },

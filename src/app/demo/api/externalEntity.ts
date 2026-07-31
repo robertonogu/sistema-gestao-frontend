@@ -1,5 +1,5 @@
 export interface ExternalEntity {
-    externalEntityId: number;
+    originId: number;
     name: string;
-    nif: string;
+    nif: number;
 }

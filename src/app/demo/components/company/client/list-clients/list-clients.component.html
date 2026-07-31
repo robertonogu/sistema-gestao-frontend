@@ -5,13 +5,13 @@
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
                 <div class="text-900 text-xl font-semibold">Clientes</div>
                 <div class="flex gap-2 sm:ml-auto">
-                    <button 
+                    <button
                         class="p-button-rounded p-button-outlined"
-                        (click)="newClient()" 
-                        icon="pi pi-plus" 
+                        (click)="openNew()"
+                        icon="pi pi-plus"
                         label="Novo"
-                        pButton 
-                        type="button" 
+                        pButton
+                        type="button"
                     ></button>
                     <button 
                         class="p-button-rounded"
@@ -52,13 +52,14 @@
                         <td>{{ client.name }}</td>
                         <td>{{ client.nif }}</td>
                         <td>
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-pencil" 
-                                class="mr-2" 
-                                [rounded]="true" 
-                                [text]="true" 
-                                severity="success" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-pencil"
+                                class="mr-2"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="success"
+                                (click)="editClient(client)"
                             />
                             <p-button 
                                 pRipple 
@@ -76,6 +77,41 @@
 		</div>
 	</div>
 </div>
+
+<p-dialog
+    [header]="client.originId ? 'Editar Cliente' : 'Novo Cliente'"
+    [(visible)]="clientDialog"
+    [style]="{ width: '450px' }"
+    [modal]="true"
+    class="p-fluid"
+    (onHide)="hideDialog()"
+>
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="name" class="block font-bold mb-4">Nome</label>
+            <input
+                type="text"
+                pInputText
+                id="name"
+                [(ngModel)]="client.name"
+                required
+                autofocus
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !client.name }"
+            />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !client.name">Nome é obrigatório.</small>
+        </div>
+
+        <div class="field">
+            <label for="nif" class="block font-bold mb-4">NIF</label>
+            <p-inputNumber id="nif" [(ngModel)]="client.nif" [useGrouping]="false"></p-inputNumber>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveClient()"></button>
+    </ng-template>
+</p-dialog>
 
 <p-confirmDialog #cd>
     <ng-template pTemplate="headless" let-message>

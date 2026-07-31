@@ -24,6 +24,11 @@ export class ExternalEntityService {
         return this.http.post<ExternalEntity>(this.externalEntitiesUrl, externalEntity, environment.httpOptions);
     }
 
+    updateExternalEntity(externalEntityId: number, externalEntity: ExternalEntityCreation) : Observable<ExternalEntity> {
+        let url = this.externalEntitiesUrl + "/" + externalEntityId;
+        return this.http.put<ExternalEntity>(url, externalEntity, environment.httpOptions);
+    }
+
     deleteExternalEntity(externalEntityId: number) {
         let url = this.externalEntitiesUrl + externalEntityId;
         return this.http.delete(url);

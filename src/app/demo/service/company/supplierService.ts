@@ -31,4 +31,14 @@ export class SupplierService {
         return this.http.post<Supplier>(this.suppliersUrl, supplier, environment.httpOptions);
     }
 
+    updateSupplier(supplierId: number, supplier: SupplierCreation) : Observable<Supplier> {
+        let url = this.suppliersUrl + "/" + supplierId;
+        return this.http.put<Supplier>(url, supplier, environment.httpOptions);
+    }
+
+    deleteSupplier(supplierId: number) {
+        let url = this.suppliersUrl + "/" + supplierId;
+        return this.http.delete(url);
+    }
+
 }
