@@ -22,8 +22,8 @@
         </div>
 
         <div class="field col-12 md:col-4">
-          <label>Local</label>
-          <input type="text" pInputText [(ngModel)]="local" />
+          <label>Endereço</label>
+          <input type="text" pInputText [(ngModel)]="address" />
         </div>
 
         <div class="field col-12 md:col-4">
@@ -36,6 +36,17 @@
           <label>Data de Ajudicação</label>
           <p-calendar [(ngModel)]="adjudicationDate" [iconDisplay]="'input'" [showIcon]="true" inputId="icondisplay"
             dateFormat="dd/mm/yy" />
+        </div>
+
+        <div class="field col-12 md:col-4">
+          <label>Data de Início</label>
+          <p-calendar [(ngModel)]="initialDate" [iconDisplay]="'input'" [showIcon]="true" inputId="initialDate"
+            dateFormat="dd/mm/yy" />
+        </div>
+
+        <div class="field col-12 md:col-4">
+          <label>Dias estimados</label>
+          <p-inputNumber [(ngModel)]="estimatedDays" suffix=" dias" />
         </div>
 
         <div class="field col-12 md:col-3">
@@ -92,16 +103,16 @@
 
                 <div class="col-num">
                   <ng-container *ngIf="getSubInputs(rowIndex).length === 0; else parentMatAgg">
-                    <p-inputNumber formControlName="materialsCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                    <p-inputNumber formControlName="materialCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
                   </ng-container>
-                  <ng-template #parentMatAgg><span class="muted small">{{ fmtEUR(capituloMaterialsCost(rowIndex)) }}</span></ng-template>
+                  <ng-template #parentMatAgg><span class="muted small">{{ fmtEUR(capituloMaterialCost(rowIndex)) }}</span></ng-template>
                 </div>
 
                 <div class="col-num">
                   <ng-container *ngIf="getSubInputs(rowIndex).length === 0; else parentExtAgg">
-                    <p-inputNumber formControlName="externalServicesCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                    <p-inputNumber formControlName="externalServiceCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
                   </ng-container>
-                  <ng-template #parentExtAgg><span class="muted small">{{ fmtEUR(capituloExternalServicesCost(rowIndex)) }}</span></ng-template>
+                  <ng-template #parentExtAgg><span class="muted small">{{ fmtEUR(capituloExternalServiceCost(rowIndex)) }}</span></ng-template>
                 </div>
 
                 <div class="col-num">
@@ -143,16 +154,16 @@
 
                       <div class="col-num">
                         <ng-container *ngIf="getSubSubInputs(rowIndex, subIndex).length === 0; else subMatAgg">
-                          <p-inputNumber formControlName="subMaterialsCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subMaterialCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
                         </ng-container>
-                        <ng-template #subMatAgg><span class="muted small">{{ fmtEUR(subItemMaterialsCost(rowIndex, subIndex)) }}</span></ng-template>
+                        <ng-template #subMatAgg><span class="muted small">{{ fmtEUR(subItemMaterialCost(rowIndex, subIndex)) }}</span></ng-template>
                       </div>
 
                       <div class="col-num">
                         <ng-container *ngIf="getSubSubInputs(rowIndex, subIndex).length === 0; else subExtAgg">
-                          <p-inputNumber formControlName="subExternalServicesCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subExternalServiceCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
                         </ng-container>
-                        <ng-template #subExtAgg><span class="muted small">{{ fmtEUR(subItemExternalServicesCost(rowIndex, subIndex)) }}</span></ng-template>
+                        <ng-template #subExtAgg><span class="muted small">{{ fmtEUR(subItemExternalServiceCost(rowIndex, subIndex)) }}</span></ng-template>
                       </div>
 
                       <div class="col-num">
@@ -187,11 +198,11 @@
                         </div>
 
                         <div class="col-num">
-                          <p-inputNumber formControlName="subSubMaterialsCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subSubMaterialCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
                         </div>
 
                         <div class="col-num">
-                          <p-inputNumber formControlName="subSubExternalServicesCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subSubExternalServiceCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
                         </div>
 
                         <div class="col-num">
@@ -199,7 +210,7 @@
                         </div>
 
                         <div class="col-num strong">
-                          {{ fmtEUR((subSubGroup.value.subSubLaborCost || 0) + (subSubGroup.value.subSubMaterialsCost || 0) + (subSubGroup.value.subSubExternalServicesCost || 0) + (subSubGroup.value.subSubIndirectCost || 0)) }}
+                          {{ fmtEUR((subSubGroup.value.subSubLaborCost || 0) + (subSubGroup.value.subSubMaterialCost || 0) + (subSubGroup.value.subSubExternalServiceCost || 0) + (subSubGroup.value.subSubIndirectCost || 0)) }}
                         </div>
 
                         <div class="col-actions">

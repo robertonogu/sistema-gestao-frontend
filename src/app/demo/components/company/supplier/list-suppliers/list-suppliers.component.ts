@@ -60,7 +60,7 @@ export class ListSuppliersComponent {
     this.submitted = true;
 
     if (this.supplier.name?.trim()) {
-      const supplierCreation = { name: this.supplier.name, nif: this.supplier.nif, distance: this.supplier.distance } as SupplierCreation;
+      const supplierCreation = { name: this.supplier.name, nif: this.supplier.nif, address: this.supplier.address } as SupplierCreation;
 
       if (this.supplier.originId) {
         this.supplierService.updateSupplier(this.supplier.originId, supplierCreation).subscribe(() => {

@@ -7,7 +7,7 @@ export interface ItemCreation {
     name: string;
     quantity: number;
     unit: Unit;
-    unitValue: number;
+    netValue: number;
     iva: number;
     totalValue: number;
     costAllocations?: CostAllocationCreation[];

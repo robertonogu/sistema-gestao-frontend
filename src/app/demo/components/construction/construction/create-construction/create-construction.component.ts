@@ -196,9 +196,11 @@ export class CreateConstructionComponent {
   dynamicForm!: FormGroup; // Your main form group
 
   name!: string;
-  local!: string;
+  address!: string;
   selectedClient!: number;
   adjudicationDate!: Date;
+  initialDate!: Date;
+  estimatedDays!: number;
   distance!: number;
 
   //units = Unit;
@@ -215,8 +217,6 @@ export class CreateConstructionComponent {
     vg: 'vg',
     tn: 'tn',
   };
-
-  readonly IVA_RATE = 0.23;
 
   constructor(
     private constructionService: ConstructionService,
@@ -262,8 +262,8 @@ export class CreateConstructionComponent {
     return this.fb.group({
       name: ['', Validators.required],
       laborCost: [0],
-      materialsCost: [0],
-      externalServicesCost: [0],
+      materialCost: [0],
+      externalServiceCost: [0],
       indirectCost: [0],
       expanded: [true],
       subInputs: this.fb.array([] as FormGroup[]),
@@ -274,8 +274,8 @@ export class CreateConstructionComponent {
     return this.fb.group({
       subName: ['', Validators.required],
       subLaborCost: [0],
-      subMaterialsCost: [0],
-      subExternalServicesCost: [0],
+      subMaterialCost: [0],
+      subExternalServiceCost: [0],
       subIndirectCost: [0],
       expanded: [false],
       subSubInputs: this.fb.array([] as FormGroup[]),
@@ -286,8 +286,8 @@ export class CreateConstructionComponent {
     return this.fb.group({
       subSubName: ['', Validators.required],
       subSubLaborCost: [0],
-      subSubMaterialsCost: [0],
-      subSubExternalServicesCost: [0],
+      subSubMaterialCost: [0],
+      subSubExternalServiceCost: [0],
       subSubIndirectCost: [0],
     });
   }
@@ -298,23 +298,30 @@ export class CreateConstructionComponent {
     this.cdr.markForCheck();
   }
 
+  private readonly capituloCostFields = ['laborCost', 'materialCost', 'externalServiceCost', 'indirectCost'];
+  private readonly subItemCostFields = ['subLaborCost', 'subMaterialCost', 'subExternalServiceCost', 'subIndirectCost'];
+
+  private setCapituloCostLock(rowIndex: number, locked: boolean): void {
+    const grp = this.inputs.at(rowIndex) as FormGroup;
+    this.capituloCostFields.forEach(f => locked ? grp.get(f)?.disable() : grp.get(f)?.enable());
+  }
+
+  private setSubItemCostLock(rowIndex: number, subIndex: number, locked: boolean): void {
+    const grp = this.getSubInputs(rowIndex).at(subIndex) as FormGroup;
+    this.subItemCostFields.forEach(f => locked ? grp.get(f)?.disable() : grp.get(f)?.enable());
+  }
+
   addSubInput(rowIndex: number): void {
-    const subs = this.getSubInputs(rowIndex);
-    if (subs.length === 0) {
-      this.inputs.at(rowIndex).patchValue({ laborCost: null, materialsCost: null, externalServicesCost: null, indirectCost: null });
-    }
-    subs.push(this.buildSubInput());
+    this.getSubInputs(rowIndex).push(this.buildSubInput());
     this.inputs.at(rowIndex).patchValue({ expanded: true });
+    this.setCapituloCostLock(rowIndex, true);
     this.cdr.markForCheck();
   }
 
   addSubSubInput(rowIndex: number, subIndex: number): void {
-    const subSubs = this.getSubSubInputs(rowIndex, subIndex);
-    if (subSubs.length === 0) {
-      this.getSubInputs(rowIndex).at(subIndex).patchValue({ subLaborCost: null, subMaterialsCost: null, subExternalServicesCost: null, subIndirectCost: null });
-    }
-    subSubs.push(this.buildSubSubInput());
+    this.getSubSubInputs(rowIndex, subIndex).push(this.buildSubSubInput());
     this.getSubInputs(rowIndex).at(subIndex).patchValue({ expanded: true });
+    this.setSubItemCostLock(rowIndex, subIndex, true);
     this.cdr.markForCheck();
   }
 
@@ -325,11 +332,17 @@ export class CreateConstructionComponent {
 
   removeSubInput(rowIndex: number, subIndex: number): void {
     this.getSubInputs(rowIndex).removeAt(subIndex);
+    if (this.getSubInputs(rowIndex).length === 0) {
+      this.setCapituloCostLock(rowIndex, false);
+    }
     this.cdr.markForCheck();
   }
 
   removeSubSubInput(rowIndex: number, subIndex: number, subSubIndex: number): void {
     this.getSubSubInputs(rowIndex, subIndex).removeAt(subSubIndex);
+    if (this.getSubSubInputs(rowIndex, subIndex).length === 0) {
+      this.setSubItemCostLock(rowIndex, subIndex, false);
+    }
     this.cdr.markForCheck();
   }
 
@@ -363,34 +376,32 @@ export class CreateConstructionComponent {
   }
 
   subItemLaborCost(ri: number, si: number) { return this.subItemCategoryTotal(ri, si, 'subLaborCost', 'subSubLaborCost'); }
-  subItemMaterialsCost(ri: number, si: number) { return this.subItemCategoryTotal(ri, si, 'subMaterialsCost', 'subSubMaterialsCost'); }
-  subItemExternalServicesCost(ri: number, si: number) { return this.subItemCategoryTotal(ri, si, 'subExternalServicesCost', 'subSubExternalServicesCost'); }
+  subItemMaterialCost(ri: number, si: number) { return this.subItemCategoryTotal(ri, si, 'subMaterialCost', 'subSubMaterialCost'); }
+  subItemExternalServiceCost(ri: number, si: number) { return this.subItemCategoryTotal(ri, si, 'subExternalServiceCost', 'subSubExternalServiceCost'); }
   subItemIndirectCost(ri: number, si: number) { return this.subItemCategoryTotal(ri, si, 'subIndirectCost', 'subSubIndirectCost'); }
 
   capituloLaborCost(i: number) { return this.capituloCategory(i, 'laborCost', 'subLaborCost', 'subSubLaborCost'); }
-  capituloMaterialsCost(i: number) { return this.capituloCategory(i, 'materialsCost', 'subMaterialsCost', 'subSubMaterialsCost'); }
-  capituloExternalServicesCost(i: number) { return this.capituloCategory(i, 'externalServicesCost', 'subExternalServicesCost', 'subSubExternalServicesCost'); }
+  capituloMaterialCost(i: number) { return this.capituloCategory(i, 'materialCost', 'subMaterialCost', 'subSubMaterialCost'); }
+  capituloExternalServiceCost(i: number) { return this.capituloCategory(i, 'externalServiceCost', 'subExternalServiceCost', 'subSubExternalServiceCost'); }
   capituloIndirectCost(i: number) { return this.capituloCategory(i, 'indirectCost', 'subIndirectCost', 'subSubIndirectCost'); }
 
   subItemTotal(rowIndex: number, subIndex: number): number {
     return this.subItemLaborCost(rowIndex, subIndex)
-      + this.subItemMaterialsCost(rowIndex, subIndex)
-      + this.subItemExternalServicesCost(rowIndex, subIndex)
+      + this.subItemMaterialCost(rowIndex, subIndex)
+      + this.subItemExternalServiceCost(rowIndex, subIndex)
       + this.subItemIndirectCost(rowIndex, subIndex);
   }
 
   capituloTotal(rowIndex: number): number {
     return this.capituloLaborCost(rowIndex)
-      + this.capituloMaterialsCost(rowIndex)
-      + this.capituloExternalServicesCost(rowIndex)
+      + this.capituloMaterialCost(rowIndex)
+      + this.capituloExternalServiceCost(rowIndex)
       + this.capituloIndirectCost(rowIndex);
   }
 
-  get subtotal(): number {
+  get total(): number {
     return this.inputs.controls.reduce((s, _, i) => s + this.capituloTotal(i), 0);
   }
-  get iva(): number { return this.subtotal * this.IVA_RATE; }
-  get total(): number { return this.subtotal + this.iva; }
 
   fmtEUR(n: number): string {
     return (n || 0).toLocaleString('pt-PT', {
@@ -405,43 +416,44 @@ export class CreateConstructionComponent {
         const subSubItems: BudgetItemCreation[] = this.getSubSubInputs(rowIndex, subIndex).controls.map(subSubInput => ({
           name: subSubInput.value.subSubName,
           laborCost: subSubInput.value.subSubLaborCost,
-          materialsCost: subSubInput.value.subSubMaterialsCost,
-          externalServicesCost: subSubInput.value.subSubExternalServicesCost,
+          materialCost: subSubInput.value.subSubMaterialCost,
+          externalServiceCost: subSubInput.value.subSubExternalServiceCost,
           indirectCost: subSubInput.value.subSubIndirectCost,
         }));
-        const hasSubSubs = subSubItems.length > 0;
         return {
           name: subInput.value.subName,
-          laborCost: hasSubSubs ? this.subItemLaborCost(rowIndex, subIndex) : subInput.value.subLaborCost,
-          materialsCost: hasSubSubs ? this.subItemMaterialsCost(rowIndex, subIndex) : subInput.value.subMaterialsCost,
-          externalServicesCost: hasSubSubs ? this.subItemExternalServicesCost(rowIndex, subIndex) : subInput.value.subExternalServicesCost,
-          indirectCost: hasSubSubs ? this.subItemIndirectCost(rowIndex, subIndex) : subInput.value.subIndirectCost,
+          laborCost: this.subItemLaborCost(rowIndex, subIndex),
+          materialCost: this.subItemMaterialCost(rowIndex, subIndex),
+          externalServiceCost: this.subItemExternalServiceCost(rowIndex, subIndex),
+          indirectCost: this.subItemIndirectCost(rowIndex, subIndex),
           children: subSubItems,
         };
       });
-      const hasSubItems = subItems.length > 0;
       return {
         name: raw.name,
-        laborCost: hasSubItems ? this.capituloLaborCost(rowIndex) : raw.laborCost,
-        materialsCost: hasSubItems ? this.capituloMaterialsCost(rowIndex) : raw.materialsCost,
-        externalServicesCost: hasSubItems ? this.capituloExternalServicesCost(rowIndex) : raw.externalServicesCost,
-        indirectCost: hasSubItems ? this.capituloIndirectCost(rowIndex) : raw.indirectCost,
+        laborCost: this.capituloLaborCost(rowIndex),
+        materialCost: this.capituloMaterialCost(rowIndex),
+        externalServiceCost: this.capituloExternalServiceCost(rowIndex),
+        indirectCost: this.capituloIndirectCost(rowIndex),
         children: subItems
       };
     });
 
-    console.log(budgetItems);
+    console.log('raw form value (inputs):', this.dynamicForm.getRawValue());
+    console.log('budgetItems built for submission:', JSON.parse(JSON.stringify(budgetItems)));
 
     this.construction = {
       name: this.name,
-      local: this.local,
+      address: this.address,
       clientId: this.selectedClient,
       adjudicationDate: this.adjudicationDate,
+      initialDate: this.initialDate,
+      estimatedDays: this.estimatedDays,
       distance: this.distance,
       budgetItems: budgetItems
     } as ConstructionCreation;
 
-    console.log(this.construction);
+    console.log('full construction payload sent to backend:', JSON.parse(JSON.stringify(this.construction)));
 
     this.constructionService.createConstruction(this.construction).subscribe({
       next: () => {

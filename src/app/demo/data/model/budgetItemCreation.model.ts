@@ -1,8 +1,8 @@
 export interface BudgetItemCreation {
     name: string;
     laborCost: number;
-    materialsCost: number;
-    externalServicesCost: number;
+    materialCost: number;
+    externalServiceCost: number;
     indirectCost: number;
     children?: BudgetItemCreation[];
 }

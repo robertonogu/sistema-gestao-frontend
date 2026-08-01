@@ -43,7 +43,7 @@
                     <tr>
                         <th pSortableColumn="name">Nome<p-sortIcon field="name"></p-sortIcon></th>
                         <th>NIF</th>
-                        <th>Distância</th>
+                        <th>Endereço</th>
                         <th>Ações</th>
                     </tr>
                 </ng-template>
@@ -52,7 +52,7 @@
                     <tr>
                         <td>{{ supplier.name }}</td>
                         <td>{{ supplier.nif }}</td>
-                        <td>{{ supplier.distance | number }} km</td>
+                        <td>{{ supplier.address }}</td>
                         <td>
                             <p-button
                                 pRipple
@@ -110,8 +110,8 @@
         </div>
 
         <div class="field">
-            <label for="distance" class="block font-bold mb-4">Distância</label>
-            <p-inputNumber id="distance" [(ngModel)]="supplier.distance" mode="decimal" [maxFractionDigits]="1" suffix=" km"></p-inputNumber>
+            <label for="address" class="block font-bold mb-4">Endereço</label>
+            <input type="text" pInputText id="address" [(ngModel)]="supplier.address" />
         </div>
     </ng-template>
 

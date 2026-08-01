@@ -340,6 +340,7 @@ export class CreateExpenseComponent implements OnInit {
       quantity: [null, Validators.required],
       unit: [null, Validators.required],
       value: [null, Validators.required],
+      total: [null],
       iva: [0, Validators.required],
       constructionId: [null],
       budgetItemId: [null],
@@ -350,6 +351,53 @@ export class CreateExpenseComponent implements OnInit {
 
   addItemInput() {
     this.itemInputs.push(this.buildItemInput());
+  }
+
+  private recalcItemTotal(index: number): void {
+    const grp = this.itemInputs.at(index) as FormGroup;
+    const value = Number(grp.value.value) || 0;
+    const ivaRate = Number(grp.value.iva) || 0;
+    grp.get('total')?.setValue(value + value * ivaRate / 100, { emitEvent: false });
+  }
+
+  private recalcItemValue(index: number): void {
+    const grp = this.itemInputs.at(index) as FormGroup;
+    const total = Number(grp.value.total) || 0;
+    const ivaRate = Number(grp.value.iva) || 0;
+    grp.get('value')?.setValue(ivaRate ? total / (1 + ivaRate / 100) : total, { emitEvent: false });
+  }
+
+  onItemValueChange(index: number): void {
+    const grp = this.itemInputs.at(index) as FormGroup;
+    grp.get('value')?.enable({ emitEvent: false });
+    if (!Number(grp.get('value')?.value)) {
+      grp.get('total')?.enable({ emitEvent: false });
+      grp.get('total')?.setValue(null, { emitEvent: false });
+      return;
+    }
+    grp.get('total')?.disable({ emitEvent: false });
+    this.recalcItemTotal(index);
+  }
+
+  onItemTotalChange(index: number): void {
+    const grp = this.itemInputs.at(index) as FormGroup;
+    grp.get('total')?.enable({ emitEvent: false });
+    if (!Number(grp.get('total')?.value)) {
+      grp.get('value')?.enable({ emitEvent: false });
+      grp.get('value')?.setValue(null, { emitEvent: false });
+      return;
+    }
+    grp.get('value')?.disable({ emitEvent: false });
+    this.recalcItemValue(index);
+  }
+
+  onItemIvaChange(index: number): void {
+    const grp = this.itemInputs.at(index) as FormGroup;
+    if (grp.get('value')?.disabled) {
+      this.recalcItemValue(index);
+    } else {
+      this.recalcItemTotal(index);
+    }
   }
 
   removeItemInput(index: number) {
@@ -501,13 +549,12 @@ export class CreateExpenseComponent implements OnInit {
     });
   }
 
+  itemValue(index: number): number {
+    return Number(this.itemInputs.at(index).get('value')?.value) || 0;
+  }
+
   itemTotal(index: number): number {
-    const raw = this.itemInputs.at(index).value;
-    const quantity = Number(raw.quantity) || 0;
-    const value = Number(raw.value) || 0;
-    const iva = Number(raw.iva) || 0;
-    const subtotal = value * quantity;
-    return subtotal + subtotal * iva / 100;
+    return Number(this.itemInputs.at(index).get('total')?.value) || 0;
   }
 
   fmt(n: number): string {
@@ -516,18 +563,14 @@ export class CreateExpenseComponent implements OnInit {
     }) + ' €';
   }
 
-  fmtItemTotal(index: number): string {
-    return this.fmt(this.itemTotal(index));
-  }
-
   get valueWithoutIva(): number {
     const servicesTotal = this.inputs.controls.reduce((sum, c) => sum + (Number(c.value.value) || 0), 0);
-    const itemsTotal = this.itemInputs.controls.reduce((sum, c) => sum + (Number(c.value.value) || 0) * (Number(c.value.quantity) || 0), 0);
+    const itemsTotal = this.itemInputs.controls.reduce((sum, _, index) => sum + this.itemValue(index), 0);
     return servicesTotal + itemsTotal;
   }
 
   get ivaAmount(): number {
-    return this.itemInputs.controls.reduce((sum, c, index) => sum + (this.itemTotal(index) - (Number(c.value.value) || 0) * (Number(c.value.quantity) || 0)), 0);
+    return this.itemInputs.controls.reduce((sum, _, index) => sum + (this.itemTotal(index) - this.itemValue(index)), 0);
   }
 
   get totalValue(): number {
@@ -560,7 +603,7 @@ export class CreateExpenseComponent implements OnInit {
         name: control.value.name,
         quantity: control.value.quantity,
         unit: control.value.unit,
-        unitValue: control.value.value,
+        netValue: this.itemValue(index),
         iva: control.value.iva,
         totalValue: this.itemTotal(index),
         costAllocations: costAllocations,
