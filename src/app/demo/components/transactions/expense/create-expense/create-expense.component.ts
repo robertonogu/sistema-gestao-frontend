@@ -164,7 +164,7 @@ export class CreateExpenseComponent implements OnInit {
     [CategoryType.OPERATION]: [SubCategoryType.ELECTRICITY, SubCategoryType.COMMUNICATIONS, SubCategoryType.CONSUMABLES],
     [CategoryType.VEHICLES]: [SubCategoryType.INSURANCE_VEHICLES, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE_VEHICLES, SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS],
     [CategoryType.EQUIPMENTS]: [SubCategoryType.MAINTENANCE_EQUIPMENTS],
-    [CategoryType.TOOLS]: [],
+    [CategoryType.TOOLS]: [SubCategoryType.TOOLS_PURCHASE, SubCategoryType.TOOLS_MAINTENANCE],
     [CategoryType.INVENTORY]: [SubCategoryType.FEEDSTOCK, SubCategoryType.WOOD, SubCategoryType.GLASS_MIRRORS, SubCategoryType.PLUMBING, SubCategoryType
       .CIVIL_CONSTRUCTION, SubCategoryType.COATINGS
     ],
@@ -240,28 +240,6 @@ export class CreateExpenseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.items = [
-      {
-        label: 'Item',
-        command: () => {
-          this.addItemInput();
-        }
-      },
-      {
-        label: 'Serviço Externo',
-        command: () => {
-          this.addInput();
-          this.getConstructionNames();
-        }
-      },
-      {
-        label: 'Almoço',
-        command: () => {
-          this.lunchVisible = true;
-        }
-      },
-    ];
-
     this.categories = this.transformCategoriesAndSubCategories(this.categoriesAndSubCategories);
   }
 
@@ -549,7 +527,7 @@ export class CreateExpenseComponent implements OnInit {
     });
   }
 
-  itemValue(index: number): number {
+  itemNetValue(index: number): number {
     return Number(this.itemInputs.at(index).get('value')?.value) || 0;
   }
 
@@ -563,18 +541,18 @@ export class CreateExpenseComponent implements OnInit {
     }) + ' €';
   }
 
-  get valueWithoutIva(): number {
+  get netValue(): number {
     const servicesTotal = this.inputs.controls.reduce((sum, c) => sum + (Number(c.value.value) || 0), 0);
-    const itemsTotal = this.itemInputs.controls.reduce((sum, _, index) => sum + this.itemValue(index), 0);
+    const itemsTotal = this.itemInputs.controls.reduce((sum, _, index) => sum + this.itemNetValue(index), 0);
     return servicesTotal + itemsTotal;
   }
 
-  get ivaAmount(): number {
-    return this.itemInputs.controls.reduce((sum, _, index) => sum + (this.itemTotal(index) - this.itemValue(index)), 0);
+  get iva(): number {
+    return this.itemInputs.controls.reduce((sum, _, index) => sum + (this.itemTotal(index) - this.itemNetValue(index)), 0);
   }
 
   get totalValue(): number {
-    return this.valueWithoutIva + this.ivaAmount;
+    return this.netValue + this.iva;
   }
 
   get paymentValue(): number {
@@ -603,7 +581,7 @@ export class CreateExpenseComponent implements OnInit {
         name: control.value.name,
         quantity: control.value.quantity,
         unit: control.value.unit,
-        netValue: this.itemValue(index),
+        netValue: this.itemNetValue(index),
         iva: control.value.iva,
         totalValue: this.itemTotal(index),
         costAllocations: costAllocations,
@@ -614,7 +592,7 @@ export class CreateExpenseComponent implements OnInit {
 
     this.expenseCreation = {
       date: this.date, originId: this.selectedOrigin, documentType: this.selectedDocumentType, documentNumber: this.documentNumber,
-      paymentDeadline: this.paymentDeadline, value: this.valueWithoutIva, iva: this.ivaAmount, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
+      paymentDeadline: this.paymentDeadline, netValue: this.netValue, iva: this.iva, totalValue: this.totalValue, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
       accountId: this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList
     } as ExpenseCreation;
 

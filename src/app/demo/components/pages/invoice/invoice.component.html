@@ -39,7 +39,7 @@
 					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Quantidade</th>
 					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Preço</th>
 					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">IVA</th>
-					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap">Line Total</th>
+					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap">Total Líquido</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -58,15 +58,15 @@
 		<div class="flex flex-column">
 			<div class="flex justify-content-between align-items-center mb-2">
 				<span class="font-semibold mr-6">SUBTOTAL</span>
-				<span>{{ expense.totalValue }}</span>
+				<span>{{ fmt(expense.totalValue - expense.iva) }}</span>
 			</div>
 			<div class="flex justify-content-between align-items-center mb-2">
-				<span class="font-semibold mr-6">VAT #</span>
-				<span>{{ expense.iva }}</span>
+				<span class="font-semibold mr-6">IVA</span>
+				<span>{{ fmt(expense.iva) }}</span>
 			</div>
 			<div class="flex justify-content-between align-items-center">
 				<span class="font-semibold mr-6">TOTAL</span>
-				<span>{{ expense.totalValue }}</span>
+				<span>{{ fmt(expense.totalValue) }}</span>
 			</div>
 		</div>
 	</div>

@@ -8,8 +8,9 @@ export interface ExpenseCreation {
     documentType: DocumentType;
     documentNumber: string;
     paymentDeadline: Date;
-    value: number;
+    netValue: number;
     iva: number;
+    totalValue: number;
     isIntegralPayment: boolean;
     paymentValue: number;
     accountId: number;
