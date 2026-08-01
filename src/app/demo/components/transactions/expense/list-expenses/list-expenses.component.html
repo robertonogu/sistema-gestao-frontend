@@ -55,7 +55,6 @@
                     <tr>
                         <th>Data</th>
                         <th>Estado</th>
-                        <th>Categoria</th>
                         <th>Documento</th>
                         <th>Origem</th>
                         <th>Valor</th>
@@ -69,7 +68,6 @@
                     <tr [pSelectableRow]="expense">
                         <td>{{ expense.date | date: 'dd/MM/yyyy' }}</td>
                         <td><span [class]="'expense-badge status-' + expense.paymentStatus.toLowerCase()">{{ PaymentStatus[expense.paymentStatus] }}</span></td>
-                        <td>{{ CategoryType[expense.category] }}</td>
                         <td>{{ expense.documentNumber }}</td>
                         <td>{{ expense.origin.name }}</td>
                         <td>{{ expense.totalValue | currency: 'EUR' }}</td>

@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Expense } from 'src/app/demo/api/expense';
-import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { PaymentStatus } from 'src/app/demo/data/enum/paymentStatus';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
@@ -18,7 +17,6 @@ export class ListExpensesComponent {
   totalRecords: number = 0;
   expenses!: Expense[];
 
-  CategoryType: any = CategoryType;
   DocumentType = DocumentType;
   PaymentStatus: any = PaymentStatus;
 
@@ -49,18 +47,6 @@ export class ListExpensesComponent {
 
   newExpense() {
     this.router.navigate(['./transactions/expenses/create-expense']);
-  }
-
-  getCategorySeverity(category: CategoryType) {
-    let status = category;
-
-    if (status == CategoryType.VEHICLES) return "info";
-    else if (status == CategoryType.EQUIPMENTS) return "primary";
-    else if (status == CategoryType.TOOLS) return "secondary";
-    else if (status == CategoryType.INVENTORY) return "contrast";
-    else if (status == CategoryType.CONSTRUCTIONS) return "primary";
-    else if (status == CategoryType.PEOPLE) return "success"; 
-    else return "constrast";
   }
 
   getPaymentStatusSeverity(paymentStatus: PaymentStatus) {
