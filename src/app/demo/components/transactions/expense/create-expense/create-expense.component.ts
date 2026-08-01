@@ -12,11 +12,17 @@ import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
 import { Unit } from 'src/app/demo/data/enum/unit';
+import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
 import { CostAllocationCreation } from 'src/app/demo/data/model/costAllocationCreation.model';
 import { ExpenseCreation } from 'src/app/demo/data/model/expenseCreation.model';
+import { ExternalEntityCreation } from 'src/app/demo/data/model/externalEntityCreation.model';
 import { ItemCreation } from 'src/app/demo/data/model/itemCreation.model';
+import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
 import { AccountService } from 'src/app/demo/service/company/accountService';
+import { ClientService } from 'src/app/demo/service/company/clientService';
+import { ExternalEntityService } from 'src/app/demo/service/company/externalEntityService';
 import { OriginService } from 'src/app/demo/service/company/originService';
+import { SupplierService } from 'src/app/demo/service/company/supplierService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
@@ -210,12 +216,28 @@ export class CreateExpenseComponent implements OnInit {
   selectedLinkBudgetNode?: TreeNode;
   vehicleNames: ItemName[] = [];
 
+  quickAddOriginOptions: MenuItem[] = [
+    { label: 'Cliente', icon: 'pi pi-user', command: () => this.openQuickAddOrigin('client') },
+    { label: 'Fornecedor', icon: 'pi pi-truck', command: () => this.openQuickAddOrigin('supplier') },
+    { label: 'Entidade Externa', icon: 'pi pi-building', command: () => this.openQuickAddOrigin('externalEntity') },
+  ];
+
+  quickAddOriginDialogVisible: boolean = false;
+  quickAddOriginType: 'client' | 'supplier' | 'externalEntity' | null = null;
+  quickAddOriginSubmitted: boolean = false;
+  quickAddOriginName: string | null = null;
+  quickAddOriginNif: number | null = null;
+  quickAddOriginAddress: string | null = null;
+
   constructor(
     private originService: OriginService,
     private accountService: AccountService,
     private constructionService: ConstructionService,
     private vehicleService: VehicleService,
     private expenseService: ExpenseService,
+    private clientService: ClientService,
+    private supplierService: SupplierService,
+    private externalEntityService: ExternalEntityService,
     private messageService: MessageService,
     private fb: FormBuilder,
     private _location: Location
@@ -245,6 +267,57 @@ export class CreateExpenseComponent implements OnInit {
 
   back() {
     this._location.back();
+  }
+
+  get quickAddOriginTitle(): string {
+    switch (this.quickAddOriginType) {
+      case 'client': return 'Novo Cliente';
+      case 'supplier': return 'Novo Fornecedor';
+      case 'externalEntity': return 'Nova Entidade Externa';
+      default: return '';
+    }
+  }
+
+  openQuickAddOrigin(type: 'client' | 'supplier' | 'externalEntity'): void {
+    this.quickAddOriginType = type;
+    this.quickAddOriginSubmitted = false;
+    this.quickAddOriginName = null;
+    this.quickAddOriginNif = null;
+    this.quickAddOriginAddress = null;
+    this.quickAddOriginDialogVisible = true;
+  }
+
+  closeQuickAddOrigin(): void {
+    this.quickAddOriginDialogVisible = false;
+    this.quickAddOriginType = null;
+  }
+
+  private afterOriginCreated(originId: number): void {
+    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Origem criada com sucesso.' });
+    this.quickAddOriginDialogVisible = false;
+    this.originService.getOriginsGrouped().subscribe(origins => {
+      this.origins = origins;
+      this.selectedOrigin = originId;
+    });
+  }
+
+  saveQuickAddOrigin(): void {
+    this.quickAddOriginSubmitted = true;
+    if (!this.quickAddOriginName?.trim()) return;
+
+    const name = this.quickAddOriginName;
+    const nif = this.quickAddOriginNif as number;
+
+    if (this.quickAddOriginType === 'client') {
+      this.clientService.createClient({ name, nif } as ClientCreation)
+        .subscribe(client => this.afterOriginCreated(client.originId));
+    } else if (this.quickAddOriginType === 'supplier') {
+      this.supplierService.createSupplier({ name, nif, address: this.quickAddOriginAddress } as SupplierCreation)
+        .subscribe(supplier => this.afterOriginCreated(supplier.originId));
+    } else if (this.quickAddOriginType === 'externalEntity') {
+      this.externalEntityService.createExternalEntity({ name, nif } as ExternalEntityCreation)
+        .subscribe(externalEntity => this.afterOriginCreated(externalEntity.originId));
+    }
   }
 
   transformCategoriesAndSubCategories(data: any): any[] {

@@ -74,24 +74,37 @@
 					</span>
 				</div>
 
-				<div class="field col-12 md:col-4">
+				<div class="field col-12 md:col-3">
 					<label>Origem</label>
-					<p-dropdown
-                        [options]="origins"
-                        [(ngModel)]="selectedOrigin"
-                        placeholder="Selecione uma origem"
-                        [group]="true"
-                        [filter]="true"
-                        filterBy="label"
-                        optionLabel="label"
-                        optionValue="value"
-					>
-                        <ng-template let-group pTemplate="group">
-                            <div class="flex align-items-center">
-                                <span>{{ group.label }}</span>
-                            </div>
-                        </ng-template>
-                    </p-dropdown>
+					<div class="flex gap-2">
+						<p-dropdown
+							[options]="origins"
+							[(ngModel)]="selectedOrigin"
+							placeholder="Selecione uma origem"
+							[group]="true"
+							[filter]="true"
+							filterBy="label"
+							optionLabel="label"
+							optionValue="value"
+							styleClass="flex-1"
+						>
+							<ng-template let-group pTemplate="group">
+								<div class="flex align-items-center">
+									<span>{{ group.label }}</span>
+								</div>
+							</ng-template>
+						</p-dropdown>
+						<button
+							pButton
+							type="button"
+							icon="pi pi-plus"
+							class="p-button-outlined"
+							pTooltip="Criar nova origem"
+							tooltipPosition="bottom"
+							(click)="quickAddOriginMenu.toggle($event)"
+						></button>
+						<p-menu #quickAddOriginMenu [popup]="true" [model]="quickAddOriginOptions" appendTo="body"></p-menu>
+					</div>
 				</div>
 
 				<div class="field col-12 md:col-4">
@@ -107,7 +120,7 @@
 				</div>
 
 
-                <div class="col-12 md:col-1 flex align-items-center gap-3">
+                <div class="col-12 md:col-2 flex align-items-center gap-3">
 					<p-checkbox
 						(onChange)="onCheckboxChange()"
                         [binary]="true"
@@ -196,7 +209,7 @@
 								</div>
 
 								<div class="item-col-num">
-									<p-inputNumber formControlName="quantity" styleClass="item-col-num" />
+									<p-inputNumber formControlName="quantity" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="2" styleClass="item-col-num" />
 								</div>
 
 								<div>
@@ -354,6 +367,47 @@
 							type="button"
 							(click)="saveLinkDialog()"
 						></button>
+					</ng-template>
+				</p-dialog>
+
+				<p-dialog
+					[header]="quickAddOriginTitle"
+					[(visible)]="quickAddOriginDialogVisible"
+					[style]="{ width: '450px' }"
+					[modal]="true"
+					class="p-fluid"
+					(onHide)="closeQuickAddOrigin()"
+				>
+					<ng-template pTemplate="content">
+						<div class="field">
+							<label for="quickAddName" class="block font-bold mb-4">Nome</label>
+							<input
+								type="text"
+								pInputText
+								id="quickAddName"
+								[(ngModel)]="quickAddOriginName"
+								[ngModelOptions]="{ standalone: true }"
+								required
+								autofocus
+								[ngClass]="{ 'ng-invalid ng-dirty': quickAddOriginSubmitted && !quickAddOriginName }"
+							/>
+							<small class="p-error" *ngIf="quickAddOriginSubmitted && !quickAddOriginName">Nome é obrigatório.</small>
+						</div>
+
+						<div class="field">
+							<label for="quickAddNif" class="block font-bold mb-4">NIF</label>
+							<p-inputNumber id="quickAddNif" [(ngModel)]="quickAddOriginNif" [ngModelOptions]="{ standalone: true }" [useGrouping]="false"></p-inputNumber>
+						</div>
+
+						<div class="field" *ngIf="quickAddOriginType === 'supplier'">
+							<label for="quickAddAddress" class="block font-bold mb-4">Endereço</label>
+							<input type="text" pInputText id="quickAddAddress" [(ngModel)]="quickAddOriginAddress" [ngModelOptions]="{ standalone: true }" />
+						</div>
+					</ng-template>
+
+					<ng-template pTemplate="footer">
+						<button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="closeQuickAddOrigin()"></button>
+						<button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveQuickAddOrigin()"></button>
 					</ng-template>
 				</p-dialog>
 
