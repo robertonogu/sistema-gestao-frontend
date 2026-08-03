@@ -16,6 +16,7 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
 
 @NgModule({
   declarations: [CreateExpenseComponent],
@@ -36,7 +37,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MenuModule,
     TooltipModule,
 		CreateExpenseRoutingModule,
-		ToastModule
+		ToastModule,
+		GooglePlaceAutocompleteDirective
   ]
 })
 

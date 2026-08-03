@@ -7,6 +7,7 @@ import { HttpHeaders } from "@angular/common/http";
 export const environment = {
   production: true,
   apiUrl: 'https://sistema-gestao-api-production.up.railway.app',
+  googleMapsApiKey: '',
 
   httpOptions: {
     headers: new HttpHeaders({

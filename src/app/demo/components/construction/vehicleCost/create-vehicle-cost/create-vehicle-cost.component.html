@@ -1,99 +1,142 @@
 <div class="grid">
 	<div class="col-12">
+		<div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+			<div class="text-900 text-xl font-semibold">Nova Deslocação</div>
+			<div class="flex gap-2 sm:ml-auto">
+				<button
+					class="p-button-rounded p-button-outlined"
+					(click)="back()"
+					icon="pi pi-arrow-left"
+					pButton
+					pTooltip="Voltar"
+					tooltipPosition="bottom"
+					type="button"
+				></button>
+				<button
+					class="p-button-rounded bg-red-500 border-red-500"
+					icon="pi pi-trash"
+					pButton
+					pTooltip="Apagar"
+					tooltipPosition="bottom"
+					type="button"
+				></button>
+				<button
+					class="p-button-rounded"
+					(click)="newVehicleCost()"
+					icon="pi pi-save"
+					label="Guardar"
+					pButton
+					tooltipPosition="bottom"
+					type="button"
+				></button>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-12 lg:col-8">
 		<div class="card">
-
-            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
-				<div class="text-900 text-xl font-semibold">Nova Deslocação</div>
-				<div class="flex gap-2 sm:ml-auto">
-                    <button 
-						class="p-button-rounded p-button-outlined"
-						(click)="back()" 
-						icon="pi pi-arrow-left" 
-						pButton 
-						pTooltip="Voltar" 
-						tooltipPosition="bottom" 
-						type="button" 
-					></button>
-					<button 
-						class="p-button-rounded bg-red-500 border-red-500"
-						icon="pi pi-trash" 
-						pButton 
-						pTooltip="Apagar" 
-						tooltipPosition="bottom" 
-						type="button" 
-					></button>
-					<button 
-						class="p-button-rounded"
-						(click)="newVehicleCost()" 
-						icon="pi pi-save" 
-						label="Guardar" 
-						pButton 
-						tooltipPosition="bottom" 
-						type="button" 
-					></button>
-                </div>
-            </div>
-
 			<div class="p-fluid p-formgrid grid">
 
-                <div class="field col-12 md:col-6">
+				<div class="field col-12 md:col-6">
 					<label>Data</label>
-					<p-calendar 
-                        [(ngModel)]="date"
-                        dateFormat="dd/mm/yy"
-                        [iconDisplay]="'input'" 
-                        [showIcon]="true" 
-                        inputId="icondisplay" 
-                    />
+					<p-calendar
+						[(ngModel)]="date"
+						dateFormat="dd/mm/yy"
+						[iconDisplay]="'input'"
+						[showIcon]="true"
+						inputId="icondisplay"
+					/>
 				</div>
 
-                <div class="field col-12 md:col-6">
+				<div class="field col-12 md:col-6">
 					<label>Viatura</label>
-					<p-dropdown 
-                        [(ngModel)]="selectedVehicle"
-                        [options]="vehicleNames" 
-                        optionLabel="name" 
-                        optionValue="id"
-                        placeholder="Selecione uma Viatura" 
-                        [ngClass]="{ 'ng-dirty ng-invalid': !selectedVehicle }"
-					/>
-				</div>
-
-				<div class="field col-12 md:col-4">
-                    <label>Obra</label>
-					<p-dropdown 
-                        [(ngModel)]="selectedConstruction"
-                        [options]="constructionNames" 
-                        optionLabel="name" 
-                        optionValue="constructionId"
-                        placeholder="Selecione uma Obra" 
-					/>
-				</div>
-
-				<div class="col-12 md:col-4 flex align-items-center gap-3">
-					<p-checkbox 
-                        [binary]="true" 
-                        [(ngModel)]="isTravelToConstruction"
-                    />
-					<label>Deslocação à Obra</label>
-				</div>
-
-				<div class="field col-12 md:col-4">
-					<label>Destino</label>
-					<p-multiSelect 
-						selectedItemsLabel="{0} destinos selecionados"
-						[options]="supplierNames" 
-						[(ngModel)]="selectedSuppliers" 
-						[filter]="true" 
-    					optionLabel="name" 
+					<p-dropdown
+						[(ngModel)]="selectedVehicle"
+						[options]="vehicleNames"
+						optionLabel="name"
 						optionValue="id"
-						placeholder="Selecione os Destinos" 
+						placeholder="Selecione uma Viatura"
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedVehicle }"
 					/>
+				</div>
+
+				<div class="field col-12 md:col-6">
+					<label>Obra</label>
+					<p-dropdown
+						[(ngModel)]="selectedConstruction"
+						[options]="constructionNames"
+						optionLabel="name"
+						optionValue="constructionId"
+						placeholder="Selecione uma Obra"
+						(onChange)="onConstructionChange()"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-6">
+					<label>Adicionar Destino</label>
+					<div class="flex gap-2">
+						<p-dropdown
+							[options]="destinationOptions"
+							[(ngModel)]="destinationToAdd"
+							optionLabel="label"
+							optionValue="value"
+							[filter]="true"
+							filterBy="label"
+							placeholder="Selecione um destino"
+							styleClass="flex-1"
+						/>
+						<button
+							pButton
+							type="button"
+							icon="pi pi-plus"
+							label="Adicionar"
+							[disabled]="!destinationToAdd"
+							(click)="addDestination()"
+						></button>
+					</div>
 				</div>
 
 			</div>
 		</div>
 	</div>
+
+	<div class="col-12 lg:col-4">
+		<div class="card route-sidebar">
+			<div class="route-sidebar-title">Percurso</div>
+
+			<div class="route-stop route-stop-fixed">
+				<span class="route-stop-index">1</span>
+				<i class="pi pi-briefcase"></i>
+				<span class="route-stop-label">Alveda Gold</span>
+				<span class="route-stop-actions">
+					<i class="pi pi-lock text-400" pTooltip="Ponto fixo" tooltipPosition="top"></i>
+				</span>
+			</div>
+
+			<div *ngIf="destinations.length === 0" class="text-500 route-empty">Ainda sem destinos intermédios adicionados.</div>
+
+			<div *ngFor="let d of destinations; let i = index" class="route-stop">
+				<span class="route-stop-index">{{ i + 2 }}</span>
+				<i class="pi" [ngClass]="d.type === 'CONSTRUCTION' ? 'pi-building' : 'pi-truck'"></i>
+				<span class="route-stop-label">{{ destinationLabel(d) }}</span>
+				<span class="route-stop-actions">
+					<button pButton type="button" icon="pi pi-arrow-up" class="p-button-text p-button-sm" [disabled]="i === 0" (click)="moveDestinationUp(i)"></button>
+					<button pButton type="button" icon="pi pi-arrow-down" class="p-button-text p-button-sm" [disabled]="i === destinations.length - 1" (click)="moveDestinationDown(i)"></button>
+					<button pButton type="button" icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger" (click)="removeDestination(i)"></button>
+				</span>
+			</div>
+
+			<div class="route-stop route-stop-fixed">
+				<span class="route-stop-index">{{ destinations.length + 2 }}</span>
+				<i class="pi pi-briefcase"></i>
+				<span class="route-stop-label">Alveda Gold</span>
+				<span class="route-stop-actions">
+					<i class="pi pi-lock text-400" pTooltip="Ponto fixo" tooltipPosition="top"></i>
+				</span>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <p-toast />

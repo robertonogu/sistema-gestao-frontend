@@ -9,6 +9,8 @@ import { ConstructionCreation } from '../../data/model/constructionCreation.mode
 import { Construction } from '../../api/construction';
 import { ConstructionDetails } from '../../api/constructionDetails';
 import { BudgetItem } from '../../api/budgetItem';
+import { MaterialAllocationDetail } from '../../data/model/materialAllocationDetail.model';
+import { WorkLogDetail } from '../../data/model/workLogDetail.model';
 
 @Injectable({
     providedIn: 'root'
@@ -23,6 +25,7 @@ export class ConstructionService {
     private budgetItemsForConstruction = `${environment.apiUrl}/constructions/budgetTree/`;
     private constructionDetailsUrl = `${environment.apiUrl}/constructions/details/`;
     private markAsFavouriteUrl = `${environment.apiUrl}/constructions/favourite/`;
+    private budgetItemsUrl = `${environment.apiUrl}/budgetItems/`;
 
     constructor(private http: HttpClient) { }
 
@@ -68,6 +71,16 @@ export class ConstructionService {
         const params = new HttpParams().set('isFavourite', isFavourite.toString());
         let url = this.markAsFavouriteUrl + constructionId;
         return this.http.patch<Construction>(url, null, { params });
+    }
+
+    getMaterialDetails(budgetItemId: number) : Observable<MaterialAllocationDetail[]> {
+        let url = this.budgetItemsUrl + budgetItemId + "/materialDetails";
+        return this.http.get<MaterialAllocationDetail[]>(url);
+    }
+
+    getWorkLogDetails(budgetItemId: number) : Observable<WorkLogDetail[]> {
+        let url = this.budgetItemsUrl + budgetItemId + "/workLogDetails";
+        return this.http.get<WorkLogDetail[]>(url);
     }
 
 }

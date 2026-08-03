@@ -401,7 +401,16 @@
 
 						<div class="field" *ngIf="quickAddOriginType === 'supplier'">
 							<label for="quickAddAddress" class="block font-bold mb-4">Endereço</label>
-							<input type="text" pInputText id="quickAddAddress" [(ngModel)]="quickAddOriginAddress" [ngModelOptions]="{ standalone: true }" />
+							<input
+								type="text"
+								pInputText
+								id="quickAddAddress"
+								autocomplete="off"
+								[(ngModel)]="quickAddOriginAddress"
+								[ngModelOptions]="{ standalone: true }"
+								appGooglePlaceAutocomplete
+								(placeSelected)="onQuickAddOriginPlaceSelected($event)"
+							/>
 						</div>
 					</ng-template>
 

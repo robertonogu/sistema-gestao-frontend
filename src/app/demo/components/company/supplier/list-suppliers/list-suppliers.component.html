@@ -111,7 +111,15 @@
 
         <div class="field">
             <label for="address" class="block font-bold mb-4">Endereço</label>
-            <input type="text" pInputText id="address" [(ngModel)]="supplier.address" />
+            <input
+                type="text"
+                pInputText
+                id="address"
+                autocomplete="off"
+                [(ngModel)]="supplier.address"
+                appGooglePlaceAutocomplete
+                (placeSelected)="onAddressPlaceSelected($event)"
+            />
         </div>
     </ng-template>
 

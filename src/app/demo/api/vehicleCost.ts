@@ -4,6 +4,5 @@ export interface VehicleCost {
     vehicle: string;
     kilometers: number;
     value: number;
-    destination: string;
     construction: string;
 }

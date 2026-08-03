@@ -3,4 +3,5 @@ export interface Supplier {
     name: string;
     nif: number;
     address: string;
+    placeId: string;
 }

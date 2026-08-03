@@ -13,6 +13,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { DividerModule } from 'primeng/divider';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
 
 @NgModule({
   imports: [
@@ -29,7 +30,8 @@ import { TooltipModule } from 'primeng/tooltip';
     DividerModule,
     ToastModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    GooglePlaceAutocompleteDirective
   ],
   declarations: [CreateConstructionComponent]
 })

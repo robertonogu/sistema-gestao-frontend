@@ -9,8 +9,6 @@ import { FormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { CreateVehicleCostComponent } from './create-vehicle-cost.component';
 import { CreateVehicleCostRoutingModule } from './create-vehicle-cost-routing.module';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
@@ -24,8 +22,6 @@ import { TooltipModule } from 'primeng/tooltip';
     DropdownModule,
     FormsModule,
     ToastModule,
-    MultiSelectModule,
-    CheckboxModule,
     TooltipModule
   ],
   declarations: [CreateVehicleCostComponent]

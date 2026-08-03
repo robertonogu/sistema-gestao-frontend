@@ -1,0 +1,49 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+
+      <div class="flex align-items-center gap-3 mb-3">
+        <button
+          class="p-button-rounded p-button-outlined"
+          (click)="back()"
+          icon="pi pi-arrow-left"
+          pButton
+          type="button"
+        ></button>
+        <div class="text-900 text-xl font-semibold">Materiais · {{ itemName }}</div>
+      </div>
+
+      <p-table [value]="materials" [loading]="loading" styleClass="p-datatable-striped">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Material</th>
+            <th>Quantidade Alocada</th>
+            <th>Valor Unitário</th>
+            <th>Preço Total</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-material>
+          <tr>
+            <td>{{ material.name }}</td>
+            <td>{{ material.quantity }}</td>
+            <td>{{ fmtEUR(material.unitValue) }}</td>
+            <td>{{ fmtEUR(material.totalValue) }}</td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="4">Sem materiais alocados a este item.</td></tr>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="3" class="text-right font-semibold">Total</td>
+            <td class="font-semibold">{{ fmtEUR(totalValue) }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+    </div>
+  </div>
+</div>

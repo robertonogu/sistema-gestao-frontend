@@ -13,6 +13,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { RippleModule } from 'primeng/ripple';
+import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
 
 @NgModule({
   imports: [
@@ -28,7 +29,8 @@ import { RippleModule } from 'primeng/ripple';
     InputTextModule,
     InputNumberModule,
     FormsModule,
-    RippleModule
+    RippleModule,
+    GooglePlaceAutocompleteDirective
   ],
   declarations: [ListSuppliersComponent]
 })

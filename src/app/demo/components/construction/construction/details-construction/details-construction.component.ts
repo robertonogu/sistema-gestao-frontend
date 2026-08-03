@@ -10,6 +10,7 @@ import { ConstructionService } from 'src/app/demo/service/construction/construct
 interface CostBucket { budgeted: number; actual: number; }
 
 interface CostsByItemSplit {
+  budgetItemId: number;
   name: string;
   materials: CostBucket;
   workLog: CostBucket;
@@ -279,6 +280,14 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   .bar-pct  { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); font-weight: 600; flex-shrink: 0; }
   .bar-pct.over { color: var(--danger); }
 }
+.bar-lupa {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; flex-shrink: 0;
+  color: var(--text-3); cursor: pointer; border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+  &:hover { background: var(--surface-2); color: var(--text); }
+  i { font-size: 10px; }
+}
 .bar-track {
   position: relative; height: 14px; background: var(--surface-2);
   border-radius: 4px; overflow: hidden;
@@ -314,10 +323,11 @@ export class DetailsConstructionComponent implements OnInit {
     if (!this.constructionDetails) return [];
 
     const byName = new Map<string, CostsByItemSplit>();
-    const ensure = (name: string): CostsByItemSplit => {
+    const ensure = (name: string, budgetItemId: number): CostsByItemSplit => {
       let entry = byName.get(name);
       if (!entry) {
         entry = {
+          budgetItemId,
           name,
           materials: { budgeted: 0, actual: 0 },
           workLog: { budgeted: 0, actual: 0 },
@@ -329,13 +339,13 @@ export class DetailsConstructionComponent implements OnInit {
     };
 
     for (const item of this.constructionDetails.articlesItemsCost ?? []) {
-      ensure(item.name).materials = { budgeted: item.budgetValue, actual: item.value };
+      ensure(item.name, item.budgetItemId).materials = { budgeted: item.budgetValue, actual: item.value };
     }
     for (const item of this.constructionDetails.workItemsCost ?? []) {
-      ensure(item.name).workLog = { budgeted: item.budgetValue, actual: item.value };
+      ensure(item.name, item.budgetItemId).workLog = { budgeted: item.budgetValue, actual: item.value };
     }
     for (const item of this.constructionDetails.externalServiceItemsCost ?? []) {
-      ensure(item.name).externalServices = { budgeted: item.budgetValue, actual: item.value };
+      ensure(item.name, item.budgetItemId).externalServices = { budgeted: item.budgetValue, actual: item.value };
     }
 
     return Array.from(byName.values());

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Supplier } from 'src/app/demo/api/supplier';
 import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
+import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
 
 @Component({
@@ -56,11 +57,16 @@ export class ListSuppliersComponent {
     this.submitted = false;
   }
 
+  onAddressPlaceSelected(place: PlaceSelection): void {
+    this.supplier.address = place.address;
+    this.supplier.placeId = place.placeId;
+  }
+
   saveSupplier() {
     this.submitted = true;
 
     if (this.supplier.name?.trim()) {
-      const supplierCreation = { name: this.supplier.name, nif: this.supplier.nif, address: this.supplier.address } as SupplierCreation;
+      const supplierCreation = { name: this.supplier.name, nif: this.supplier.nif, address: this.supplier.address, placeId: this.supplier.placeId } as SupplierCreation;
 
       if (this.supplier.originId) {
         this.supplierService.updateSupplier(this.supplier.originId, supplierCreation).subscribe(() => {

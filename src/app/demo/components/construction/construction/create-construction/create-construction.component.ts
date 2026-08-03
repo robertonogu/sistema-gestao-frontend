@@ -8,6 +8,7 @@ import { Unit } from 'src/app/demo/data/enum/unit';
 import { BudgetItemCreation } from 'src/app/demo/data/model/budgetItemCreation.model';
 import { ConstructionCreation } from 'src/app/demo/data/model/constructionCreation.model';
 import { VehicleCostCreation } from 'src/app/demo/data/model/vehicleCostCreation';
+import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { ClientService } from 'src/app/demo/service/company/clientService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 import { VehicleCostService } from 'src/app/demo/service/construction/vehicleCostService';
@@ -197,6 +198,7 @@ export class CreateConstructionComponent {
 
   name!: string;
   address!: string;
+  placeId!: string;
   selectedClient!: number;
   adjudicationDate!: Date;
   initialDate!: Date;
@@ -243,6 +245,11 @@ export class CreateConstructionComponent {
 
   back() {
     this._location.back();
+  }
+
+  onAddressPlaceSelected(place: PlaceSelection): void {
+    this.address = place.address;
+    this.placeId = place.placeId;
   }
 
   asFormGroup(c: any): FormGroup { return c as FormGroup; }
@@ -445,6 +452,7 @@ export class CreateConstructionComponent {
     this.construction = {
       name: this.name,
       address: this.address,
+      placeId: this.placeId,
       clientId: this.selectedClient,
       adjudicationDate: this.adjudicationDate,
       initialDate: this.initialDate,

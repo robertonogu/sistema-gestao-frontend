@@ -1,0 +1,40 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+
+      <div class="flex align-items-center gap-3 mb-3">
+        <button
+          class="p-button-rounded p-button-outlined"
+          (click)="back()"
+          icon="pi pi-arrow-left"
+          pButton
+          type="button"
+        ></button>
+        <div class="text-900 text-xl font-semibold">Mão-de-obra · {{ itemName }}</div>
+      </div>
+
+      <p-table [value]="workLogs" [loading]="loading" styleClass="p-datatable-striped">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Data</th>
+            <th>Funcionário</th>
+            <th>Sub-item</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-log>
+          <tr>
+            <td>{{ log.date | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ log.employeeName }}</td>
+            <td>{{ log.subItemName || '-' }}</td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="3">Sem registos de mão-de-obra para este item.</td></tr>
+        </ng-template>
+      </p-table>
+
+    </div>
+  </div>
+</div>

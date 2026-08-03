@@ -3,6 +3,7 @@ import { BudgetItemCreation } from "./budgetItemCreation.model";
 export interface ConstructionCreation {
     name: string;
     address: string;
+    placeId: string;
     clientId: number;
     adjudicationDate: Date;
     initialDate: Date;

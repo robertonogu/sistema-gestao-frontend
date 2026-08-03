@@ -18,6 +18,9 @@ src/assets/sass/theme/_vendor_extensions
 /tmp
 /out-tsc
 
+# local environment config (contains API keys)
+src/environments/environment.ts
+
 # dependencies
 /node_modules
 

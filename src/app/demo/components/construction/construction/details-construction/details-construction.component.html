@@ -171,6 +171,14 @@
         <div *ngFor="let it of itemsSplit" class="bar-row">
           <div class="bar-row-head">
             <span class="bar-name">{{ it.name }}</span>
+            <a *ngIf="col.key === 'materials' || col.key === 'workLog'"
+               class="bar-lupa"
+               [routerLink]="col.key === 'materials' ? ['materials', it.budgetItemId] : ['workLogs', it.budgetItemId]"
+               [queryParams]="{ name: it.name }"
+               pTooltip="Ver detalhes"
+               tooltipPosition="top">
+              <i class="pi pi-search"></i>
+            </a>
             <span class="bar-pct"
                   [class.over]="isOverrun(bucket(it, col.key).actual, bucket(it, col.key).budgeted)">
               {{ pctOf(bucket(it, col.key).actual, bucket(it, col.key).budgeted) }}%

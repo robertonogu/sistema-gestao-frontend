@@ -7,6 +7,7 @@ import { HttpHeaders } from "@angular/common/http";
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080',
+  googleMapsApiKey: 'AIzaSyBmyACEsjhwVOcelFmwdnE3WTerhdXO_zA',
 
   httpOptions: {
     headers: new HttpHeaders({

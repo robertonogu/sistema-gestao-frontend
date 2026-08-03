@@ -23,7 +23,14 @@
 
         <div class="field col-12 md:col-4">
           <label>Endereço</label>
-          <input type="text" pInputText [(ngModel)]="address" />
+          <input
+            type="text"
+            pInputText
+            autocomplete="off"
+            [(ngModel)]="address"
+            appGooglePlaceAutocomplete
+            (placeSelected)="onAddressPlaceSelected($event)"
+          />
         </div>
 
         <div class="field col-12 md:col-4">
