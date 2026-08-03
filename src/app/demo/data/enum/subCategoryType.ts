@@ -43,12 +43,13 @@ export enum SubCategoryType {
   
     // EQUIPMENTS
 
-    MAINTENANCE_EQUIPMENTS = 'Manutenção de Equipamentos',
+    EQUIPMENTS_PURCHASE = 'Compra de Equipamentos',
+    EQUIPMENTS_MAINTENANCE = 'Manutenção de Equipamentos',
 
     // TOOLS
 
-    TOOLS_PURCHASE = 'Compra',
-    TOOLS_MAINTENANCE = 'Manutenção',
+    TOOLS_PURCHASE = 'Compra de Ferramentas',
+    TOOLS_MAINTENANCE = 'Manutenção de Ferramentas',
 
     // INVENTORY
 

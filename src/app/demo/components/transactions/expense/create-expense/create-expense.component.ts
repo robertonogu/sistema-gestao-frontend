@@ -9,15 +9,19 @@ import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
+import { EquipmentStatus } from 'src/app/demo/data/enum/equipmentStatus';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
+import { ToolStatus } from 'src/app/demo/data/enum/toolStatus';
 import { Unit } from 'src/app/demo/data/enum/unit';
 import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
 import { CostAllocationCreation } from 'src/app/demo/data/model/costAllocationCreation.model';
+import { EquipmentCreation } from 'src/app/demo/data/model/equipmentCreation.model';
 import { ExpenseCreation } from 'src/app/demo/data/model/expenseCreation.model';
 import { ExternalEntityCreation } from 'src/app/demo/data/model/externalEntityCreation.model';
 import { ItemCreation } from 'src/app/demo/data/model/itemCreation.model';
 import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
+import { ToolCreation } from 'src/app/demo/data/model/toolCreation.model';
 import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { AccountService } from 'src/app/demo/service/company/accountService';
 import { ClientService } from 'src/app/demo/service/company/clientService';
@@ -25,6 +29,8 @@ import { ExternalEntityService } from 'src/app/demo/service/company/externalEnti
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
+import { EquipmentService } from 'src/app/demo/service/inventory/equipment.service';
+import { ToolService } from 'src/app/demo/service/inventory/tool.service';
 import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 
@@ -170,7 +176,7 @@ export class CreateExpenseComponent implements OnInit {
     [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE_PEOPLE, SubCategoryType.SAFETY],
     [CategoryType.OPERATION]: [SubCategoryType.ELECTRICITY, SubCategoryType.COMMUNICATIONS, SubCategoryType.CONSUMABLES],
     [CategoryType.VEHICLES]: [SubCategoryType.INSURANCE_VEHICLES, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE_VEHICLES, SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS],
-    [CategoryType.EQUIPMENTS]: [SubCategoryType.MAINTENANCE_EQUIPMENTS],
+    [CategoryType.EQUIPMENTS]: [SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.EQUIPMENTS_MAINTENANCE],
     [CategoryType.TOOLS]: [SubCategoryType.TOOLS_PURCHASE, SubCategoryType.TOOLS_MAINTENANCE],
     [CategoryType.INVENTORY]: [SubCategoryType.FEEDSTOCK, SubCategoryType.WOOD, SubCategoryType.GLASS_MIRRORS, SubCategoryType.PLUMBING, SubCategoryType
       .CIVIL_CONSTRUCTION, SubCategoryType.COATINGS
@@ -216,6 +222,8 @@ export class CreateExpenseComponent implements OnInit {
   linkBudgetTree: TreeNode[] = [];
   selectedLinkBudgetNode?: TreeNode;
   vehicleNames: ItemName[] = [];
+  toolNames: ItemName[] = [];
+  equipmentNames: ItemName[] = [];
 
   quickAddOriginOptions: MenuItem[] = [
     { label: 'Cliente', icon: 'pi pi-user', command: () => this.openQuickAddOrigin('client') },
@@ -231,11 +239,19 @@ export class CreateExpenseComponent implements OnInit {
   quickAddOriginAddress: string | null = null;
   quickAddOriginPlaceId: string | null = null;
 
+  quickAddToolEquipmentDialogVisible: boolean = false;
+  quickAddToolEquipmentType: 'tool' | 'equipment' | null = null;
+  quickAddToolEquipmentSubmitted: boolean = false;
+  quickAddToolEquipmentName: string | null = null;
+  quickAddToolEquipmentCode: string | null = null;
+
   constructor(
     private originService: OriginService,
     private accountService: AccountService,
     private constructionService: ConstructionService,
     private vehicleService: VehicleService,
+    private toolService: ToolService,
+    private equipmentService: EquipmentService,
     private expenseService: ExpenseService,
     private clientService: ClientService,
     private supplierService: SupplierService,
@@ -328,6 +344,53 @@ export class CreateExpenseComponent implements OnInit {
     }
   }
 
+  get quickAddToolEquipmentTitle(): string {
+    switch (this.quickAddToolEquipmentType) {
+      case 'tool': return 'Nova Ferramenta';
+      case 'equipment': return 'Novo Equipamento';
+      default: return '';
+    }
+  }
+
+  openQuickAddToolEquipment(type: 'tool' | 'equipment'): void {
+    this.quickAddToolEquipmentType = type;
+    this.quickAddToolEquipmentSubmitted = false;
+    this.quickAddToolEquipmentName = null;
+    this.quickAddToolEquipmentCode = null;
+    this.quickAddToolEquipmentDialogVisible = true;
+  }
+
+  closeQuickAddToolEquipment(): void {
+    this.quickAddToolEquipmentDialogVisible = false;
+    this.quickAddToolEquipmentType = null;
+  }
+
+  saveQuickAddToolEquipment(): void {
+    this.quickAddToolEquipmentSubmitted = true;
+    if (!this.quickAddToolEquipmentName?.trim()) return;
+
+    const name = this.quickAddToolEquipmentName;
+    const code = this.quickAddToolEquipmentCode as string;
+
+    if (this.quickAddToolEquipmentType === 'tool') {
+      this.toolService.createTool({ name, code, status: ToolStatus.AVAILABLE } as ToolCreation)
+        .subscribe(tool => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Ferramenta criada com sucesso.' });
+          this.quickAddToolEquipmentDialogVisible = false;
+          this.toolNames = [...this.toolNames, { id: tool.toolId, name: tool.name }];
+          this.linkRowGroup?.patchValue({ toolId: tool.toolId });
+        });
+    } else if (this.quickAddToolEquipmentType === 'equipment') {
+      this.equipmentService.createEquipment({ name, code, status: EquipmentStatus.ACTIVE } as EquipmentCreation)
+        .subscribe(equipment => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Equipamento criado com sucesso.' });
+          this.quickAddToolEquipmentDialogVisible = false;
+          this.equipmentNames = [...this.equipmentNames, { id: equipment.equipmentId, name: equipment.name }];
+          this.linkRowGroup?.patchValue({ equipmentId: equipment.equipmentId });
+        });
+    }
+  }
+
   transformCategoriesAndSubCategories(data: any): any[] {
     return Object.keys(data).map(category => ({
       label: category,
@@ -405,6 +468,8 @@ export class CreateExpenseComponent implements OnInit {
       budgetItemId: [null],
       allocationQuantity: [null],
       vehicleId: [null],
+      toolId: [null],
+      equipmentId: [null],
     });
   }
 
@@ -481,9 +546,24 @@ export class CreateExpenseComponent implements OnInit {
     return this.categoryOf(subCategoryType) === CategoryType.VEHICLES;
   }
 
+  showToolLink(subCategoryType: SubCategoryType | null): boolean {
+    return this.categoryOf(subCategoryType) === CategoryType.TOOLS;
+  }
+
+  showEquipmentLink(subCategoryType: SubCategoryType | null): boolean {
+    return this.categoryOf(subCategoryType) === CategoryType.EQUIPMENTS;
+  }
+
   showToolEquipmentLink(subCategoryType: SubCategoryType | null): boolean {
-    const category = this.categoryOf(subCategoryType);
-    return category === CategoryType.TOOLS || category === CategoryType.EQUIPMENTS;
+    return this.showToolLink(subCategoryType) || this.showEquipmentLink(subCategoryType);
+  }
+
+  showToolPurchaseLink(subCategoryType: SubCategoryType | null): boolean {
+    return subCategoryType === SubCategoryType.TOOLS_PURCHASE;
+  }
+
+  showEquipmentPurchaseLink(subCategoryType: SubCategoryType | null): boolean {
+    return subCategoryType === SubCategoryType.EQUIPMENTS_PURCHASE;
   }
 
   canOpenLinkDialog(subCategoryType: SubCategoryType | null): boolean {
@@ -544,6 +624,14 @@ export class CreateExpenseComponent implements OnInit {
     if (this.showVehicleLink(subCategoryType) && this.vehicleNames.length === 0) {
       this.vehicleService.getActiveVehicleNames().subscribe(names => this.vehicleNames = names);
     }
+
+    if (this.showToolLink(subCategoryType) && this.toolNames.length === 0) {
+      this.toolService.getActiveToolNames().subscribe(names => this.toolNames = names);
+    }
+
+    if (this.showEquipmentLink(subCategoryType) && this.equipmentNames.length === 0) {
+      this.equipmentService.getActiveEquipmentNames().subscribe(names => this.equipmentNames = names);
+    }
   }
 
   closeLinkDialog() {
@@ -589,6 +677,8 @@ export class CreateExpenseComponent implements OnInit {
       budgetItemId: null,
       allocationQuantity: null,
       vehicleId: null,
+      toolId: null,
+      equipmentId: null,
     });
     this.linkBudgetTree = [];
     this.selectedLinkBudgetNode = undefined;
@@ -666,7 +756,9 @@ export class CreateExpenseComponent implements OnInit {
         iva: control.value.iva,
         totalValue: this.itemTotal(index),
         costAllocations: costAllocations,
-        vehicleId: control.value.vehicleId
+        vehicleId: control.value.vehicleId,
+        toolId: control.value.toolId,
+        equipmentId: control.value.equipmentId
       } as ItemCreation;
       itemList.push(item);
     });

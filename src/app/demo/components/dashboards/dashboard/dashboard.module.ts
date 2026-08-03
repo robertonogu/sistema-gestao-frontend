@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EcommerceDashboardComponent } from './ecommerce.dashboard.component';
-import { EcommerceDashboardRoutigModule } from './ecommerce.dashboard-routing.module';
+import { DashboardComponent } from './dashboard.component';
+import { DashboardRoutingModule } from './dashboard-routing.module';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +16,7 @@ import { RippleModule } from 'primeng/ripple';
 @NgModule({
 	imports: [
 		CommonModule,
-		EcommerceDashboardRoutigModule,
+		DashboardRoutingModule,
 		ButtonModule,
 		RippleModule,
 		DropdownModule,
@@ -28,6 +28,6 @@ import { RippleModule } from 'primeng/ripple';
 		RatingModule,
 		KnobModule
 	],
-	declarations: [EcommerceDashboardComponent]
+	declarations: [DashboardComponent]
 })
-export class EcommerceDashboardModule { }
+export class DashboardModule { }

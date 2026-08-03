@@ -67,14 +67,18 @@ export class ListConstructionsComponent implements OnInit {
     else {
       this.constructionService.markAsFavourite(construction.constructionId, !construction.favourite).subscribe((constructionMarked) => {
         if (constructionMarked != null) {
-          construction = constructionMarked;
+          construction.favourite = constructionMarked.favourite;
+
           if (construction.favourite) {
             this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Obra adicionada aos favoritos.' });
             this.favouriteConstructions.push(construction);
           }
           else {
             this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Obra removida dos favoritos.' });
-            //this.favouriteConstructions.
+            const index = this.favouriteConstructions.findIndex(c => c.constructionId === construction.constructionId);
+            if (index !== -1) {
+              this.favouriteConstructions.splice(index, 1);
+            }
           }
         }
       });

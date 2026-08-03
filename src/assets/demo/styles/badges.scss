@@ -187,6 +187,76 @@
 
 }
 
+.tool-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+
+    &.status-available {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-loaned {
+        background: #B3E5FC;
+        color: #23547B;
+    }
+
+    &.status-in_repair {
+        background: #FEEDAF;
+        color: #8A5340;
+    }
+
+    &.status-damaged {
+        background: #FFD8B2;
+        color: #805B36;
+    }
+
+    &.status-lost {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+
+}
+
+.equipment-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+
+    &.status-active {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-in_maintenance {
+        background: #FEEDAF;
+        color: #8A5340;
+    }
+
+    &.status-broken {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+
+    &.status-decommissioned {
+        background: #ECCFFF;
+        color: #694382;
+    }
+
+    &.status-sold {
+        background: #CFD8DC;
+        color: #37474F;
+    }
+
+}
+
 .absence-badge {
     border-radius: var(--border-radius);
     padding: .25em .5rem;

@@ -1,45 +1,112 @@
 <div class="grid">
-    <div class="col-12">
-      <div class="card">
-        <p-table [value]="days" styleClass="p-datatable-gridlines">
-          <ng-template pTemplate="header">
-            <tr>
-              <th rowspan="2" class="text-center">Dia</th>
-              <ng-container *ngFor="let month of months; let i = index">
-                <th colspan="3" class="text-center">{{ month }}</th>
-              </ng-container>
-            </tr>
-            <tr>
-              <ng-container *ngFor="let month of months; let i = index">
-                <th class="text-center">H.T</th>
-                <th class="text-center">H.E</th>
-                <th class="text-center">H.F</th>
-              </ng-container>
-            </tr>
-          </ng-template>
-  
-          <ng-template pTemplate="body" let-day>
-            <tr>
-              <td class="font-bold text-center">{{ day }}</td>
-              <ng-container *ngFor="let month of months; let k = index">
-                <ng-container *ngIf="isHoliday(day, month); else second">
-                  <td colspan="3" class="bg-green-400 text-white text-center font-bold">{{ getHolidayName(day, month) }}</td>
-                </ng-container>
-                <ng-template #second>
-                  <ng-container *ngIf="isWeekend(day, month); else notHoliday">
-                    <td colspan="3" class="bg-primary text-center font-bold">Fim de Semana</td>
-                  </ng-container>
-                </ng-template>
-                <ng-template #notHoliday>
-                  <td class="text-center">{{ timeMaps[k][day]?.workedHours }}</td>
-                  <td class="text-center">{{ timeMaps[k][day]?.extraHours }}</td>
-                  <td class="text-center">{{ timeMaps[k][day]?.absenceHours }}</td>
-                </ng-template>
-              </ng-container>
-            </tr>
-          </ng-template>
-        </p-table>
+  <div class="col-12 md:col-6 xl:col-3">
+    <div class="card">
+      <span class="font-semibold text-lg">Horas Trabalhadas</span>
+      <div class="flex justify-content-between align-items-start mt-3">
+        <div class="w-6">
+          <span class="text-3xl font-bold text-900">{{ annualTotalWorkedHours }}</span>
+        </div>
       </div>
     </div>
   </div>
-  
+  <div class="col-12 md:col-6 xl:col-3">
+    <div class="card">
+      <span class="font-semibold text-lg">Horas Extra</span>
+      <div class="flex justify-content-between align-items-start mt-3">
+        <div class="w-6">
+          <span class="text-3xl font-bold text-900">{{ annualTotalExtraHours }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 md:col-6 xl:col-3">
+    <div class="card">
+      <span class="font-semibold text-lg">Horas de Falta</span>
+      <div class="flex justify-content-between align-items-start mt-3">
+        <div class="w-6">
+          <span class="text-3xl font-bold text-900">{{ annualTotalAbsenceHours }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 md:col-6 xl:col-3">
+    <div class="card">
+      <span class="font-semibold text-lg">Dias de Trabalho</span>
+      <div class="flex justify-content-between align-items-start mt-3">
+        <div class="w-6">
+          <span class="text-3xl font-bold text-900">{{ annualTotalWorkedDays }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+
+      <div class="flex flex-column sm:flex-row align-items-center gap-3 mb-3">
+        <p-tabMenu [model]="scopeTabs" [activeItem]="activeScopeTab"
+          (activeItemChange)="onScopeTabChange($event)"></p-tabMenu>
+        <div class="sm:ml-auto flex gap-2">
+          <p-dropdown [options]="years" [(ngModel)]="year" (onChange)="onYearChange()" />
+          <p-dropdown [options]="employeeNames" [(ngModel)]="selectedEmployee" optionLabel="name" optionValue="id"
+            placeholder="Selecione um Funcionário" [filter]="true" filterBy="name" (onChange)="loadTimeMap()" />
+        </div>
+      </div>
+
+      <p-table [value]="days" styleClass="p-datatable-gridlines">
+        <ng-template pTemplate="header">
+          <tr>
+            <th rowspan="2" class="text-center">Dia</th>
+            <ng-container *ngFor="let month of months; let i = index">
+              <th colspan="3" class="text-center">{{ month }}</th>
+            </ng-container>
+          </tr>
+          <tr>
+            <ng-container *ngFor="let month of months; let i = index">
+              <th class="text-center">H.T</th>
+              <th class="text-center">H.E</th>
+              <th class="text-center">H.F</th>
+            </ng-container>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-day>
+          <tr>
+            <td class="font-bold text-center">{{ day }}</td>
+            <ng-container *ngFor="let month of months; let k = index">
+              <ng-container *ngIf="isHoliday(day, month); else normalDay">
+                <td colspan="3" class="bg-green-400 text-white text-center font-bold">{{ getHolidayName(day, month) }}
+                </td>
+              </ng-container>
+              <ng-template #normalDay>
+                <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day]?.workedHours }}
+                </td>
+                <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day]?.extraHours }}
+                </td>
+                <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day]?.absenceHours }}
+                </td>
+              </ng-template>
+            </ng-container>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <tr>
+            <td class="font-bold text-center">Total</td>
+            <ng-container *ngFor="let month of months; let k = index">
+              <td class="text-center font-bold">{{ monthlySummaryFor(k)?.totalWorkedHours ?? 0 }}</td>
+              <td class="text-center font-bold">{{ monthlySummaryFor(k)?.totalExtraHours ?? 0 }}</td>
+              <td class="text-center font-bold">{{ monthlySummaryFor(k)?.totalAbsenceHours ?? 0 }}</td>
+            </ng-container>
+          </tr>
+          <tr>
+            <td class="font-bold text-center">Dias de Trabalho</td>
+            <ng-container *ngFor="let month of months; let k = index">
+              <td colspan="3" class="text-center font-bold">{{ monthlySummaryFor(k)?.totalWorkedDays ?? 0 }}</td>
+            </ng-container>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

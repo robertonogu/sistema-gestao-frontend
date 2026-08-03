@@ -342,10 +342,58 @@
 							/>
 						</div>
 
-						<div class="field" *ngIf="showToolEquipmentLink(linkRowSubCategory)">
-							<label>Nome</label>
-							<p-dropdown [options]="[]" placeholder="Ainda não disponível" [disabled]="true" />
-							<small class="text-500">Associação de ferramentas/equipamentos ainda não está disponível.</small>
+						<div class="field" *ngIf="showToolLink(linkRowSubCategory)">
+							<label>Ferramenta</label>
+							<div class="flex gap-2">
+								<p-dropdown
+									formControlName="toolId"
+									[options]="toolNames"
+									optionLabel="name"
+									optionValue="id"
+									placeholder="Selecione uma Ferramenta"
+									[filter]="true"
+									filterBy="name"
+									appendTo="body"
+									styleClass="flex-1"
+								/>
+								<button
+									*ngIf="showToolPurchaseLink(linkRowSubCategory)"
+									pButton
+									type="button"
+									icon="pi pi-plus"
+									class="p-button-outlined"
+									pTooltip="Criar nova ferramenta"
+									tooltipPosition="bottom"
+									(click)="openQuickAddToolEquipment('tool')"
+								></button>
+							</div>
+						</div>
+
+						<div class="field" *ngIf="showEquipmentLink(linkRowSubCategory)">
+							<label>Equipamento</label>
+							<div class="flex gap-2">
+								<p-dropdown
+									formControlName="equipmentId"
+									[options]="equipmentNames"
+									optionLabel="name"
+									optionValue="id"
+									placeholder="Selecione um Equipamento"
+									[filter]="true"
+									filterBy="name"
+									appendTo="body"
+									styleClass="flex-1"
+								/>
+								<button
+									*ngIf="showEquipmentPurchaseLink(linkRowSubCategory)"
+									pButton
+									type="button"
+									icon="pi pi-plus"
+									class="p-button-outlined"
+									pTooltip="Criar novo equipamento"
+									tooltipPosition="bottom"
+									(click)="openQuickAddToolEquipment('equipment')"
+								></button>
+							</div>
 						</div>
 
 					</form>
@@ -367,6 +415,49 @@
 							type="button"
 							(click)="saveLinkDialog()"
 						></button>
+					</ng-template>
+				</p-dialog>
+
+				<p-dialog
+					[header]="quickAddToolEquipmentTitle"
+					[(visible)]="quickAddToolEquipmentDialogVisible"
+					[style]="{ width: '350px' }"
+					[modal]="true"
+					[dismissableMask]="true"
+					class="p-fluid"
+					(onHide)="closeQuickAddToolEquipment()"
+				>
+					<ng-template pTemplate="content">
+						<div class="field">
+							<label for="quickAddToolEquipmentName" class="block font-bold mb-4">Nome</label>
+							<input
+								type="text"
+								pInputText
+								id="quickAddToolEquipmentName"
+								[(ngModel)]="quickAddToolEquipmentName"
+								[ngModelOptions]="{ standalone: true }"
+								required
+								autofocus
+								[ngClass]="{ 'ng-invalid ng-dirty': quickAddToolEquipmentSubmitted && !quickAddToolEquipmentName }"
+							/>
+							<small class="p-error" *ngIf="quickAddToolEquipmentSubmitted && !quickAddToolEquipmentName">Nome é obrigatório.</small>
+						</div>
+
+						<div class="field">
+							<label for="quickAddToolEquipmentCode" class="block font-bold mb-4">Código</label>
+							<input
+								type="text"
+								pInputText
+								id="quickAddToolEquipmentCode"
+								[(ngModel)]="quickAddToolEquipmentCode"
+								[ngModelOptions]="{ standalone: true }"
+							/>
+						</div>
+					</ng-template>
+
+					<ng-template pTemplate="footer">
+						<button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="closeQuickAddToolEquipment()"></button>
+						<button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveQuickAddToolEquipment()"></button>
 					</ng-template>
 				</p-dialog>
 

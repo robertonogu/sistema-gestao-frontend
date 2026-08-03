@@ -198,26 +198,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 
 // ===== KPIs =====
 .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-.kpi {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--accent, var(--border));
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  display: flex; flex-direction: column; gap: 4px;
-
-  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); }
-  .kpi-value { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
-  .kpi-foot  { display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-top: 2px; }
-  .kpi-sub   { color: var(--text-3); }
-  .kpi-delta {
-    display: inline-flex; gap: 4px; align-items: center;
-    font-family: var(--font-mono); font-weight: 600;
-    &.up   { color: var(--success); }
-    &.down { color: var(--danger); }
-    small { font-weight: 400; }
-  }
-}
 
 // ===== Execução financeira =====
 :host ::ng-deep .exec-card .p-card-body { padding: 16px; }

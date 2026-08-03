@@ -12,20 +12,9 @@ export class AppMenuComponent implements OnInit {
     ngOnInit() {
         this.model = [
             {
-                label: 'Dashboards',
+                label: 'Dashboard',
                 icon: 'pi pi-home',
-                items: [
-                    {
-                        label: 'E-Commerce',
-                        icon: 'pi pi-fw pi-home',
-                        routerLink: ['/']
-                    },
-                    {
-                        label: 'Banking',
-                        icon: 'pi pi-fw pi-image',
-                        routerLink: ['/dashboard-banking']
-                    }
-                ]
+                routerLink: ['/']
             },
             {
                 label: "Atalhos",
@@ -148,7 +137,7 @@ export class AppMenuComponent implements OnInit {
             },
             {
                 label: "Inventário",
-                icon: 'pi pi-hammer',
+                icon: 'pi pi-box',
                 items: [
                     {
                         label: 'Artigos',
@@ -163,12 +152,12 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Equipamentos',
                         icon: 'pi pi-fw pi-lock',
-                        routerLink: ['/auth/access']
+                        routerLink: ['/inventory/equipments']
                     },
                     {
                         label: 'Ferramentas',
                         icon: 'pi pi-fw pi-wrench',
-                        routerLink: ['/auth/access']
+                        routerLink: ['/inventory/tools']
                     }
                 ]
             },
@@ -205,7 +194,7 @@ export class AppMenuComponent implements OnInit {
             },
             {
                 label: "Empresa",
-                icon: 'pi pi-warehouse',
+                icon: 'pi pi-briefcase',
                 items: [
                     {
                         label: 'Clientes',

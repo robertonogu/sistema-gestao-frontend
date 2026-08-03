@@ -1,17 +1,32 @@
 import { Component, OnInit } from '@angular/core';
+import { MenuItem } from 'primeng/api';
+import { ItemName } from 'src/app/demo/api/itemName';
+import { MonthlySummary } from 'src/app/demo/api/monthlySummary';
 import { TimeMap } from 'src/app/demo/api/timemap';
-import { HolidayService } from 'src/app/demo/service/company/holidayService';
+import { HolidayService, NationalHoliday } from 'src/app/demo/service/company/holidayService';
+import { EmployeeService } from 'src/app/demo/service/people/employee.service';
 import { WorkLogService } from 'src/app/demo/service/people/workLogService';
 
-export interface Holiday {
-  id: number;
-  name: string;
-  date: string;
-}
+type SummaryScope = 'external' | 'internal';
 
 @Component({
   templateUrl: './timemap.component.html',
-  styles: ['p-table td, p-table th { font-size: 12px; } td,th { padding: 1px; width: 15px; }']
+  styles: [`
+    :host ::ng-deep .p-datatable-table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    :host ::ng-deep .p-datatable-table td,
+    :host ::ng-deep .p-datatable-table th {
+      font-size: 12px;
+      padding: 1px;
+      width: 15px;
+      max-width: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `]
 })
 export class TimeMapComponent implements OnInit {
 
@@ -19,48 +34,105 @@ export class TimeMapComponent implements OnInit {
   daysPerMonth: number[];
 
   days: number[] = Array.from({ length: 31 }, (_, i) => i);
-  timeMaps: TimeMap[][] = [];
+  timeMaps: (TimeMap | null)[][] = Array(12).fill(null).map(() => Array(31).fill(null));
+  monthlySummaries: MonthlySummary[] = [];
 
-  holidays: any;
+  year: number = 2026;
+  years: number[] = [];
+
+  holidays: NationalHoliday[] = [];
+
+  employeeNames: ItemName[] = [];
+  selectedEmployee: number | null = null;
+
+  scope: SummaryScope = 'external';
+  scopeTabs: MenuItem[] = [
+    { label: 'Externo' },
+    { label: 'Interno' },
+  ];
+  activeScopeTab: MenuItem = this.scopeTabs[0];
 
   constructor(
     private workLogService: WorkLogService,
-    private holidayService: HolidayService
+    private holidayService: HolidayService,
+    private employeeService: EmployeeService
   ) {
     this.months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     this.daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    const currentYear = new Date().getFullYear();
+    this.years = Array.from({ length: 7 }, (_, i) => currentYear + 1 - i);
   }
 
   ngOnInit(): void {
-    this.workLogService.getTimeMap(2).subscribe((timemap) => {
-      this.timeMaps = this.transformWorkLogData(timemap);
+    this.employeeService.getEmployeeNames().subscribe(names => {
+      this.employeeNames = names;
     });
 
-    this.holidayService.getHolidays().subscribe(
+    this.loadHolidays();
+  }
+
+  loadHolidays(): void {
+    this.holidayService.getHolidays(this.year).subscribe(
       data => {
         this.holidays = data;
-        console.log(this.holidays);
       },
       error => {
         console.error('There was an error!', error);
       }
     );
-    this.holidays = [
-      { id: 1, name: 'New Year\'s Day', date: '2024-01-01' },
-      { id: 2, name: 'Martin Luther King Jr. Day', date: '2024-01-16' },
-      { id: 3, name: 'Presidents\' Day', date: '2024-02-20' },
-      { id: 4, name: 'Memorial Day', date: '2024-05-29' },
-      { id: 5, name: 'Independence Day', date: '2024-07-04' },
-      { id: 6, name: 'Labor Day', date: '2024-09-04' },
-      { id: 7, name: 'Columbus Day', date: '2024-10-09' },
-      { id: 8, name: 'Veterans Day', date: '2024-11-11' },
-      { id: 9, name: 'Thanksgiving Day', date: '2024-11-23' },
-      { id: 10, name: 'Christmas Day', date: '2024-12-25' }
-    ];
   }
 
-  transformWorkLogData(data: TimeMap[]): any[] {
-    const timeMaps = Array(12).fill(null).map(() => Array(31).fill(null));
+  onYearChange(): void {
+    this.loadHolidays();
+    this.loadTimeMap();
+  }
+
+  onScopeTabChange(item: MenuItem): void {
+    this.activeScopeTab = item;
+    this.scope = item === this.scopeTabs[1] ? 'internal' : 'external';
+    this.loadTimeMap();
+  }
+
+  loadTimeMap(): void {
+    if (this.selectedEmployee == null) {
+      this.timeMaps = Array(12).fill(null).map(() => Array(31).fill(null));
+      this.monthlySummaries = [];
+      return;
+    }
+
+    const summary$ = this.scope === 'external'
+      ? this.workLogService.getExternalSummary(this.selectedEmployee, this.year)
+      : this.workLogService.getInternalSummary(this.selectedEmployee, this.year);
+
+    summary$.subscribe((summary) => {
+      this.monthlySummaries = summary.monthlySummaries;
+      this.timeMaps = this.transformWorkLogData(summary.dailySummaries);
+    });
+  }
+
+  monthlySummaryFor(monthIndex: number): MonthlySummary | undefined {
+    return this.monthlySummaries.find(m => m.month === monthIndex + 1);
+  }
+
+  get annualTotalWorkedHours(): number {
+    return this.monthlySummaries.reduce((sum, m) => sum + m.totalWorkedHours, 0);
+  }
+
+  get annualTotalExtraHours(): number {
+    return this.monthlySummaries.reduce((sum, m) => sum + m.totalExtraHours, 0);
+  }
+
+  get annualTotalAbsenceHours(): number {
+    return this.monthlySummaries.reduce((sum, m) => sum + m.totalAbsenceHours, 0);
+  }
+
+  get annualTotalWorkedDays(): number {
+    return this.monthlySummaries.reduce((sum, m) => sum + m.totalWorkedDays, 0);
+  }
+
+  transformWorkLogData(data: TimeMap[]): (TimeMap | null)[][] {
+    const timeMaps: (TimeMap | null)[][] = Array(12).fill(null).map(() => Array(31).fill(null));
     data.forEach(log => {
       const date = new Date(log.date);
       const monthIndex = date.getMonth();
@@ -72,18 +144,19 @@ export class TimeMapComponent implements OnInit {
   }
 
   isHoliday(day: number, month: string): boolean {
-    const date = new Date(2024, this.months.indexOf(month), day);
-    return this.holidays.some((holiday: { date: string | number | Date; }) => new Date(holiday.date).getTime() === date.getTime());
+    const date = new Date(this.year, this.months.indexOf(month), day);
+    return this.holidays.some(holiday => new Date(holiday.date).getTime() === date.getTime());
   }
 
   isWeekend(day: number, month: string): boolean {
-    const date = new Date(2024, this.months.indexOf(month), day); 
-    return date.getDay() === 6;
+    const date = new Date(this.year, this.months.indexOf(month), day);
+    const dayOfWeek = date.getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6;
   }
 
   getHolidayName(day: number, month: string): string | null {
-    const date = new Date(2024, this.months.indexOf(month), day); 
-    const holiday = this.holidays.find((holiday: { date: string | number | Date; }) => new Date(holiday.date).getTime() === date.getTime());
+    const date = new Date(this.year, this.months.indexOf(month), day);
+    const holiday = this.holidays.find(holiday => new Date(holiday.date).getTime() === date.getTime());
     return holiday ? holiday.name : null;
   }
 

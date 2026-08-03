@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment';
 import { ObjectList } from '../../api/objectList';
 import { WorkLog } from '../../api/workLog';
 import { WorkLogCreation } from '../../data/model/worklogCreation.model';
-import { TimeMap } from '../../api/timemap';
+import { WorkLogSummary } from '../../api/workLogSummary';
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +13,8 @@ import { TimeMap } from '../../api/timemap';
 export class WorkLogService {
 
     private workLogsUrl = `${environment.apiUrl}/worklogs`;
-    private timemapUrl = `${environment.apiUrl}/worklogs/summary/`;
+    private externalSummaryUrl = `${environment.apiUrl}/worklogs/externalSummary/`;
+    private internalSummaryUrl = `${environment.apiUrl}/worklogs/internalSummary/`;
 
     constructor(private http: HttpClient) { }
 
@@ -26,9 +27,12 @@ export class WorkLogService {
         return this.http.post<WorkLog>(this.workLogsUrl, worklog, environment.httpOptions);
     }
 
-    getTimeMap(employeeId: number) : Observable<TimeMap[]> {
-        let url = this.timemapUrl + employeeId;
-        return this.http.get<TimeMap[]>(url);
+    getExternalSummary(employeeId: number, year: number) : Observable<WorkLogSummary> {
+        return this.http.get<WorkLogSummary>(this.externalSummaryUrl + employeeId + "?year=" + year);
+    }
+
+    getInternalSummary(employeeId: number, year: number) : Observable<WorkLogSummary> {
+        return this.http.get<WorkLogSummary>(this.internalSummaryUrl + employeeId + "?year=" + year);
     }
 
 }

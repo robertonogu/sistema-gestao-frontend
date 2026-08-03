@@ -12,4 +12,6 @@ export interface ItemCreation {
     totalValue: number;
     costAllocations?: CostAllocationCreation[];
     vehicleId?: number;
+    toolId?: number;
+    equipmentId?: number;
 }

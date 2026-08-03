@@ -63,21 +63,11 @@
 
   <!-- ========== KPIs ========== -->
   <section class="kpi-grid">
-    <div *ngFor="let k of kpis()" class="kpi" [style.--accent]="k.accent">
-      <div class="kpi-label">{{ k.label }}</div>
-      <div class="kpi-value">{{ k.value }}</div>
-      <div class="kpi-foot">
-        <span class="kpi-sub">{{ k.sub }}</span>
-        <!--<span *ngIf="k.delta !== undefined"
-              class="kpi-delta"
-              [class.up]="k.delta > 0"
-              [class.down]="k.delta < 0">
-          <i class="pi"
-             [class.pi-arrow-up]="k.delta > 0"
-             [class.pi-arrow-down]="k.delta < 0"></i>
-          {{ k.delta > 0 ? '+' : '' }}{{ k.delta }}%
-          <small class="muted">{{ k.deltaLabel }}</small>
-        </span>-->
+    <div *ngFor="let k of kpis()" class="card mb-0" [style.border-top]="'3px solid ' + k.accent">
+      <span class="font-semibold text-lg">{{ k.label }}</span>
+      <div class="mt-3">
+        <span class="text-2xl font-bold text-900">{{ k.value }}</span>
+        <div class="text-500 text-sm mt-1">{{ k.sub }}</div>
       </div>
     </div>
   </section>

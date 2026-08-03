@@ -6,17 +6,18 @@ import { ProductService } from 'src/app/demo/service/product.service';
 import { Table } from 'primeng/table';
 import { DashboardService } from 'src/app/demo/service/dashboard/dashboardService';
 import { CategoryCost } from 'src/app/demo/api/categoryCost';
+import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 
 @Component({
-    templateUrl: './ecommerce.dashboard.component.html',
+    templateUrl: './dashboard.component.html',
 })
-export class EcommerceDashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
     knobValue: number = 90;
 
-    selectedWeek: any;
+    selectedYear: number = new Date().getFullYear();
 
-    weeks: any[] = [];
+    years: number[] = [];
 
     barData: any;
 
@@ -39,7 +40,8 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
     revenuesPerMonth: number[] = [];
     expensesPerMonth: number[] = [];
     categoryCosts: CategoryCost[] = [];
-    CategoryType = CategoryType;
+    expensesInDebt: ExpenseInDebt[] = [];
+    CategoryType: any = CategoryType;
 
     constructor(
         private productService: ProductService,
@@ -51,60 +53,45 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
             .subscribe((config) => {
                 this.initCharts();
             });
+
+        const currentYear = new Date().getFullYear();
+        this.years = Array.from({ length: 7 }, (_, i) => currentYear + 1 - i);
     }
 
     getCategoriesName(): string[] {
-        console.log(this.categoryCosts.map(item => item.categoryType as CategoryType))
-        
-        //console.log(this.categoryCosts.map(item => CategoryType[CategoryType[item.categoryType]]));
-        return this.categoryCosts.map(item => item.categoryType);
+        return this.categoryCosts.map(item => this.CategoryType[item.categoryType] ?? item.categoryType);
     }
-    
+
     getCategoriesValues() {
         return this.categoryCosts.map(item => item.value);
     }
 
+    buildSparklinePath(values: number[], width: number = 258, height: number = 96): string {
+        if (!values || values.length === 0) return '';
+
+        const max = Math.max(...values, 0);
+        const min = Math.min(...values, 0);
+        const range = max - min || 1;
+        const stepX = width / (values.length - 1 || 1);
+
+        const points = values.map((value, i) => ({
+            x: i * stepX,
+            y: height - ((value - min) / range) * height,
+        }));
+
+        let path = `M${points[0].x.toFixed(2)},${points[0].y.toFixed(2)}`;
+        for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i];
+            const p1 = points[i + 1];
+            const midX = ((p0.x + p1.x) / 2).toFixed(2);
+            path += ` C${midX},${p0.y.toFixed(2)} ${midX},${p1.y.toFixed(2)} ${p1.x.toFixed(2)},${p1.y.toFixed(2)}`;
+        }
+
+        return path;
+    }
+
     ngOnInit(): void {
-        this.dashboardService.getDashboardData().subscribe((dashboardData) => {
-            console.log(dashboardData)
-            this.revenuesValue = dashboardData.revenuesValue;
-            this.expensesValue = dashboardData.expensesValue;
-            this.debtsValue = dashboardData.debtsValue;
-            this.balance = dashboardData.balance;
-            this.revenuesPerMonth = dashboardData.revenuesPerMonth;
-            this.expensesPerMonth = dashboardData.expensesPerMonth;
-            this.categoryCosts = dashboardData.categoryCosts;
-            this.initCharts();
-        });
-
-        this.weeks = [
-            {
-                label: 'Last Week',
-                value: 0,
-                data: [
-                    [65, 59, 80, 81, 56, 55, 40],
-                    [28, 48, 40, 19, 86, 27, 90],
-                ],
-            },
-            {
-                label: 'This Week',
-                value: 1,
-                data: [
-                    [35, 19, 40, 61, 16, 55, 30],
-                    [48, 78, 10, 29, 76, 77, 10],
-                ],
-            },
-            {
-                label: 'This Weekwekewkekwkekwksk',
-                value: 1,
-                data: [
-                    [35, 19, 40, 61, 16, 55, 30],
-                    [48, 78, 10, 29, 76, 77, 10],
-                ],
-            },
-        ];
-
-        this.selectedWeek = this.weeks[0];
+        this.loadDashboardData();
 
         this.productService
             .getProductsSmall()
@@ -116,6 +103,20 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
             { header: 'Price', field: 'price' },
             { header: 'Status', field: 'inventoryStatus' },
         ];
+    }
+
+    loadDashboardData(): void {
+        this.dashboardService.getDashboardData(this.selectedYear).subscribe((dashboardData) => {
+            this.revenuesValue = dashboardData.revenuesValue;
+            this.expensesValue = dashboardData.expensesValue;
+            this.debtsValue = dashboardData.debtsValue;
+            this.balance = dashboardData.balance;
+            this.revenuesPerMonth = dashboardData.revenuesPerMonth;
+            this.expensesPerMonth = dashboardData.expensesPerMonth;
+            this.categoryCosts = dashboardData.categoryCosts;
+            this.expensesInDebt = dashboardData.expensesInDebt;
+            this.initCharts();
+        });
     }
 
     async initCharts() {
@@ -266,11 +267,8 @@ export class EcommerceDashboardComponent implements OnInit, OnDestroy {
         };
     }
 
-    onWeekChange() {
-        let newBarData = { ...this.barData };
-        newBarData.datasets[0].data = this.selectedWeek.data[0];
-        newBarData.datasets[1].data = this.selectedWeek.data[1];
-        this.barData = newBarData;
+    onYearChange() {
+        this.loadDashboardData();
     }
 
     onGlobalFilter(table: Table, event: Event) {

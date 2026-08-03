@@ -1,0 +1,130 @@
+<div class="grid">
+    <div class="col-12 md:col-6 xl:col-3">
+        <div class="card">
+            <span class="font-semibold text-lg">Receitas</span>
+            <div class="flex justify-content-between align-items-start mt-3">
+                <div class="w-6">
+                    <span class="text-3xl font-bold text-900">{{ revenuesValue | currency: 'EUR' }}</span>
+                    <div class="text-green-500">
+                        <span class="font-medium">+12%</span>
+                        <i class="pi pi-arrow-up text-xs ml-2"></i>
+                    </div>
+                </div>
+                <div class="w-6">
+                    <svg width="100%" viewBox="0 0 258 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path [attr.d]="buildSparklinePath(revenuesPerMonth, 258, 96)"
+                            style="stroke-width:2px;stroke:var(--primary-color);stroke-linecap:round;stroke-linejoin:round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 md:col-6 xl:col-3">
+        <div class="card h-full">
+            <span class="font-semibold text-lg">Despesas</span>
+            <div class="flex justify-content-between align-items-start mt-3">
+                <div class="w-6">
+                    <span class="text-3xl font-bold text-900">{{ expensesValue | currency: 'EUR' }}</span>
+                    <div class="text-green-500">
+                        <span class="font-medium">+20%</span>
+                        <i class="pi pi-arrow-up text-xs ml-2"></i>
+                    </div>
+                </div>
+                <div class="w-6">
+                    <svg width="100%" viewBox="0 0 258 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path [attr.d]="buildSparklinePath(expensesPerMonth, 258, 96)"
+                            style="stroke-width:2px;stroke:var(--primary-color);stroke-linecap:round;stroke-linejoin:round" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 md:col-6 xl:col-3">
+        <div class="card h-full">
+            <span class="font-semibold text-lg">Débitos</span>
+            <div class="mt-3">
+                <span class="text-4xl font-bold text-900">{{ debtsValue | currency: 'EUR' }}</span>
+                <div class="text-pink-500">
+                    <span class="font-medium">+24%</span>
+                    <i class="pi pi-arrow-down text-xs ml-2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 md:col-6 xl:col-3">
+        <div class="card h-full">
+            <span class="font-semibold text-lg">Saldo</span>
+            <div class="mt-3">
+                <span class="text-4xl font-bold text-900">{{ balance | currency: 'EUR' }}</span>
+                <div class="text-green-500">
+                    <span class="font-medium">+30%</span>
+                    <i class="pi pi-arrow-up text-xs ml-2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 xl:col-9">
+        <div class="card h-full">
+            <div class="flex align-items-start justify-content-between mb-6">
+                <span class="text-900 text-xl font-semibold">Análise Financeira</span>
+                <p-dropdown [options]="years" [(ngModel)]="selectedYear" styleClass="w-10rem"
+                    (onChange)="onYearChange()"></p-dropdown>
+            </div>
+            <p-chart type="bar" [data]="barData" [options]="barOptions" height="300px"></p-chart>
+        </div>
+    </div>
+    <div class="col-12 xl:col-3">
+        <div class="card h-full">
+            <div class="text-900 text-xl font-semibold mb-6">Despesas por Categoria</div>
+            <p-chart type="pie" [data]="pieData" [options]="pieOptions" height="300px"></p-chart>
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-8">
+        <div class="card">
+            <div class="flex flex-column md:flex-row md:align-items-start md:justify-content-between mb-3">
+                <div class="text-900 text-xl font-semibold mb-3 md:mb-0">Débitos Urgentes</div>
+            </div>
+            <p-table #dt [value]="expensesInDebt" [paginator]="true" [rows]="5" responsiveLayout="scroll"
+                [globalFilterFields]="['origin','documentNumber']">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="origin" style="min-width:12rem" class="white-space-nowrap">Origem</th>
+                        <th pSortableColumn="documentNumber" style="min-width:10rem" class="white-space-nowrap">Documento</th>
+                        <th pSortableColumn="totalValue" style="min-width:10rem" class="white-space-nowrap">Valor</th>
+                        <th pSortableColumn="paymentDeadline" style="min-width:10rem" class="white-space-nowrap">Data Limite</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-debt>
+                    <tr>
+                        <td>{{ debt.origin }}</td>
+                        <td>{{ debt.documentNumber }}</td>
+                        <td>{{ debt.totalValue | currency:'EUR' }}</td>
+                        <td>{{ debt.paymentDeadline ? (debt.paymentDeadline | date:'dd/MM/yyyy') : '-' }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="col-12 lg:col-4">
+        <div class="card h-full">
+            <div class="text-900 text-xl font-semibold mb-3">Top Products</div>
+            <ul class="list-none p-0 m-0">
+                <li *ngFor="let product of products | slice:0:6"
+                    class="flex align-items-center justify-content-between p-3">
+                    <div class="inline-flex align-items-center">
+                        <img [src]="'assets/demo/images/product/' + product.image" [alt]="product.name" width="75"
+                            class="shadow-2 flex-shrink-0" />
+                        <div class="flex flex-column ml-3">
+                            <span class="font-medium text-lg mb-1">{{product.name}}</span>
+                            <p-rating [ngModel]="product.rating" [readonly]="true" [cancel]="false"
+                                [iconOnStyle]="{'fontSize':'12px'}" [iconOffStyle]="{'fontSize':'12px'}"></p-rating>
+                        </div>
+                    </div>
+                    <span class="ml-auto font-semibold text-xl p-text-secondary">${{product.price}}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

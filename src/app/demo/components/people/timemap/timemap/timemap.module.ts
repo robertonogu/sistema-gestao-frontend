@@ -12,6 +12,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
 import { SliderModule } from 'primeng/slider';
 import { RatingModule } from 'primeng/rating';
+import { TabMenuModule } from 'primeng/tabmenu';
 import { TimeMapComponent } from './timemap.component';
 import { TimeMapRoutingModule } from './timemap-routing.module';
 
@@ -31,6 +32,7 @@ import { TimeMapRoutingModule } from './timemap-routing.module';
 		DropdownModule,
 		ProgressBarModule,
 		ToastModule,
+		TabMenuModule,
 		TimeMapRoutingModule
   	]
 })

@@ -89,9 +89,9 @@
                 <ng-template pTemplate="body" let-construction>
                     <tr [pSelectableRow]="construction">
                         <td>
-                            <i 
-                                (click)="addFavorite(construction)" 
-                                class="pi pi-star cursor-pointer" 
+                            <i
+                                (click)="addFavorite(construction); $event.stopPropagation()"
+                                class="pi pi-star cursor-pointer"
                                 [ngClass]="construction.favourite ? 'text-yellow-500' : '' "
                             >
                             </i>

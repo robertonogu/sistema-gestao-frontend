@@ -13,8 +13,8 @@ export class DashboardService {
 
     constructor(private http: HttpClient) { }
 
-    getDashboardData() : Observable<DashboardData> {
-        const params = new HttpParams().set('year', "2025");
+    getDashboardData(year: number) : Observable<DashboardData> {
+        const params = new HttpParams().set('year', year.toString());
 
         return this.http.get<DashboardData>(
             this.dashboardDataUrl,
