@@ -5,7 +5,7 @@ import { ConstructionNames } from '../../api/constructionNames';
 import { environment } from 'src/environments/environment';
 import { ObjectList } from '../../api/objectList';
 import { ItemName } from '../../api/itemName';
-import { ConstructionCreation } from '../../data/model/constructionCreation.model';
+import { Construction as ConstructionInput } from '../../data/model/construction.model';
 import { Construction } from '../../api/construction';
 import { ConstructionDetails } from '../../api/constructionDetails';
 import { BudgetItem } from '../../api/budgetItem';
@@ -24,6 +24,7 @@ export class ConstructionService {
     private budgetSubItemsForConstruction = `${environment.apiUrl}/constructions/budgetSubItems/`;
     private budgetItemsForConstruction = `${environment.apiUrl}/constructions/budgetTree/`;
     private constructionDetailsUrl = `${environment.apiUrl}/constructions/details/`;
+    private constructionEditUrl = `${environment.apiUrl}/constructions/edit/`;
     private markAsFavouriteUrl = `${environment.apiUrl}/constructions/favourite/`;
     private budgetItemsUrl = `${environment.apiUrl}/budgetItems/`;
 
@@ -63,8 +64,18 @@ export class ConstructionService {
         return this.http.get<ConstructionDetails>(url);
       }
 
-    createConstruction(construction: ConstructionCreation) : Observable<Construction> {
+    createConstruction(construction: ConstructionInput) : Observable<Construction> {
         return this.http.post<Construction>(this.constructionsUrl, construction, environment.httpOptions);
+    }
+
+    getConstructionForEdit(constructionId: number) : Observable<ConstructionInput> {
+        let url = this.constructionEditUrl + constructionId;
+        return this.http.get<ConstructionInput>(url);
+    }
+
+    updateConstruction(constructionId: number, construction: ConstructionInput) : Observable<Construction> {
+        let url = this.constructionsUrl + "/" + constructionId;
+        return this.http.put<Construction>(url, construction, environment.httpOptions);
     }
 
     markAsFavourite(constructionId: number, isFavourite: boolean) : Observable<Construction> {

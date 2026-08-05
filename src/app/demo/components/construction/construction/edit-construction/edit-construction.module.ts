@@ -7,8 +7,8 @@ import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
-import { CreateConstructionComponent } from './create-construction.component';
-import { CreateConstructionRoutingModule } from './create-construction-routing.module';
+import { EditConstructionComponent } from './edit-construction.component';
+import { EditConstructionRoutingModule } from './edit-construction-routing.module';
 import { FileUploadModule } from 'primeng/fileupload';
 import { DividerModule } from 'primeng/divider';
 import { TableModule } from 'primeng/table';
@@ -20,7 +20,7 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
   imports: [
     ButtonModule,
     CommonModule,
-    CreateConstructionRoutingModule,
+    EditConstructionRoutingModule,
     InputTextModule,
     InputNumberModule,
     CalendarModule,
@@ -35,7 +35,7 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
     CheckboxModule,
     GooglePlaceAutocompleteDirective
   ],
-  declarations: [CreateConstructionComponent]
+  declarations: [EditConstructionComponent]
 })
 
-export class CreateConstructionModule { }
+export class EditConstructionModule { }

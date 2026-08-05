@@ -103,20 +103,21 @@
                         <td>{{ construction.amountReceived | currency: 'EUR' }}</td>
                         <td>{{ construction.amountToReceive | currency: 'EUR' }}</td>
                         <td>
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-pencil" 
-                                class="mr-2" 
-                                [rounded]="true" 
-                                [text]="true" 
-                                severity="success" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-pencil"
+                                class="mr-2"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="success"
+                                (click)="editConstruction(construction); $event.stopPropagation()"
                             />
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-trash" 
-                                severity="danger" 
-                                [rounded]="true" 
-                                [text]="true" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-trash"
+                                severity="danger"
+                                [rounded]="true"
+                                [text]="true"
                             />
                         </td>
                     </tr>

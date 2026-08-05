@@ -60,6 +60,10 @@ export class ListConstructionsComponent implements OnInit {
     this.router.navigate(['./constructions/create-construction']);
   }
 
+  editConstruction(construction: Construction) {
+    this.router.navigate(['./constructions/edit-construction', construction.constructionId]);
+  }
+
   addFavorite(construction: Construction) {
     if (this.favouriteConstructions.length == 4 && !construction.favourite) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Máximo de obras favoritas atingidas.' });

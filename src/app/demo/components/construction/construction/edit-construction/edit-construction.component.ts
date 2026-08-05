@@ -1,21 +1,17 @@
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-import { MenuItem, MessageService } from 'primeng/api';
-import { ConstructionNames } from 'src/app/demo/api/constructionNames';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ItemName } from 'src/app/demo/api/itemName';
-import { Unit } from 'src/app/demo/data/enum/unit';
-import { Construction } from 'src/app/demo/data/model/construction.model';
 import { BudgetItem } from 'src/app/demo/data/model/budgetItem.model';
-import { VehicleCostCreation } from 'src/app/demo/data/model/vehicleCostCreation';
+import { Construction } from 'src/app/demo/data/model/construction.model';
 import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { ClientService } from 'src/app/demo/service/company/clientService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
-import { VehicleCostService } from 'src/app/demo/service/construction/vehicleCostService';
-import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
 
 @Component({
-  templateUrl: './create-construction.component.html',
+  templateUrl: './edit-construction.component.html',
   providers: [MessageService],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`:host {
@@ -190,12 +186,15 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
   i { font-size: 11px; }
 }`]
 })
-export class CreateConstructionComponent {
-  [x: string]: any;
+export class EditConstructionComponent implements OnInit {
 
   clientNames!: ItemName[];
 
-  dynamicForm!: FormGroup; // Your main form group
+  dynamicForm!: FormGroup;
+
+  loading = true;
+
+  constructionId!: number;
 
   name!: string;
   address!: string;
@@ -205,41 +204,50 @@ export class CreateConstructionComponent {
   initialDate!: Date;
   estimatedDays!: number;
 
-  //units = Unit;
-
   construction!: Construction;
-
-  units: Record<string, string> = {
-    un: 'un',
-    m: 'm',
-    m2: 'm²',
-    m3: 'm³',
-    kg: 'kg',
-    h: 'h',
-    vg: 'vg',
-    tn: 'tn',
-  };
 
   constructor(
     private constructionService: ConstructionService,
     private clientService: ClientService,
     private _location: Location,
     private messageService: MessageService,
-    private vehicleCostService: VehicleCostService,
+    private route: ActivatedRoute,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
+    this.constructionId = Number(this.route.snapshot.params['constructionId']);
+
     this.clientService.getClientNames().subscribe((clientNames) => {
       this.clientNames = clientNames;
+      this.cdr.markForCheck();
     });
 
-    /*this.dynamicForm = this.fb.group({
-      inputs: this.fb.array([])
-    });*/
+    this.constructionService.getConstructionForEdit(this.constructionId).subscribe({
+      next: (construction) => {
+        this.name = construction.name;
+        this.address = construction.address;
+        this.placeId = construction.placeId;
+        this.selectedClient = construction.clientId;
+        this.adjudicationDate = construction.adjudicationDate ? new Date(construction.adjudicationDate) : null as any;
+        this.initialDate = construction.initialDate ? new Date(construction.initialDate) : null as any;
+        this.estimatedDays = construction.estimatedDays;
 
-    this.dynamicForm = this.fb.group({
-      inputs: this.fb.array([this.buildInput()]),
+        this.dynamicForm = this.fb.group({
+          inputs: this.fb.array(
+            (construction.budgetItems ?? []).map(item => this.buildInput(item))
+          ),
+        });
+        this.applyInitialExtraLocks();
+
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível carregar a obra.' });
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -265,40 +273,45 @@ export class CreateConstructionComponent {
   }
 
   // ===== builders =====
-  private buildInput(): FormGroup {
+  private buildInput(item?: BudgetItem): FormGroup {
+    const hasChildren = !!item?.children?.length;
     return this.fb.group({
-      name: ['', Validators.required],
-      laborCost: [0],
-      materialCost: [0],
-      externalServiceCost: [0],
-      indirectCost: [0],
-      isExtra: [false],
+      budgetItemId: [item?.budgetItemId ?? null],
+      name: [item?.name ?? '', Validators.required],
+      laborCost: [{ value: item?.laborCost ?? 0, disabled: hasChildren }],
+      materialCost: [{ value: item?.materialCost ?? 0, disabled: hasChildren }],
+      externalServiceCost: [{ value: item?.externalServiceCost ?? 0, disabled: hasChildren }],
+      indirectCost: [{ value: item?.indirectCost ?? 0, disabled: hasChildren }],
+      isExtra: [item?.isExtra ?? false],
       expanded: [true],
-      subInputs: this.fb.array([] as FormGroup[]),
+      subInputs: this.fb.array((item?.children ?? []).map(child => this.buildSubInput(child))),
     });
   }
 
-  private buildSubInput(): FormGroup {
+  private buildSubInput(item?: BudgetItem): FormGroup {
+    const hasChildren = !!item?.children?.length;
     return this.fb.group({
-      subName: ['', Validators.required],
-      subLaborCost: [0],
-      subMaterialCost: [0],
-      subExternalServiceCost: [0],
-      subIndirectCost: [0],
-      isExtra: [false],
+      budgetItemId: [item?.budgetItemId ?? null],
+      subName: [item?.name ?? '', Validators.required],
+      subLaborCost: [{ value: item?.laborCost ?? 0, disabled: hasChildren }],
+      subMaterialCost: [{ value: item?.materialCost ?? 0, disabled: hasChildren }],
+      subExternalServiceCost: [{ value: item?.externalServiceCost ?? 0, disabled: hasChildren }],
+      subIndirectCost: [{ value: item?.indirectCost ?? 0, disabled: hasChildren }],
+      isExtra: [item?.isExtra ?? false],
       expanded: [false],
-      subSubInputs: this.fb.array([] as FormGroup[]),
+      subSubInputs: this.fb.array((item?.children ?? []).map(child => this.buildSubSubInput(child))),
     });
   }
 
-  private buildSubSubInput(): FormGroup {
+  private buildSubSubInput(item?: BudgetItem): FormGroup {
     return this.fb.group({
-      subSubName: ['', Validators.required],
-      subSubLaborCost: [0],
-      subSubMaterialCost: [0],
-      subSubExternalServiceCost: [0],
-      subSubIndirectCost: [0],
-      isExtra: [false],
+      budgetItemId: [item?.budgetItemId ?? null],
+      subSubName: [item?.name ?? '', Validators.required],
+      subSubLaborCost: [item?.laborCost ?? 0],
+      subSubMaterialCost: [item?.materialCost ?? 0],
+      subSubExternalServiceCost: [item?.externalServiceCost ?? 0],
+      subSubIndirectCost: [item?.indirectCost ?? 0],
+      isExtra: [item?.isExtra ?? false],
     });
   }
 
@@ -347,7 +360,16 @@ export class CreateConstructionComponent {
   }
 
   // ===== "extra" cascades to descendants =====
-  private setSubSubExtra(rowIndex: number, subIndex: number, value: boolean): void {
+  private cascadeCapituloExtra(rowIndex: number, value: boolean): void {
+    this.getSubInputs(rowIndex).controls.forEach((subGrp, subIndex) => {
+      const ctrl = (subGrp as FormGroup).get('isExtra');
+      ctrl?.setValue(value);
+      value ? ctrl?.disable() : ctrl?.enable();
+      this.cascadeSubExtra(rowIndex, subIndex, value);
+    });
+  }
+
+  private cascadeSubExtra(rowIndex: number, subIndex: number, value: boolean): void {
     this.getSubSubInputs(rowIndex, subIndex).controls.forEach(subSubGrp => {
       const ctrl = (subSubGrp as FormGroup).get('isExtra');
       ctrl?.setValue(value);
@@ -357,19 +379,28 @@ export class CreateConstructionComponent {
 
   onParentExtraChange(rowIndex: number): void {
     const isExtra = !!this.inputs.at(rowIndex).get('isExtra')?.value;
-    this.getSubInputs(rowIndex).controls.forEach((subGrp, subIndex) => {
-      const ctrl = (subGrp as FormGroup).get('isExtra');
-      ctrl?.setValue(isExtra);
-      isExtra ? ctrl?.disable() : ctrl?.enable();
-      this.setSubSubExtra(rowIndex, subIndex, isExtra);
-    });
+    this.cascadeCapituloExtra(rowIndex, isExtra);
     this.cdr.markForCheck();
   }
 
   onSubExtraChange(rowIndex: number, subIndex: number): void {
     const isExtra = !!this.getSubInputs(rowIndex).at(subIndex).get('isExtra')?.value;
-    this.setSubSubExtra(rowIndex, subIndex, isExtra);
+    this.cascadeSubExtra(rowIndex, subIndex, isExtra);
     this.cdr.markForCheck();
+  }
+
+  private applyInitialExtraLocks(): void {
+    this.inputs.controls.forEach((_, rowIndex) => {
+      if (this.inputs.at(rowIndex).get('isExtra')?.value) {
+        this.cascadeCapituloExtra(rowIndex, true);
+        return;
+      }
+      this.getSubInputs(rowIndex).controls.forEach((__, subIndex) => {
+        if (this.getSubInputs(rowIndex).at(subIndex).get('isExtra')?.value) {
+          this.cascadeSubExtra(rowIndex, subIndex, true);
+        }
+      });
+    });
   }
 
   removeInput(rowIndex: number): void {
@@ -456,43 +487,48 @@ export class CreateConstructionComponent {
     }) + ' €';
   }
 
-  newConstruction() {
+  saveConstruction() {
     const budgetItems: BudgetItem[] = this.inputs.controls.map((input, rowIndex) => {
       const raw = (input as FormGroup).getRawValue();
       const subItems: BudgetItem[] = (input.get('subInputs') as FormArray).controls.map((subInput, subIndex) => {
-        const subSubItems: BudgetItem[] = this.getSubSubInputs(rowIndex, subIndex).controls.map(subSubInput => ({
-          name: subSubInput.value.subSubName,
-          laborCost: subSubInput.value.subSubLaborCost,
-          materialCost: subSubInput.value.subSubMaterialCost,
-          externalServiceCost: subSubInput.value.subSubExternalServiceCost,
-          indirectCost: subSubInput.value.subSubIndirectCost,
-          isExtra: !!subSubInput.get('isExtra')?.value,
-        }));
+        const rawSub = (subInput as FormGroup).getRawValue();
+        const subSubItems: BudgetItem[] = this.getSubSubInputs(rowIndex, subIndex).controls.map(subSubInput => {
+          const rawSubSub = (subSubInput as FormGroup).getRawValue();
+          return {
+            budgetItemId: rawSubSub.budgetItemId ?? undefined,
+            name: rawSubSub.subSubName,
+            laborCost: rawSubSub.subSubLaborCost,
+            materialCost: rawSubSub.subSubMaterialCost,
+            externalServiceCost: rawSubSub.subSubExternalServiceCost,
+            indirectCost: rawSubSub.subSubIndirectCost,
+            isExtra: rawSubSub.isExtra,
+          };
+        });
         return {
-          name: subInput.value.subName,
+          budgetItemId: rawSub.budgetItemId ?? undefined,
+          name: rawSub.subName,
           laborCost: this.subItemLaborCost(rowIndex, subIndex),
           materialCost: this.subItemMaterialCost(rowIndex, subIndex),
           externalServiceCost: this.subItemExternalServiceCost(rowIndex, subIndex),
           indirectCost: this.subItemIndirectCost(rowIndex, subIndex),
-          isExtra: !!subInput.get('isExtra')?.value,
+          isExtra: rawSub.isExtra,
           children: subSubItems,
         };
       });
       return {
+        budgetItemId: raw.budgetItemId ?? undefined,
         name: raw.name,
         laborCost: this.capituloLaborCost(rowIndex),
         materialCost: this.capituloMaterialCost(rowIndex),
         externalServiceCost: this.capituloExternalServiceCost(rowIndex),
         indirectCost: this.capituloIndirectCost(rowIndex),
         isExtra: raw.isExtra,
-        children: subItems
+        children: subItems,
       };
     });
 
-    console.log('raw form value (inputs):', this.dynamicForm.getRawValue());
-    console.log('budgetItems built for submission:', JSON.parse(JSON.stringify(budgetItems)));
-
     this.construction = {
+      id: this.constructionId,
       name: this.name,
       address: this.address,
       placeId: this.placeId,
@@ -500,14 +536,14 @@ export class CreateConstructionComponent {
       adjudicationDate: this.adjudicationDate,
       initialDate: this.initialDate,
       estimatedDays: this.estimatedDays,
-      budgetItems: budgetItems
-    } as Construction;
+      budgetItems: budgetItems,
+    };
 
-    console.log('full construction payload sent to backend:', JSON.parse(JSON.stringify(this.construction)));
+    console.log(this.construction.budgetItems);
 
-    this.constructionService.createConstruction(this.construction).subscribe({
+    this.constructionService.updateConstruction(this.constructionId, this.construction).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Construção adicionada com sucesso.' });
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Obra atualizada com sucesso.' });
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });

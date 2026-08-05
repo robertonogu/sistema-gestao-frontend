@@ -3,16 +3,22 @@
     <div class="card">
 
       <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
-        <div class="text-900 text-xl font-semibold">Nova Obra</div>
+        <div class="text-900 text-xl font-semibold">Editar Obra</div>
         <div class="flex gap-2 sm:ml-auto">
           <button class="p-button-rounded p-button-outlined" (click)="back()" icon="pi pi-arrow-left" pButton
             pTooltip="Voltar" tooltipPosition="bottom" type="button"></button>
           <button class="p-button-rounded bg-red-500 border-red-500 hover:shadow-8" icon="pi pi-trash" pButton
             pTooltip="Apagar" tooltipPosition="bottom" type="button"></button>
-          <button class="p-button-rounded" (click)="newConstruction()" icon="pi pi-save" label="Guardar" pButton
+          <button class="p-button-rounded" (click)="saveConstruction()" icon="pi pi-save" label="Guardar" pButton
             tooltipPosition="bottom" type="button"></button>
         </div>
       </div>
+
+      <div *ngIf="loading" class="flex justify-content-center py-6">
+        <i class="pi pi-spin pi-spinner text-3xl text-500"></i>
+      </div>
+
+      <ng-container *ngIf="!loading">
 
       <div class="p-fluid p-formgrid grid">
 
@@ -56,14 +62,7 @@
           <p-inputNumber [(ngModel)]="estimatedDays" suffix=" dias" />
         </div>
 
-        <div class="field col-12 md:col-2">
-          <label>Imagem</label>
-          <p-fileUpload mode="basic" chooseLabel="Escolher" chooseIcon="pi pi-upload" name="demo[]"
-            url="https://www.primefaces.org/cdn/api/upload.php" accept="image/*" />
-        </div>
-
       </div>
-
 
       <form [formGroup]="dynamicForm" class="orcamento-form">
 
@@ -76,7 +75,7 @@
             <div class="col-num">Serviços Externos</div>
             <div class="col-num">Indiretos</div>
             <div class="col-num">Total</div>
-            <div class="col-extra">Extra</div>
+            <div class="col-num">Extra</div>
             <div class="col-actions"></div>
           </div>
 
@@ -276,6 +275,8 @@
           </div>
         </div>
       </form>
+
+      </ng-container>
 
     </div>
   </div>
