@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Tool } from 'src/app/demo/api/tool';
@@ -18,7 +18,7 @@ export class ListToolsComponent {
   tools!: Tool[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   constructor(
     private toolService: ToolService,

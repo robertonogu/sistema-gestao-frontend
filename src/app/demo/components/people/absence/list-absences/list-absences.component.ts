@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Absence } from 'src/app/demo/api/absence';
@@ -16,7 +16,7 @@ export class ListAbsencesComponent {
   absences!: Absence[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   AbsenceType: any = AbsenceType;
 

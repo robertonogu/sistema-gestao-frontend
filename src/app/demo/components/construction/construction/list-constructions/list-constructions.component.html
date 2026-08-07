@@ -1,4 +1,4 @@
-<div class="grid">
+﻿<div class="grid">
     <div class="col-12 lg:col-6 xl:col-3" *ngFor="let construction of favouriteConstructions">
         <div *ngIf="construction.favourite">
             <p-card header="{{ construction.name }}" subheader="{{ construction.client }}">
@@ -63,8 +63,8 @@
                 (onLazyLoad)="nextPage($event)"
                 (onRowSelect)="onRowSelect($event)"
                 [paginator]="true"
-                [rows]="5"
-                [rowsPerPageOptions]="[5, 10, 20]" 
+                [rows]="20"
+                [rowsPerPageOptions]="[5, 10, 20, 50, 100]" 
                 selectionMode="single"
                 [showCurrentPageReport]="true"
                 styleClass="p-datatable-striped" 

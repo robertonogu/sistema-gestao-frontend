@@ -5,35 +5,35 @@
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
                 <div class="text-900 text-xl font-semibold">Funcionários</div>
                 <div class="flex gap-2 sm:ml-auto">
-                    <button 
+                    <button
                         class="p-button-rounded p-button-outlined"
-                        (click)="newEmployee()" 
-                        icon="pi pi-plus" 
+                        (click)="openNew()"
+                        icon="pi pi-plus"
                         label="Novo"
-                        pButton 
-                        type="button" 
+                        pButton
+                        type="button"
                     ></button>
-                    <button 
+                    <button
                         class="p-button-rounded"
-                        icon="pi pi-download" 
-                        pTooltip="Exportar" 
-                        tooltipPosition="bottom" 
-                        pButton 
-                        type="button" 
+                        icon="pi pi-download"
+                        pTooltip="Exportar"
+                        tooltipPosition="bottom"
+                        pButton
+                        type="button"
                     ></button>
                 </div>
             </div>
 
-			<p-table 
+			<p-table
                 currentPageReportTemplate="{first} de {last} de {totalRecords} funcionários"
                 [lazy]="true"
                 [loading]="loading"
                 (onLazyLoad)="nextPage($event)"
                 [paginator]="true"
-                [rows]="5"
-                [rowsPerPageOptions]="[5, 10, 20]"
+                [rows]="20"
+                [rowsPerPageOptions]="[5, 10, 20, 50, 100]"
                 [showCurrentPageReport]="true"
-                styleClass="p-datatable-striped" 
+                styleClass="p-datatable-striped"
                 [totalRecords]="totalRecords"
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="employees"
@@ -41,6 +41,7 @@
 
                 <ng-template pTemplate = "header">
                     <tr>
+                        <th style="width: 3rem"></th>
                         <th pSortableColumn = "name">Nome <p-sortIcon field = "name"></p-sortIcon></th>
                         <th>Vencimento Base</th>
                         <th>Ajudas de Custo</th>
@@ -52,33 +53,166 @@
 
                 <ng-template pTemplate = "body" let-employee>
                     <tr>
+                        <td>
+                            <i *ngIf="employee.internal" class="pi pi-star-fill text-yellow-500" pTooltip="Interno"></i>
+                        </td>
                         <td>{{ employee.name }}</td>
                         <td>{{ employee.baseSalary | currency: 'EUR' }}</td>
                         <td>{{ employee.allowance | currency: 'EUR' }}</td>
                         <td>{{ employee.foodAllowance | currency: 'EUR' }}</td>
                         <td>{{ employee.healthInsurance | currency: 'EUR' }}</td>
                         <td>
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-pencil" 
-                                class="mr-2" 
-                                [rounded]="true" 
-                                [text]="true" 
-                                severity="success" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-pencil"
+                                class="mr-2"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="success"
+                                pTooltip="Editar"
+                                (click)="editEmployee(employee)"
                             />
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-trash" 
-                                severity="danger" 
-                                [rounded]="true" 
-                                [text]="true" 
+                            <p-button
+                                pRipple
+                                [icon]="employee.statusEmployee === employeeStatus.ACTIVE ? 'pi pi-ban' : 'pi pi-check'"
+                                class="mr-2"
+                                severity="warning"
+                                [rounded]="true"
+                                [text]="true"
+                                [pTooltip]="employee.statusEmployee === employeeStatus.ACTIVE ? 'Desativar' : 'Ativar'"
+                                (click)="updateStatus(employee)"
+                            />
+                            <p-button
+                                pRipple
+                                icon="pi pi-trash"
+                                severity="danger"
+                                [rounded]="true"
+                                [text]="true"
+                                pTooltip="Eliminar"
+                                (click)="deleteEmployee(employee)"
                             />
                         </td>
                     </tr>
                 </ng-template>
-                
+
             </p-table>
 
 		</div>
 	</div>
 </div>
+
+<p-dialog
+    [header]="employee.originId ? 'Editar Funcionário' : 'Novo Funcionário'"
+    [(visible)]="employeeDialog"
+    [style]="{ width: '550px' }"
+    [modal]="true"
+    class="p-fluid"
+    (onHide)="hideDialog()"
+>
+    <ng-template pTemplate="content">
+        <div class="p-fluid p-formgrid grid">
+            <div class="field col-12">
+                <label for="name" class="block font-bold mb-2">Nome</label>
+                <input
+                    type="text"
+                    pInputText
+                    id="name"
+                    [(ngModel)]="employee.name"
+                    required
+                    autofocus
+                    [ngClass]="{ 'ng-invalid ng-dirty': submitted && !employee.name }"
+                />
+                <small class="ng-dirty ng-invalid" *ngIf="submitted && !employee.name">Nome é obrigatório.</small>
+            </div>
+
+            <div class="field col-12">
+                <label for="nif" class="block font-bold mb-2">NIF</label>
+                <p-inputNumber id="nif" [(ngModel)]="employee.nif" [useGrouping]="false" [maxlength]="9" />
+            </div>
+
+            <div class="field col-12">
+                <label for="baseSalary" class="block font-bold mb-2">Vencimento Base</label>
+                <p-inputNumber
+                    id="baseSalary"
+                    [(ngModel)]="employee.baseSalary"
+                    mode="currency"
+                    currency="EUR"
+                    locale="de-DE"
+                />
+            </div>
+
+            <div class="field col-12">
+                <label for="allowance" class="block font-bold mb-2">Ajudas de Custo</label>
+                <p-inputNumber
+                    id="allowance"
+                    [(ngModel)]="employee.allowance"
+                    mode="currency"
+                    currency="EUR"
+                    locale="de-DE"
+                />
+            </div>
+
+            <div class="field col-12">
+                <label for="foodAllowance" class="block font-bold mb-2">Subsídio de Alimentação</label>
+                <p-inputNumber
+                    id="foodAllowance"
+                    [(ngModel)]="employee.foodAllowance"
+                    mode="currency"
+                    currency="EUR"
+                    locale="de-DE"
+                />
+            </div>
+
+            <div class="field col-12">
+                <label for="healthInsurance" class="block font-bold mb-2">Seguro de Saúde</label>
+                <p-inputNumber
+                    id="healthInsurance"
+                    [(ngModel)]="employee.healthInsurance"
+                    mode="currency"
+                    currency="EUR"
+                    locale="de-DE"
+                />
+            </div>
+
+            <div class="col-12 flex align-items-center gap-3">
+                <p-checkbox [binary]="true" [(ngModel)]="employee.internal" inputId="internal" />
+                <label for="internal">Interno</label>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveEmployee()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button
+                    pButton
+                    label="Eliminar"
+                    (click)="cd.accept()"
+                    class="bg-red-500 border-transparent text-white w-8rem text-red-500">
+                </button>
+                <button
+                    pButton
+                    label="Cancelar"
+                    (click)="cd.reject()"
+                    class="p-button-outlined w-8rem ">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-toast />

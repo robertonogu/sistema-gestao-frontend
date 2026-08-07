@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { Movement } from 'src/app/demo/api/movement';
 import { ObjectName } from 'src/app/demo/api/objectName';
@@ -18,7 +18,7 @@ export class ListMovementsComponent implements OnInit {
   movements!: Movement[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   MovementType = MovementType;
 

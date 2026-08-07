@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LazyLoadEvent } from 'primeng/api';
 import { Payment } from 'src/app/demo/api/payment';
@@ -15,7 +15,7 @@ export class ListPaymentsComponent {
   payments!: Payment[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   PaymentMethod: any = PaymentMethod;
 

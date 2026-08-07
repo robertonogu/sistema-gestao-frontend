@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { VehicleCost } from 'src/app/demo/api/vehicleCost';
@@ -15,7 +15,7 @@ export class ListVehicleCostsComponent {
   vehicleCosts!: VehicleCost[];
   
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   constructor(
     private vehicleCostService: VehicleCostService, 

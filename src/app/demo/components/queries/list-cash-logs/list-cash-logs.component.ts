@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { LazyLoadEvent } from 'primeng/api';
 import { AccountLog } from 'src/app/demo/api/accountLogs';
 import { MovementType } from 'src/app/demo/data/enum/movementType';
@@ -17,7 +17,7 @@ export class ListCashLogsComponent {
   accountLogs!: AccountLog[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   MovementType: any = MovementType;
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Sale } from 'src/app/demo/api/sale';
@@ -15,7 +15,7 @@ export class ListSalesComponent {
   sales!: Sale[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   constructor(
     private confirmationService: ConfirmationService,

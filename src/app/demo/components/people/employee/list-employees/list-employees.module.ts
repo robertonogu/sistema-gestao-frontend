@@ -15,6 +15,11 @@ import { RatingModule } from 'primeng/rating';
 import { ListEmployeesComponent } from './list-employees.component';
 import { ListEmployeesRoutingModule } from './list-employees-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TagModule } from 'primeng/tag';
 
 @NgModule({
 	imports: [
@@ -32,7 +37,12 @@ import { TooltipModule } from 'primeng/tooltip';
 		DropdownModule,
 		ProgressBarModule,
 		ToastModule,
-		ListEmployeesRoutingModule
+		ListEmployeesRoutingModule,
+		DialogModule,
+		InputNumberModule,
+		CheckboxModule,
+		ConfirmDialogModule,
+		TagModule
 	],
 	declarations: [ListEmployeesComponent]
 })

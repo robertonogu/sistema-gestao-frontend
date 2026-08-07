@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { LazyLoadEvent, MessageService } from 'primeng/api';
 import { Construction } from 'src/app/demo/api/construction';
@@ -20,7 +20,7 @@ export class ListConstructionsComponent implements OnInit {
   constructions!: Construction[];
   
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   constructor(
     private constructionService: ConstructionService, 

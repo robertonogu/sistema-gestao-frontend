@@ -1,4 +1,4 @@
-<div class="grid">
+﻿<div class="grid">
 	<div class="col-12">
 		<div class="card">
 
@@ -30,8 +30,8 @@
                 [loading]="loading"
                 (onLazyLoad)="nextPage($event)"
                 [paginator]="true"
-                [rows]="5"
-                [rowsPerPageOptions]="[5, 10, 20]"
+                [rows]="20"
+                [rowsPerPageOptions]="[5, 10, 20, 50, 100]"
                 styleClass="p-datatable-striped"
                 [showCurrentPageReport]="true"
                 [totalRecords]="totalRecords"

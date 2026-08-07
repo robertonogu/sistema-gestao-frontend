@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CurrentAccountLog } from 'src/app/demo/api/currentAccountLog';
 import { Origin } from 'src/app/demo/api/origin';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
@@ -19,7 +19,7 @@ export class ListCurrentAccountsComponent implements OnInit {
   currentAccountLogs: CurrentAccountLog[] = [];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   PaymentMethod: any = PaymentMethod;
 

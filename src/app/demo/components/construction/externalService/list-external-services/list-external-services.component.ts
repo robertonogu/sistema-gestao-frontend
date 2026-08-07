@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { CostEmployeeHour } from 'src/app/demo/api/costEmployeeHour';
 import { ExternalService } from 'src/app/demo/api/externalService';
@@ -15,7 +15,7 @@ export class ListExternalServicesComponent {
   externalServices!: ExternalService[];
   
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   constructor(
     private externalServiceService: ExternalServiceService, 

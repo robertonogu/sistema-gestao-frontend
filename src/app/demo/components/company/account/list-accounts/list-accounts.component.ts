@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LazyLoadEvent } from 'primeng/api';
 import { Account } from 'src/app/demo/api/account';
@@ -14,7 +14,7 @@ export class ListAccountsComponent {
   accounts!: Account[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   constructor(
     private accountService: AccountService, 

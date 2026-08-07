@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Client } from 'src/app/demo/api/client';
 import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
@@ -15,7 +15,7 @@ export class ListClientsComponent {
   clients!: Client[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
   sortField: string = 'originId';
   sortDirection!: string;
 

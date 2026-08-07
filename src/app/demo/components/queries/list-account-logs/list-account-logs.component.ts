@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { AccountLog } from 'src/app/demo/api/accountLogs';
 import { ObjectName } from 'src/app/demo/api/objectName';
 import { MovementType } from 'src/app/demo/data/enum/movementType';
@@ -21,7 +21,7 @@ export class ListAccountLogsComponent {
   accountLogs: AccountLog[] = [];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   MovementType: any = MovementType;
 

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+﻿import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Subscription, debounceTime } from 'rxjs';
@@ -31,7 +31,7 @@ export class BankingDashboardComponent implements OnInit, OnDestroy {
   sales!: Sale[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
     constructor(private layoutService: LayoutService,  private confirmationService: ConfirmationService,
         private messageService: MessageService, 

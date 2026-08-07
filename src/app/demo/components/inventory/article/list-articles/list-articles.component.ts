@@ -15,7 +15,7 @@ export class ListArticlesComponent {
   stockEntries!: StockMovement[];
   stockExits!: StockMovement[];
   articlesStock!: ArticleStock[];
-  pageSize: number = 5;
+  pageSize: number = 20;
   currentPage: number = 0;
   totalRecords: number = 0;
 

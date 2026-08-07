@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Supplier } from 'src/app/demo/api/supplier';
 import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
@@ -16,7 +16,7 @@ export class ListSuppliersComponent {
   suppliers!: Supplier[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   supplierDialog: boolean = false;
   submitted: boolean = false;

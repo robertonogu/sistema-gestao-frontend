@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { ExternalEntity } from 'src/app/demo/api/externalEntity';
 import { ExternalEntityCreation } from 'src/app/demo/data/model/externalEntityCreation.model';
@@ -15,7 +15,7 @@ export class ListExternalEntitiesComponent {
   externalEntities!: ExternalEntity[];
 
   currentPage: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 20;
 
   externalEntityDialog: boolean = false;
   submitted: boolean = false;
