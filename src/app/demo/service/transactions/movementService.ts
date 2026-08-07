@@ -12,6 +12,7 @@ import { Movement } from '../../api/movement';
 export class MovementService {
 
     private movementsUrl = `${environment.apiUrl}/movements`;
+    private movementByIdUrl = `${environment.apiUrl}/movements/`;
 
     constructor(private http: HttpClient) { }
 
@@ -22,5 +23,10 @@ export class MovementService {
 
     createMovement(newMovement: MovementCreation) : Observable<Movement> {
         return this.http.post<Movement>(this.movementsUrl, newMovement, environment.httpOptions);
+    }
+
+    updateMovement(movementId: number, movement: MovementCreation) : Observable<Movement> {
+        let url = this.movementByIdUrl + movementId;
+        return this.http.put<Movement>(url, movement, environment.httpOptions);
     }
 }

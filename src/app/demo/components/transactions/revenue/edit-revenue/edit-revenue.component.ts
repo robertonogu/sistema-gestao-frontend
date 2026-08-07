@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ObjectName } from 'src/app/demo/api/objectName';
@@ -13,21 +14,24 @@ import { ConstructionService } from 'src/app/demo/service/construction/construct
 import { RevenueService } from 'src/app/demo/service/transactions/revenueService';
 
 @Component({
-  templateUrl: './create-revenue.component.html',
+  templateUrl: './edit-revenue.component.html',
   providers: [MessageService]
 })
-export class CreateRevenueComponent {
-  
+export class EditRevenueComponent implements OnInit {
+
   revenueTypes = RevenueType;
   origins!: Origin[];
   accountNames!: ObjectName[];
   paymentMethods = PaymentMethod;
   validIvaRates!: number[];
-  constructionNames!: ConstructionNames[];
+  constructionNames: ConstructionNames[] = [];
+
+  loading = true;
+  revenueId!: number;
 
   date!: Date;
   selectedRevenueType!: RevenueType;
-  documentNumber!: string
+  documentNumber!: string;
   selectedOrigin!: number;
   selectedAccount!: number;
   selectedPaymentMethod!: PaymentMethod;
@@ -39,24 +43,47 @@ export class CreateRevenueComponent {
   revenue!: RevenueCreation;
 
   constructor(
-    private originService: OriginService, 
-    private accountService: AccountService, 
-    private constructionService: ConstructionService, 
+    private originService: OriginService,
+    private accountService: AccountService,
+    private constructionService: ConstructionService,
     private messageService: MessageService,
     private revenueService: RevenueService,
+    private route: ActivatedRoute,
     private _location: Location
   ) {
     this.validIvaRates = [0, 6, 13, 23];
   }
 
   ngOnInit(): void {
-    this.originService.getOriginsGrouped().subscribe((origins) => {
-      this.origins = origins;
-      console.log(this.origins)
-    });
+    this.revenueId = Number(this.route.snapshot.params['revenueId']);
 
     this.accountService.getAccountNames().subscribe((accountNames) => {
       this.accountNames = accountNames;
+    });
+
+    this.originService.getOriginsGrouped().subscribe((origins) => {
+      this.origins = origins;
+
+      this.revenueService.getRevenue(this.revenueId).subscribe({
+        next: (revenue) => {
+          this.date = new Date(revenue.date);
+          this.selectedRevenueType = revenue.revenueType;
+          this.documentNumber = revenue.documentNumber;
+          this.selectedOrigin = revenue.originId;
+          this.selectedAccount = revenue.accountId;
+          this.selectedPaymentMethod = revenue.paymentMethod;
+          this.netValue = revenue.netValue;
+          this.iva = revenue.netValue > 0 ? Math.round((revenue.iva / revenue.netValue) * 100) : 0;
+          this.selectedConstruction = revenue.constructionId ?? (undefined as any);
+
+          this.getConstructionNames();
+          this.loading = false;
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível carregar a receita.' });
+          this.loading = false;
+        }
+      });
     });
   }
 
@@ -75,16 +102,22 @@ export class CreateRevenueComponent {
     }
   }
 
-  newRevenue() {
+  saveRevenue() {
     this.revenue = new RevenueCreation(this.date, this.selectedRevenueType, this.documentNumber, this.selectedOrigin, this.selectedAccount, this.selectedPaymentMethod, this.netValue, this.iva, this.selectedConstruction);
-    console.log(this.revenue);
+
     if (this.revenue != null) {
-      this.revenueService.createRevenue(this.revenue).subscribe(newRevenue => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Receita adicionada com sucesso.' });
-      })      
+      this.revenueService.updateRevenue(this.revenueId, this.revenue).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Receita atualizada com sucesso.' });
+        },
+        error: (err) => {
+          const detail = err?.error?.message || 'Existem campos por preencher.';
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail });
+        }
+      });
     }
     else {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher' });
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
   }
 }

@@ -43,7 +43,7 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Novo Movimento',
                         icon: 'pi pi-fw pi-plus',
-                        routerLink: ['/transactions/movements/create-movement']
+                        routerLink: ['/transactions/movements']
                     },
                     {
                         label: 'Nova Deslocação',

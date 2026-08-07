@@ -1,9 +1,7 @@
-import { MovementType } from "../data/enum/movementType";
-
 export interface AccountLog {
     date: Date;
     documentNumber: string;
-    movementType: MovementType;
+    movementType: string;
     credit: number;
     debt: number;
     balance: number;

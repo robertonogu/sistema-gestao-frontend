@@ -40,4 +40,8 @@ export class ListRevenuesComponent {
     this.router.navigate(['./transactions/revenues/create-revenue']);
   }
 
+  editRevenue(revenue: Revenue) {
+    this.router.navigate(['./transactions/revenues/edit-revenue', revenue.revenueId]);
+  }
+
 }

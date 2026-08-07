@@ -1,11 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Article } from 'src/app/demo/api/article';
-import { IssuedArticle } from 'src/app/demo/api/issuedArticle';
+import { ArticleStock } from 'src/app/demo/api/articleStock';
+import { StockMovement } from 'src/app/demo/api/stockMovement';
 import { ArticleFamily } from 'src/app/demo/data/enum/articleFamily';
-import { ArticleService } from 'src/app/demo/service/inventory/article.service';
-import { IssuedArticleService } from 'src/app/demo/service/inventory/issuedArticle.service';
+import { StockMovementService } from 'src/app/demo/service/inventory/stockMovement.service';
 
 @Component({
   templateUrl: './list-articles.component.html',
@@ -13,9 +12,9 @@ import { IssuedArticleService } from 'src/app/demo/service/inventory/issuedArtic
 })
 export class ListArticlesComponent {
 
-  articles!: Article[];
-  issuedArticles!: IssuedArticle[];
-  articlesStock!: Article[];
+  stockEntries!: StockMovement[];
+  stockExits!: StockMovement[];
+  articlesStock!: ArticleStock[];
   pageSize: number = 5;
   currentPage: number = 0;
   totalRecords: number = 0;
@@ -25,42 +24,38 @@ export class ListArticlesComponent {
   ArticleFamily = ArticleFamily;
 
   constructor(
-    private articleService: ArticleService,
-    private issuedArticleService: IssuedArticleService,
+    private stockMovementService: StockMovementService,
     private router: Router,
     private datePipe: DatePipe
   ) {}
 
   ngOnInit() {
-    this.getEntryArticles();
+    this.getStockEntries();
   }
 
   issueArticle() {
     this.router.navigate(['./inventory/articles/issue-article']);
   }
 
-  getEntryArticles() {
-    this.articleService.getArticles(this.currentPage, this.pageSize).subscribe((articles) => {
-      this.articles = articles.objectList;
-      this.totalRecords = this.totalRecords;
-      console.log(this.articles)
+  getStockEntries() {
+    this.stockMovementService.getStockEntries(this.currentPage, this.pageSize).subscribe((stockEntries) => {
+      this.stockEntries = stockEntries.objectList;
+      this.totalRecords = stockEntries.totalElements;
     });
   }
 
-  getIssuedArticles() {
-    this.issuedArticleService.getIssuedArticles(this.currentPage, this.pageSize).subscribe((issuedArticles) => {
-      this.issuedArticles = issuedArticles.objectList;
-      this.totalRecords = this.totalRecords;
+  getStockExits() {
+    this.stockMovementService.getStockExits(this.currentPage, this.pageSize).subscribe((stockExits) => {
+      this.stockExits = stockExits.objectList;
+      this.totalRecords = stockExits.totalElements;
     });
   }
 
   getStockAsOfDate() {
-    console.log(this.date);
     let dt = this.datePipe.transform(this.date, 'yyyy-MM-dd');
     if (dt != null) {
-      this.articleService.findStockAsOfDate(dt).subscribe((articles) => {
+      this.stockMovementService.getStockAsOfDate(dt, this.currentPage, this.pageSize).subscribe((articles) => {
         this.articlesStock = articles.objectList;
-        console.log(this.articlesStock)
       });
     }
   }
@@ -68,13 +63,13 @@ export class ListArticlesComponent {
   handleChange(e: any) {
     var index = e.index;
     if (index == 1) {
-      this.getIssuedArticles();
+      this.getStockExits();
     }
     else if (index == 2) {
-      //this.getStockArticles();
+      this.getStockAsOfDate();
     }
     else {
-      this.getEntryArticles();
+      this.getStockEntries();
     }
   }
 }

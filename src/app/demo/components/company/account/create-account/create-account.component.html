@@ -63,14 +63,19 @@
                     <label>Saldo Inicial</label>
 					<span class="p-input-icon-left">
 						<i class="pi pi-id-card"></i>
-						<p-inputNumber 
+						<p-inputNumber
                             [(ngModel)]="initialBalance"
                             mode="currency"
-                            currency="EUR" 
+                            currency="EUR"
                             locale="de-DE"
                         />
 					</span>
 				</div>
+
+                <div class="field col-12 md:col-6 flex align-items-center gap-2">
+                    <p-checkbox [(ngModel)]="cashBox" [binary]="true" inputId="cashBox" />
+                    <label for="cashBox" class="mb-0">Caixa?</label>
+                </div>
 
 			</div>
 

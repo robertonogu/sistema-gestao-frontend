@@ -41,6 +41,10 @@ export class ListSalesComponent {
     this.router.navigate(['./transactions/sales/create-sale']);
   }
 
+  editSale(sale: Sale) {
+    this.router.navigate(['./transactions/sales/edit-sale', sale.saleId]);
+  }
+
   deleteSale(sale: Sale) {
     this.confirmationService.confirm({
       header: `Tem a certeza que pretende apagar a venda com o número ${sale.documentNumber}?`,

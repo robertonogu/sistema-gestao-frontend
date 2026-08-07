@@ -13,6 +13,7 @@ export class SaleService {
 
     private salesUrl = `${environment.apiUrl}/sales`;
     private deleteSaleUrl = `${environment.apiUrl}/sales/`;
+    private saleByIdUrl = `${environment.apiUrl}/sales/`;
 
     constructor(private http: HttpClient) { }
 
@@ -21,10 +22,22 @@ export class SaleService {
       return this.http.get<ObjectList>(url);
     }
 
+    getSale(saleId: number) : Observable<Sale> {
+      let url = this.saleByIdUrl + saleId;
+      return this.http.get<Sale>(url);
+    }
+
     createSale(newSale: SaleCreation) : Observable<Sale> {
       return this.http.post<Sale>(this.salesUrl, newSale, environment.httpOptions).pipe(
         catchError(this.handleError)
       );;
+    }
+
+    updateSale(saleId: number, sale: SaleCreation) : Observable<Sale> {
+      let url = this.saleByIdUrl + saleId;
+      return this.http.put<Sale>(url, sale, environment.httpOptions).pipe(
+        catchError(this.handleError)
+      );
     }
 
     deleteSale(saleId: number) {

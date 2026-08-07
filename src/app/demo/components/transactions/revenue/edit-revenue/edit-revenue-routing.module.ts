@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CreateMovementComponent } from './create-movement.component';
+import { EditRevenueComponent } from './edit-revenue.component';
 
 @NgModule({
 	imports: [RouterModule.forChild([
-		{ path: '', component: CreateMovementComponent }
+		{ path: '', component: EditRevenueComponent }
 	])],
 	exports: [RouterModule]
 })
 
-export class CreateMovementRoutingModule { }
+export class EditRevenueRoutingModule { }

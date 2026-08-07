@@ -58,12 +58,13 @@
                         <td>{{ sale.totalValue | currency: 'EUR' }}</td>
                         <td>{{ sale.construction }}</td>
                         <td>
-                            <p-button 
-                                class="mr-2" 
-                                icon="pi pi-pencil" 
-                                [text]="true" 
-                                [rounded]="true" 
-                                severity="success" 
+                            <p-button
+                                (click)="editSale(sale)"
+                                class="mr-2"
+                                icon="pi pi-pencil"
+                                [text]="true"
+                                [rounded]="true"
+                                severity="success"
                             />
                             <p-button 
                                 (click)="deleteSale(sale)"

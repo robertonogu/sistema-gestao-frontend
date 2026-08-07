@@ -2,33 +2,32 @@ import { NgModule } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import { ListMovementsComponent } from './list-movements.component';
-import { ListMovementsRoutingModule } from './list-movements-routing.module';
-import { TagModule } from 'primeng/tag';
-import { DialogModule } from 'primeng/dialog';
-import { CalendarModule } from 'primeng/calendar';
+import { EditSaleComponent } from './edit-sale.component';
+import { EditSaleRoutingModule } from './edit-sale-routing.module';
+import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
+import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
   imports: [
     ButtonModule,
     CommonModule,
-    ListMovementsRoutingModule,
-	  TableModule,
-    TagModule,
-    DialogModule,
-    CalendarModule,
-    InputNumberModule,
-    DropdownModule,
+    EditSaleRoutingModule,
+    InputTextModule,
     FormsModule,
+    InputNumberModule,
+    CalendarModule,
+    DropdownModule,
+    ToolbarModule,
     ToastModule,
     TooltipModule
   ],
-  declarations: [ListMovementsComponent]
+  declarations: [EditSaleComponent]
 })
 
-export class ListMovementsModule { }
+export class EditSaleModule { }

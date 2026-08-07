@@ -1,12 +1,16 @@
 export interface Revenue {
+    revenueId: number;
     date: Date;
     revenueType: string;
     documentNumber: string;
     origin: string;
-    description: string;
-    value: number;
+    originId: number;
+    netValue: number;
     iva: number;
     totalValue: number;
     accountName: string;
+    accountId: number;
     paymentMethod: string;
+    construction: string;
+    constructionId: number | null;
 }

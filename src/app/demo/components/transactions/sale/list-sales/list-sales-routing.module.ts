@@ -6,6 +6,7 @@ import { ListSalesComponent } from './list-sales.component';
 	imports: [RouterModule.forChild([
 		{ path: '', component: ListSalesComponent },
 		{ path: 'create-sale', data: { breadcrumb: 'Nova Venda' }, loadChildren: () => import('../create-sale/create-sale.module').then(m => m.CreateSaleModule) },
+		{ path: 'edit-sale/:saleId', data: { breadcrumb: 'Editar Venda' }, loadChildren: () => import('../edit-sale/edit-sale.module').then(m => m.EditSaleModule) },
 	])],
 	exports: [RouterModule]
 })

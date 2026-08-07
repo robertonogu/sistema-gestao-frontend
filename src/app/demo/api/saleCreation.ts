@@ -3,6 +3,6 @@ export interface SaleCreation {
     clientId: number;
     documentNumber: string;
     constructionId: number;
-    value: number;
+    netValue: number;
     iva: number;
 }

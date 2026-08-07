@@ -59,13 +59,14 @@
                         <td>{{ revenue.totalValue | currency: 'EUR' }}</td>
                         <td>{{ revenue.iva | currency: 'EUR' }}</td>
                         <td>
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-pencil" 
-                                class="mr-2" 
-                                [rounded]="true" 
-                                [text]="true" 
-                                severity="success" 
+                            <p-button
+                                pRipple
+                                (click)="editRevenue(revenue)"
+                                icon="pi pi-pencil"
+                                class="mr-2"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="success"
                             />
                             <p-button 
                                 pRipple 

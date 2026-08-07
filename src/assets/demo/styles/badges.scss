@@ -257,6 +257,46 @@
 
 }
 
+.movement-badge {
+    border-radius: var(--border-radius);
+    padding: .25em .5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .3px;
+
+    &.status-deposit {
+        background: #C8E6C9;
+        color: #256029;
+    }
+
+    &.status-receipt {
+        background: #B3E5FC;
+        color: #23547B;
+    }
+
+    &.status-withdrawal {
+        background: #FFCDD2;
+        color: #C63737;
+    }
+
+    &.status-payment {
+        background: #FEEDAF;
+        color: #8A5340;
+    }
+
+    &.status-bank_transfer {
+        background: #ECCFFF;
+        color: #694382;
+    }
+
+    &.status-first_interaction {
+        background: #CFD8DC;
+        color: #37474F;
+    }
+
+}
+
 .absence-badge {
     border-radius: var(--border-radius);
     padding: .25em .5rem;

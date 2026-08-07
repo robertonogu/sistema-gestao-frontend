@@ -23,7 +23,7 @@ export class ListAccountLogsComponent {
   currentPage: number = 0;
   pageSize: number = 5;
 
-  MovementType = MovementType;
+  MovementType: any = MovementType;
 
   constructor(
     private accountService: AccountService,

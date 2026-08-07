@@ -256,7 +256,8 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 .bars { display: flex; flex-direction: column; gap: 12px; }
 .bar-row-head {
   display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px;
-  .bar-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-name-wrap { display: flex; align-items: baseline; gap: 4px; min-width: 0; }
+  .bar-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .bar-pct  { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); font-weight: 600; flex-shrink: 0; }
   .bar-pct.over { color: var(--danger); }
 }
@@ -264,10 +265,13 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   display: inline-flex; align-items: center; justify-content: center;
   width: 18px; height: 18px; flex-shrink: 0;
   color: var(--text-3); cursor: pointer; border-radius: 4px;
-  transition: background 0.15s, color 0.15s;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
   &:hover { background: var(--surface-2); color: var(--text); }
+  &:focus-visible { opacity: 1; }
   i { font-size: 10px; }
 }
+.bar-row:hover .bar-lupa { opacity: 1; }
 .bar-track {
   position: relative; height: 14px; background: var(--surface-2);
   border-radius: 4px; overflow: hidden;

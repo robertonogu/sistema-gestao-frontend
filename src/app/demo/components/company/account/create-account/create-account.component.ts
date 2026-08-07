@@ -1,4 +1,5 @@
 import { Location } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { AccountCreation } from 'src/app/demo/data/model/accountCreation.model';
@@ -15,6 +16,7 @@ export class CreateAccountComponent {
   name!: string;
   bank!: string;
   initialBalance!: number;
+  cashBox: boolean = false;
 
   account!: AccountCreation;
 
@@ -29,12 +31,18 @@ export class CreateAccountComponent {
   }
 
   newAccount() {
-    this.account = { name: this.name, bank: this.bank, initialBalance: this.initialBalance } as AccountCreation;
+    this.account = { name: this.name, bank: this.bank, initialBalance: this.initialBalance, cashBox: this.cashBox } as AccountCreation;
 
     if (this.account != null) {
-      this.accountService.createAccount(this.account).subscribe(newAccount => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Conta adicionada com sucesso.' });
-      })      
+      this.accountService.createAccount(this.account).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Conta adicionada com sucesso.' });
+        },
+        error: (err: HttpErrorResponse) => {
+          const detail = err.error?.message || 'Existem campos por preencher.';
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail });
+        }
+      });
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });

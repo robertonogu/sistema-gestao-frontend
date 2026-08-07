@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { CreateAccountComponent } from './create-account.component';
 import { CreateAccountRoutingModule } from './create-account-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @NgModule({
 	imports: [
@@ -18,7 +19,8 @@ import { TooltipModule } from 'primeng/tooltip';
 		CreateAccountRoutingModule,
 		ToastModule,
 		FormsModule,
-		TooltipModule
+		TooltipModule,
+		CheckboxModule
 	],
 	declarations: [CreateAccountComponent]
 })
