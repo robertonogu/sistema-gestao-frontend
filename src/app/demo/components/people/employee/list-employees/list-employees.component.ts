@@ -16,9 +16,12 @@ export class ListEmployeesComponent {
   loading: boolean = true;
   totalRecords: number = 0;
   employees!: Employee[];
+  displayedEmployees: Employee[] = [];
 
   currentPage: number = 0;
   pageSize: number = 20;
+
+  selectedStatusFilter: EmployeeStatus[] = [EmployeeStatus.ACTIVE];
 
   employeeDialog: boolean = false;
   submitted: boolean = false;
@@ -40,7 +43,26 @@ export class ListEmployeesComponent {
       this.employees = employees.objectList;
       this.totalRecords = employees.totalElements;
       this.loading = false;
+      this.applyStatusFilter();
     });
+  }
+
+  isStatusChecked(status: EmployeeStatus): boolean {
+    return this.selectedStatusFilter.includes(status);
+  }
+
+  toggleStatusFilter(status: EmployeeStatus) {
+    this.selectedStatusFilter = this.isStatusChecked(status)
+      ? this.selectedStatusFilter.filter((s) => s !== status)
+      : [...this.selectedStatusFilter, status];
+
+    this.applyStatusFilter();
+  }
+
+  applyStatusFilter() {
+    this.displayedEmployees = this.selectedStatusFilter.length
+      ? this.employees.filter((employee) => this.selectedStatusFilter.includes(employee.statusEmployee))
+      : this.employees;
   }
 
   openNew() {

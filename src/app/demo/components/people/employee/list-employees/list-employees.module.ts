@@ -20,6 +20,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 @NgModule({
 	imports: [
@@ -42,7 +43,8 @@ import { TagModule } from 'primeng/tag';
 		InputNumberModule,
 		CheckboxModule,
 		ConfirmDialogModule,
-		TagModule
+		TagModule,
+		OverlayPanelModule
 	],
 	declarations: [ListEmployeesComponent]
 })

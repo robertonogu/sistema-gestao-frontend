@@ -5,13 +5,13 @@
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
                 <div class="text-900 text-xl font-semibold">Custo de Hora</div>
                 <div class="flex gap-2 sm:ml-auto">
-                    <button 
+                    <button
                         class="p-button-rounded p-button-outlined"
-                        (click)="newCostEmployeeHour()" 
-                        icon="pi pi-plus" 
+                        (click)="openNew()"
+                        icon="pi pi-plus"
                         label="Novo"
-                        pButton 
-                        type="button" 
+                        pButton
+                        type="button"
                     ></button>
                     <button 
                         class="p-button-rounded"
@@ -79,6 +79,59 @@
 		</div>
 	</div>
 </div>
+
+<p-dialog
+    header="Novo Custo por Hora"
+    [(visible)]="costEmployeeHourDialog"
+    [style]="{ width: '450px' }"
+    [modal]="true"
+    class="p-fluid"
+    (onHide)="hideDialog()"
+>
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label class="block font-bold mb-4">Obra</label>
+            <p-dropdown
+                [(ngModel)]="selectedConstruction"
+                [options]="constructionNames"
+                optionLabel="name"
+                optionValue="constructionId"
+                placeholder="Selecione uma Obra"
+                appendTo="body"
+                (onChange)="getEmployeeNames()"
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !selectedConstruction }"
+            />
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-4">Funcionário</label>
+            <p-dropdown
+                [(ngModel)]="selectedEmployee"
+                [options]="employeeNames"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Selecione um Funcionário"
+                appendTo="body"
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !selectedEmployee }"
+            />
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-4">Valor</label>
+            <p-inputNumber
+                [(ngModel)]="hourCost"
+                mode="currency"
+                currency="EUR"
+                locale="de-DE"
+            />
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveCostEmployeeHour()"></button>
+    </ng-template>
+</p-dialog>
 
 <p-confirmDialog #cd>
     <ng-template pTemplate="headless" let-message>

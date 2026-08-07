@@ -27,6 +27,16 @@ export class WorkLogService {
         return this.http.post<WorkLog>(this.workLogsUrl, worklog, environment.httpOptions);
     }
 
+    updateWorkLog(workLogId: number, worklog: WorkLogCreation) : Observable<WorkLog> {
+        let url = this.workLogsUrl + "/" + workLogId;
+        return this.http.put<WorkLog>(url, worklog, environment.httpOptions);
+    }
+
+    deleteWorkLog(workLogId: number) {
+        let url = this.workLogsUrl + "/" + workLogId;
+        return this.http.delete(url);
+    }
+
     getExternalSummary(employeeId: number, year: number) : Observable<WorkLogSummary> {
         return this.http.get<WorkLogSummary>(this.externalSummaryUrl + employeeId + "?year=" + year);
     }

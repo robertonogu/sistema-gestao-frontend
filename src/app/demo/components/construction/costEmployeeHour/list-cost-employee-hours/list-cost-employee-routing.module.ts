@@ -5,7 +5,6 @@ import { ListCostEmployeeHoursComponent } from './list-cost-employee-hours.compo
 @NgModule({
 	imports: [RouterModule.forChild([
 		{ path: '', component: ListCostEmployeeHoursComponent },
-		{ path: 'create-costEmployeeHour', data: { breadcrumb: 'Novo Custo de Hora'}, loadChildren: () => import('../create-cost-employee-hour/create-cost-employee-hour.module').then(m => m.CreateCostEmployeeHourModule) },
 	])],
 	exports: [RouterModule]
 })

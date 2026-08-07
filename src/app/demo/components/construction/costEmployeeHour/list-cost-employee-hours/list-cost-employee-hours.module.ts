@@ -18,6 +18,8 @@ import { ListCostEmployeeHoursComponent } from './list-cost-employee-hours.compo
 import { ListCostEmployeeHoursRoutingModule } from './list-cost-employee-routing.module';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 @NgModule({
 	imports: [
@@ -38,6 +40,8 @@ import { TooltipModule } from 'primeng/tooltip';
 		CardModule,
 		DividerModule,
 		ConfirmDialogModule,
+		DialogModule,
+		InputNumberModule,
 		ListCostEmployeeHoursRoutingModule
 	],
 	declarations: [ListCostEmployeeHoursComponent]

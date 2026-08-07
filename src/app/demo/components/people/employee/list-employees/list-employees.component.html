@@ -36,12 +36,44 @@
                 styleClass="p-datatable-striped"
                 [totalRecords]="totalRecords"
                 [tableStyle]="{ 'min-width': '50rem' }"
-                [value]="employees"
+                [value]="displayedEmployees"
             >
 
                 <ng-template pTemplate = "header">
                     <tr>
-                        <th style="width: 3rem"></th>
+                        <th style="width: 3.5rem">
+                            <button
+                                type="button"
+                                pButton
+                                pRipple
+                                icon="pi pi-filter"
+                                class="p-button-text p-button-rounded"
+                                pTooltip="Filtrar por estado"
+                                (click)="statusFilterPanel.toggle($event)"
+                            ></button>
+                            <p-overlayPanel #statusFilterPanel appendTo="body">
+                                <div class="flex flex-column gap-2">
+                                    <div class="flex align-items-center gap-2">
+                                        <p-checkbox
+                                            [ngModel]="isStatusChecked(employeeStatus.ACTIVE)"
+                                            (onChange)="toggleStatusFilter(employeeStatus.ACTIVE)"
+                                            [binary]="true"
+                                            inputId="filterActive"
+                                        />
+                                        <label for="filterActive">Ativos</label>
+                                    </div>
+                                    <div class="flex align-items-center gap-2">
+                                        <p-checkbox
+                                            [ngModel]="isStatusChecked(employeeStatus.INACTIVE)"
+                                            (onChange)="toggleStatusFilter(employeeStatus.INACTIVE)"
+                                            [binary]="true"
+                                            inputId="filterInactive"
+                                        />
+                                        <label for="filterInactive">Inativos</label>
+                                    </div>
+                                </div>
+                            </p-overlayPanel>
+                        </th>
                         <th pSortableColumn = "name">Nome <p-sortIcon field = "name"></p-sortIcon></th>
                         <th>Vencimento Base</th>
                         <th>Ajudas de Custo</th>
@@ -110,74 +142,72 @@
     (onHide)="hideDialog()"
 >
     <ng-template pTemplate="content">
-        <div class="p-fluid p-formgrid grid">
-            <div class="field col-12">
-                <label for="name" class="block font-bold mb-2">Nome</label>
-                <input
-                    type="text"
-                    pInputText
-                    id="name"
-                    [(ngModel)]="employee.name"
-                    required
-                    autofocus
-                    [ngClass]="{ 'ng-invalid ng-dirty': submitted && !employee.name }"
-                />
-                <small class="ng-dirty ng-invalid" *ngIf="submitted && !employee.name">Nome é obrigatório.</small>
-            </div>
+        <div class="field">
+            <label for="name" class="block font-bold mb-4">Nome</label>
+            <input
+                type="text"
+                pInputText
+                id="name"
+                [(ngModel)]="employee.name"
+                required
+                autofocus
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !employee.name }"
+            />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !employee.name">Nome é obrigatório.</small>
+        </div>
 
-            <div class="field col-12">
-                <label for="nif" class="block font-bold mb-2">NIF</label>
-                <p-inputNumber id="nif" [(ngModel)]="employee.nif" [useGrouping]="false" [maxlength]="9" />
-            </div>
+        <div class="field">
+            <label for="nif" class="block font-bold mb-4">NIF</label>
+            <p-inputNumber id="nif" [(ngModel)]="employee.nif" [useGrouping]="false" [maxlength]="9" />
+        </div>
 
-            <div class="field col-12">
-                <label for="baseSalary" class="block font-bold mb-2">Vencimento Base</label>
-                <p-inputNumber
-                    id="baseSalary"
-                    [(ngModel)]="employee.baseSalary"
-                    mode="currency"
-                    currency="EUR"
-                    locale="de-DE"
-                />
-            </div>
+        <div class="field">
+            <label for="baseSalary" class="block font-bold mb-4">Vencimento Base</label>
+            <p-inputNumber
+                id="baseSalary"
+                [(ngModel)]="employee.baseSalary"
+                mode="currency"
+                currency="EUR"
+                locale="de-DE"
+            />
+        </div>
 
-            <div class="field col-12">
-                <label for="allowance" class="block font-bold mb-2">Ajudas de Custo</label>
-                <p-inputNumber
-                    id="allowance"
-                    [(ngModel)]="employee.allowance"
-                    mode="currency"
-                    currency="EUR"
-                    locale="de-DE"
-                />
-            </div>
+        <div class="field">
+            <label for="allowance" class="block font-bold mb-4">Ajudas de Custo</label>
+            <p-inputNumber
+                id="allowance"
+                [(ngModel)]="employee.allowance"
+                mode="currency"
+                currency="EUR"
+                locale="de-DE"
+            />
+        </div>
 
-            <div class="field col-12">
-                <label for="foodAllowance" class="block font-bold mb-2">Subsídio de Alimentação</label>
-                <p-inputNumber
-                    id="foodAllowance"
-                    [(ngModel)]="employee.foodAllowance"
-                    mode="currency"
-                    currency="EUR"
-                    locale="de-DE"
-                />
-            </div>
+        <div class="field">
+            <label for="foodAllowance" class="block font-bold mb-4">Subsídio de Alimentação</label>
+            <p-inputNumber
+                id="foodAllowance"
+                [(ngModel)]="employee.foodAllowance"
+                mode="currency"
+                currency="EUR"
+                locale="de-DE"
+            />
+        </div>
 
-            <div class="field col-12">
-                <label for="healthInsurance" class="block font-bold mb-2">Seguro de Saúde</label>
-                <p-inputNumber
-                    id="healthInsurance"
-                    [(ngModel)]="employee.healthInsurance"
-                    mode="currency"
-                    currency="EUR"
-                    locale="de-DE"
-                />
-            </div>
+        <div class="field">
+            <label for="healthInsurance" class="block font-bold mb-4">Seguro de Saúde</label>
+            <p-inputNumber
+                id="healthInsurance"
+                [(ngModel)]="employee.healthInsurance"
+                mode="currency"
+                currency="EUR"
+                locale="de-DE"
+            />
+        </div>
 
-            <div class="col-12 flex align-items-center gap-3">
-                <p-checkbox [binary]="true" [(ngModel)]="employee.internal" inputId="internal" />
-                <label for="internal">Interno</label>
-            </div>
+        <div class="field flex align-items-center gap-3">
+            <p-checkbox [binary]="true" [(ngModel)]="employee.internal" inputId="internal" />
+            <label for="internal" class="mb-0">Interno</label>
         </div>
     </ng-template>
 

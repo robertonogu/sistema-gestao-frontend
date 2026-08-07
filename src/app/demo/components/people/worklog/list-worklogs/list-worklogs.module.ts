@@ -15,6 +15,12 @@ import { RatingModule } from 'primeng/rating';
 import { ListWorkLogsComponent } from './list-worklogs.component';
 import { ListWorkLogsRoutingModule } from './list-worklogs-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { CheckboxModule } from 'primeng/checkbox';
+import { CalendarModule } from 'primeng/calendar';
+import { TreeSelectModule } from 'primeng/treeselect';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   	declarations: [ListWorkLogsComponent],
@@ -33,6 +39,12 @@ import { TooltipModule } from 'primeng/tooltip';
 		DropdownModule,
 		ProgressBarModule,
 		ToastModule,
+		DialogModule,
+		InputNumberModule,
+		CheckboxModule,
+		CalendarModule,
+		TreeSelectModule,
+		ConfirmDialogModule,
 		ListWorkLogsRoutingModule
   	]
 })
