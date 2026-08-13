@@ -6,6 +6,7 @@ export enum PaymentMethod {
     DEBIT_CARD = "Cartão de Débito",
     CHECK = "Cheque",
     PAYMENT_REFERENCE = "Referência de Pagamento",
+    MB_WAY = "MB WAY",
     ANOTHER = "Outro Meio de Pagamento"
 }
 
@@ -20,6 +21,7 @@ export const PAYMENT_METHODS_BY_ACCOUNT_TYPE: Record<'bank' | 'cash', PaymentMet
     PaymentMethod.DEBIT_CARD,
     PaymentMethod.CHECK,
     PaymentMethod.PAYMENT_REFERENCE,
+    PaymentMethod.MB_WAY,
     PaymentMethod.ANOTHER,
   ],
 };

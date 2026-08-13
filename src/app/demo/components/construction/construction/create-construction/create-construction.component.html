@@ -58,8 +58,8 @@
 
         <div class="field col-12 md:col-2">
           <label>Imagem</label>
-          <p-fileUpload mode="basic" chooseLabel="Escolher" chooseIcon="pi pi-upload" name="demo[]"
-            url="https://www.primefaces.org/cdn/api/upload.php" accept="image/*" />
+          <p-fileUpload mode="basic" chooseLabel="Escolher" chooseIcon="pi pi-upload" [auto]="false"
+            accept="image/*" (onSelect)="onImageSelect($event)" />
         </div>
 
       </div>

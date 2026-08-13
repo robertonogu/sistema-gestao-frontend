@@ -10,7 +10,7 @@
                             [ngStyle]="{ 'left.px': 5, 'top.px': 5 }" 
                         >
                         </i>
-                        <img alt="Card" src="https://rpcr.visitesposende.com/wp-content/uploads/2021/05/Igreja-Matriz-de-Apu%CC%81lia-1.jpg" />
+                        <img alt="Card" [src]="construction.imageUrl || 'assets/demo/images/product/product-placeholder.svg'" />
                     </div>
                 </ng-template>
                 <div class="flex justify-content-around">

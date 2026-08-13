@@ -206,6 +206,9 @@ export class EditConstructionComponent implements OnInit {
 
   construction!: Construction;
 
+  currentImageUrl?: string;
+  selectedImageFile?: File;
+
   constructor(
     private constructionService: ConstructionService,
     private clientService: ClientService,
@@ -232,6 +235,7 @@ export class EditConstructionComponent implements OnInit {
         this.adjudicationDate = construction.adjudicationDate ? new Date(construction.adjudicationDate) : null as any;
         this.initialDate = construction.initialDate ? new Date(construction.initialDate) : null as any;
         this.estimatedDays = construction.estimatedDays;
+        this.currentImageUrl = construction.imageUrl;
 
         this.dynamicForm = this.fb.group({
           inputs: this.fb.array(
@@ -258,6 +262,10 @@ export class EditConstructionComponent implements OnInit {
   onAddressPlaceSelected(place: PlaceSelection): void {
     this.address = place.address;
     this.placeId = place.placeId;
+  }
+
+  onImageSelect(event: any): void {
+    this.selectedImageFile = event.files?.[0];
   }
 
   asFormGroup(c: any): FormGroup { return c as FormGroup; }
@@ -541,7 +549,7 @@ export class EditConstructionComponent implements OnInit {
 
     console.log(this.construction.budgetItems);
 
-    this.constructionService.updateConstruction(this.constructionId, this.construction).subscribe({
+    this.constructionService.updateConstruction(this.constructionId, this.construction, this.selectedImageFile).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Obra atualizada com sucesso.' });
       },

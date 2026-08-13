@@ -64,8 +64,8 @@ export class ConstructionService {
         return this.http.get<ConstructionDetails>(url);
       }
 
-    createConstruction(construction: ConstructionInput) : Observable<Construction> {
-        return this.http.post<Construction>(this.constructionsUrl, construction, environment.httpOptions);
+    createConstruction(construction: ConstructionInput, image?: File) : Observable<Construction> {
+        return this.http.post<Construction>(this.constructionsUrl, this.buildConstructionFormData(construction, image));
     }
 
     getConstructionForEdit(constructionId: number) : Observable<ConstructionInput> {
@@ -73,9 +73,18 @@ export class ConstructionService {
         return this.http.get<ConstructionInput>(url);
     }
 
-    updateConstruction(constructionId: number, construction: ConstructionInput) : Observable<Construction> {
+    updateConstruction(constructionId: number, construction: ConstructionInput, image?: File) : Observable<Construction> {
         let url = this.constructionsUrl + "/" + constructionId;
-        return this.http.put<Construction>(url, construction, environment.httpOptions);
+        return this.http.put<Construction>(url, this.buildConstructionFormData(construction, image));
+    }
+
+    private buildConstructionFormData(construction: ConstructionInput, image?: File) : FormData {
+        const formData = new FormData();
+        formData.append('construction', new Blob([JSON.stringify(construction)], { type: 'application/json' }));
+        if (image) {
+            formData.append('image', image, image.name);
+        }
+        return formData;
     }
 
     markAsFavourite(constructionId: number, isFavourite: boolean) : Observable<Construction> {

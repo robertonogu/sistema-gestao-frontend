@@ -7,4 +7,5 @@ export interface Construction {
     amountReceived: number;
     amountToReceive: number;
     favourite: boolean;
+    imageUrl?: string;
 }

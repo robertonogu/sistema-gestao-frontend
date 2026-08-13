@@ -4,8 +4,8 @@
   <header class="obra-header">
     <!-- ===== Foto (fora da caixa branca) ===== -->
     <div class="obra-photo">
-      <img *ngIf="constructionDetails.name; else fotoPlaceholder"
-           [src]="constructionDetails.name"
+      <img *ngIf="constructionDetails.imageUrl; else fotoPlaceholder"
+           [src]="constructionDetails.imageUrl"
            [alt]="constructionDetails.name" />
       <ng-template #fotoPlaceholder>
         <div class="obra-photo-placeholder">[ FOTO ]</div>

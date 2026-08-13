@@ -25,4 +25,5 @@ export interface ConstructionDetails {
     timeProgress: number;
     cashflowData: CashflowMonth[];
     calendarEvents: ConstructionCalendarEvent[];
+    imageUrl?: string;
 }

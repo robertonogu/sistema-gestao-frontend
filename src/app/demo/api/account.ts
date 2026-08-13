@@ -1,4 +1,6 @@
 export interface Account {
+    originId: number;
     name: string;
-    bank: string;
+    initialBalance: number;
+    cashBox: boolean;
 }

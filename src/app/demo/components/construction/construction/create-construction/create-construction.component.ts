@@ -209,6 +209,8 @@ export class CreateConstructionComponent {
 
   construction!: Construction;
 
+  selectedImageFile?: File;
+
   units: Record<string, string> = {
     un: 'un',
     m: 'm',
@@ -250,6 +252,10 @@ export class CreateConstructionComponent {
   onAddressPlaceSelected(place: PlaceSelection): void {
     this.address = place.address;
     this.placeId = place.placeId;
+  }
+
+  onImageSelect(event: any): void {
+    this.selectedImageFile = event.files?.[0];
   }
 
   asFormGroup(c: any): FormGroup { return c as FormGroup; }
@@ -505,7 +511,7 @@ export class CreateConstructionComponent {
 
     console.log('full construction payload sent to backend:', JSON.parse(JSON.stringify(this.construction)));
 
-    this.constructionService.createConstruction(this.construction).subscribe({
+    this.constructionService.createConstruction(this.construction, this.selectedImageFile).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Construção adicionada com sucesso.' });
       },

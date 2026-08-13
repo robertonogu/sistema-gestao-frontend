@@ -1,30 +1,30 @@
-﻿<div class="grid">
+<div class="grid">
 	<div class="col-12">
 		<div class="card">
 
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
                 <div class="text-900 text-xl font-semibold">Contas</div>
                 <div class="flex gap-2 sm:ml-auto">
-                    <button 
+                    <button
                         class="p-button-rounded p-button-outlined"
-                        (click)="newAccount()" 
-                        icon="pi pi-plus" 
+                        (click)="openNew()"
+                        icon="pi pi-plus"
                         label="Novo"
-                        pButton 
-                        type="button" 
+                        pButton
+                        type="button"
                     ></button>
-                    <button 
+                    <button
                         class="p-button-rounded"
-                        icon="pi pi-download" 
-                        pTooltip="Exportar" 
-                        tooltipPosition="bottom" 
-                        pButton 
-                        type="button" 
+                        icon="pi pi-download"
+                        pTooltip="Exportar"
+                        tooltipPosition="bottom"
+                        pButton
+                        type="button"
                     ></button>
                 </div>
             </div>
 
-			<p-table 
+			<p-table
                 currentPageReportTemplate="{first} de {last} de {totalRecords} contas"
                 [lazy]="true"
                 [loading]="loading"
@@ -33,7 +33,7 @@
                 [rows]="20"
                 [rowsPerPageOptions]="[5, 10, 20, 50, 100]"
                 [showCurrentPageReport]="true"
-                styleClass="p-datatable-striped" 
+                styleClass="p-datatable-striped"
                 [totalRecords]="totalRecords"
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="accounts"
@@ -42,7 +42,6 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th pSortableColumn="name">Nome<p-sortIcon field="name"></p-sortIcon></th>
-                        <th>Banco</th>
                         <th>Ações</th>
                     </tr>
                 </ng-template>
@@ -50,29 +49,106 @@
                 <ng-template pTemplate="body" let-account>
                     <tr>
                         <td>{{ account.name }}</td>
-                        <td>{{ account.bank }}</td>
                         <td>
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-pencil" 
-                                class="mr-2" 
-                                [rounded]="true" 
-                                [text]="true" 
-                                severity="success" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-pencil"
+                                class="mr-2"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="success"
+                                (click)="editAccount(account)"
                             />
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-trash" 
-                                severity="danger" 
-                                [rounded]="true" 
-                                [text]="true" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-trash"
+                                severity="danger"
+                                [rounded]="true"
+                                [text]="true"
+                                (click)="deleteAccount(account)"
                             />
                         </td>
                     </tr>
                 </ng-template>
-                
+
             </p-table>
 
 		</div>
 	</div>
 </div>
+
+<p-dialog
+    [header]="account.originId ? 'Editar Conta' : 'Nova Conta'"
+    [(visible)]="accountDialog"
+    [style]="{ width: '450px' }"
+    [modal]="true"
+    class="p-fluid"
+    (onHide)="hideDialog()"
+>
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="name" class="block font-bold mb-4">Nome</label>
+            <input
+                type="text"
+                pInputText
+                id="name"
+                [(ngModel)]="account.name"
+                required
+                autofocus
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !account.name }"
+            />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !account.name">Nome é obrigatório.</small>
+        </div>
+
+        <div class="field">
+            <label for="initialBalance" class="block font-bold mb-4">Saldo Inicial</label>
+            <p-inputNumber
+                id="initialBalance"
+                [(ngModel)]="account.initialBalance"
+                mode="currency"
+                currency="EUR"
+                locale="de-DE"
+            />
+        </div>
+
+        <div class="field flex align-items-center gap-2">
+            <p-checkbox [(ngModel)]="account.cashBox" [binary]="true" inputId="cashBox" />
+            <label for="cashBox" class="mb-0">Caixa?</label>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveAccount()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button
+                    pButton
+                    label="Eliminar"
+                    (click)="cd.accept()"
+                    class="bg-red-500 border-transparent text-white w-8rem text-red-500">
+                </button>
+                <button
+                    pButton
+                    label="Cancelar"
+                    (click)="cd.reject()"
+                    class="p-button-outlined w-8rem ">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-toast />

@@ -62,6 +62,15 @@
           <p-inputNumber [(ngModel)]="estimatedDays" suffix=" dias" />
         </div>
 
+        <div class="field col-12 md:col-2">
+          <label>Imagem</label>
+          <div class="flex align-items-center gap-2">
+            <img *ngIf="currentImageUrl" [src]="currentImageUrl" alt="Imagem da obra" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" />
+            <p-fileUpload mode="basic" chooseLabel="Escolher" chooseIcon="pi pi-upload" [auto]="false"
+              accept="image/*" (onSelect)="onImageSelect($event)" />
+          </div>
+        </div>
+
       </div>
 
       <form [formGroup]="dynamicForm" class="orcamento-form">
