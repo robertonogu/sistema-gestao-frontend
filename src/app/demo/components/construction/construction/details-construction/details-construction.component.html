@@ -14,6 +14,13 @@
 
     <!-- ===== Caixa branca ===== -->
     <div class="obra-card">
+      <a class="obra-edit-lupa"
+         [routerLink]="['/constructions/edit-construction', constructionId]"
+         pTooltip="Editar obra"
+         tooltipPosition="left">
+        <i class="pi pi-search"></i>
+      </a>
+
       <div class="obra-main">
         <div class="obra-id">
           <p-tag value="Em curso" severity="warning"></p-tag>

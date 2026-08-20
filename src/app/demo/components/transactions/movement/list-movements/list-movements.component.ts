@@ -1,4 +1,5 @@
 ﻿import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Movement } from 'src/app/demo/api/movement';
 import { ObjectName } from 'src/app/demo/api/objectName';
@@ -31,13 +32,18 @@ export class ListMovementsComponent implements OnInit {
   constructor(
     private movementService: MovementService,
     private accountService: AccountService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.accountService.getAccountNames().subscribe((accountNames) => {
       this.accountNames = accountNames;
     });
+
+    if (this.route.snapshot.queryParamMap.get('new') === 'true') {
+      this.openNew();
+    }
   }
 
   nextPage(event: any) {

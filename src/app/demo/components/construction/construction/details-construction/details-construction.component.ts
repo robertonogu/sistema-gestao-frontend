@@ -73,6 +73,7 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 
 // ===== Caixa branca (nome, status, morada, progresso, meta) =====
 .obra-card {
+  position: relative;
   flex: 1;
   background: #ffffff;
   border: 1px solid var(--border);
@@ -83,6 +84,24 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   gap: 20px;
   align-items: center;
   min-width: 0;
+}
+
+.obra-edit-lupa {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover { background: var(--surface-2); color: var(--accent); }
+  i { font-size: 13px; }
 }
 
 .obra-main {
