@@ -109,14 +109,15 @@
 				</div>
 
 				<div class="field col-12 md:col-4">
-                    <label>Data Limite de Pagamento</label>
-					<p-calendar
-						dateFormat="dd/mm/yy"
-						[(ngModel)]="paymentDeadline"
-                        [iconDisplay]="'input'"
-                        [showIcon]="true"
-                        inputId="icondisplay"
-						[disabled]="disablePaymentDeadline"
+                    <label>Condições de Pagamento</label>
+					<p-dropdown
+						[(ngModel)]="selectedPaymentCondition"
+						(onChange)="onPaymentConditionChange()"
+                        [options]="paymentConditions | keyvalue:originalOrder"
+                        optionLabel="value"
+						optionValue="key"
+                        placeholder="Selecione uma Condição de Pagamento"
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaymentCondition }"
                     />
 				</div>
 
@@ -299,36 +300,38 @@
 									optionLabel="name"
 									optionValue="constructionId"
 									placeholder="Selecione uma Obra"
-									(onChange)="onLinkConstructionChange($event.value)"
+									(onChange)="showBudgetItemLink(linkRowSubCategory) && onLinkConstructionChange($event.value)"
 									appendTo="body"
 								/>
 							</div>
 
-							<div class="field">
-								<label>Item</label>
-								<p-treeSelect
-									[(ngModel)]="selectedLinkBudgetNode"
-									[ngModelOptions]="{ standalone: true }"
-									(ngModelChange)="onLinkBudgetNodeChange($event)"
-									[options]="linkBudgetTree"
-									containerStyleClass="w-full"
-									placeholder="Selecione um Item"
-									appendTo="body"
-									[ngClass]="{ 'ng-dirty ng-invalid': linkValidationAttempted && linkItemRequired && !grp.value.budgetItemId }"
-								/>
-								<small class="p-error" *ngIf="linkValidationAttempted && linkItemRequired && !grp.value.budgetItemId">O Item é obrigatório quando uma Obra é selecionada.</small>
-							</div>
+							<ng-container *ngIf="showBudgetItemLink(linkRowSubCategory)">
+								<div class="field">
+									<label>Item</label>
+									<p-treeSelect
+										[(ngModel)]="selectedLinkBudgetNode"
+										[ngModelOptions]="{ standalone: true }"
+										(ngModelChange)="onLinkBudgetNodeChange($event)"
+										[options]="linkBudgetTree"
+										containerStyleClass="w-full"
+										placeholder="Selecione um Item"
+										appendTo="body"
+										[ngClass]="{ 'ng-dirty ng-invalid': linkValidationAttempted && linkItemRequired && !grp.value.budgetItemId }"
+									/>
+									<small class="p-error" *ngIf="linkValidationAttempted && linkItemRequired && !grp.value.budgetItemId">O Item é obrigatório quando uma Obra é selecionada.</small>
+								</div>
 
-							<div class="field">
-								<label>Quantidade a Alocar</label>
-								<p-inputNumber
-									formControlName="allocationQuantity"
-									[min]="0"
-									[max]="grp.value.quantity"
-									[ngClass]="{ 'ng-dirty ng-invalid': linkValidationAttempted && linkAllocationQuantityInvalid }"
-								/>
-								<small class="p-error" *ngIf="linkValidationAttempted && linkAllocationQuantityInvalid">A quantidade alocada tem de ser maior que 0 e no máximo {{ grp.value.quantity }}.</small>
-							</div>
+								<div class="field">
+									<label>Quantidade a Alocar</label>
+									<p-inputNumber
+										formControlName="allocationQuantity"
+										[min]="0"
+										[max]="grp.value.quantity"
+										[ngClass]="{ 'ng-dirty ng-invalid': linkValidationAttempted && linkAllocationQuantityInvalid }"
+									/>
+									<small class="p-error" *ngIf="linkValidationAttempted && linkAllocationQuantityInvalid">A quantidade alocada tem de ser maior que 0 e no máximo {{ grp.value.quantity }}.</small>
+								</div>
+							</ng-container>
 						</ng-container>
 
 						<div class="field" *ngIf="showVehicleLink(linkRowSubCategory)">

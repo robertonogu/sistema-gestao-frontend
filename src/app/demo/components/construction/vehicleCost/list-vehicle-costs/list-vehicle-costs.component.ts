@@ -1,5 +1,5 @@
-﻿import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+﻿import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { VehicleCost } from 'src/app/demo/api/vehicleCost';
 import { VehicleCostService } from 'src/app/demo/service/construction/vehicleCostService';
@@ -8,7 +8,7 @@ import { VehicleCostService } from 'src/app/demo/service/construction/vehicleCos
   templateUrl: './list-vehicle-costs.component.html',
   providers: [ConfirmationService, MessageService]
 })
-export class ListVehicleCostsComponent implements OnInit {
+export class ListVehicleCostsComponent {
 
   loading: boolean = true;
   totalRecords: number = 0;
@@ -20,16 +20,9 @@ export class ListVehicleCostsComponent implements OnInit {
   constructor(
     private vehicleCostService: VehicleCostService,
     private router: Router,
-    private route: ActivatedRoute,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}
-
-  ngOnInit(): void {
-    if (this.route.snapshot.queryParamMap.get('new') === 'true') {
-      this.newVehicleCost();
-    }
-  }
 
   nextPage(event: any) {
     this.loading = true;

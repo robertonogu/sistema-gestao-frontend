@@ -10,6 +10,7 @@ export interface ConstructionDetails {
     workItemsCost: ItemCost[];
     externalServiceItemsCost: ItemCost[];
     articlesItemsCost: ItemCost[];
+    mealsCost: number;
     name: string;
     constructionNumber: string;
     status: string;

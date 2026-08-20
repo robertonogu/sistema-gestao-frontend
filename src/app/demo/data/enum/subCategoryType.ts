@@ -24,6 +24,7 @@ export enum SubCategoryType {
     INSURANCE_PEOPLE = 'Seguros',
     SAFETY = 'Segurança',
     HYGIENE = 'Higiene',
+    MEALS = 'Refeições',
   
     // OPERATION
 

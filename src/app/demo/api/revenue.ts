@@ -11,6 +11,5 @@ export interface Revenue {
     accountName: string;
     accountId: number;
     paymentMethod: string;
-    construction: string;
-    constructionId: number | null;
+    saleId: number | null;
 }

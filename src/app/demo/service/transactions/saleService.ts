@@ -5,6 +5,7 @@ import { ObjectList } from '../../api/objectList';
 import { environment } from 'src/environments/environment';
 import { Sale } from '../../api/sale';
 import { SaleCreation } from '../../api/saleCreation';
+import { SaleForRevenue } from '../../api/saleForRevenue';
 
 @Injectable({
     providedIn: 'root'
@@ -25,6 +26,11 @@ export class SaleService {
     getSale(saleId: number) : Observable<Sale> {
       let url = this.saleByIdUrl + saleId;
       return this.http.get<Sale>(url);
+    }
+
+    getSalesPendingForRevenue(clientId: number) : Observable<SaleForRevenue[]> {
+      let url = `${environment.apiUrl}/sales/pendingForRevenue/${clientId}`;
+      return this.http.get<SaleForRevenue[]>(url);
     }
 
     createSale(newSale: SaleCreation) : Observable<Sale> {

@@ -2,7 +2,6 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
@@ -10,7 +9,6 @@ import { RevenueType } from 'src/app/demo/data/enum/revenueType';
 import { RevenueCreation } from 'src/app/demo/data/model/revenueCreation.model';
 import { AccountService } from 'src/app/demo/service/company/accountService';
 import { OriginService } from 'src/app/demo/service/company/originService';
-import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 import { RevenueService } from 'src/app/demo/service/transactions/revenueService';
 
 @Component({
@@ -24,7 +22,6 @@ export class EditRevenueComponent implements OnInit {
   accountNames!: ObjectName[];
   paymentMethods = PaymentMethod;
   validIvaRates!: number[];
-  constructionNames: ConstructionNames[] = [];
 
   loading = true;
   revenueId!: number;
@@ -35,17 +32,15 @@ export class EditRevenueComponent implements OnInit {
   selectedOrigin!: number;
   selectedAccount!: number;
   selectedPaymentMethod!: PaymentMethod;
-  netValue!: number;
   iva!: number;
   totalValue!: number;
-  selectedConstruction!: number;
+  selectedSale!: number;
 
   revenue!: RevenueCreation;
 
   constructor(
     private originService: OriginService,
     private accountService: AccountService,
-    private constructionService: ConstructionService,
     private messageService: MessageService,
     private revenueService: RevenueService,
     private route: ActivatedRoute,
@@ -72,11 +67,10 @@ export class EditRevenueComponent implements OnInit {
           this.selectedOrigin = revenue.originId;
           this.selectedAccount = revenue.accountId;
           this.selectedPaymentMethod = revenue.paymentMethod;
-          this.netValue = revenue.netValue;
+          this.totalValue = revenue.totalValue;
           this.iva = revenue.netValue > 0 ? Math.round((revenue.iva / revenue.netValue) * 100) : 0;
-          this.selectedConstruction = revenue.constructionId ?? (undefined as any);
+          this.selectedSale = revenue.saleId ?? (undefined as any);
 
-          this.getConstructionNames();
           this.loading = false;
         },
         error: () => {
@@ -91,19 +85,8 @@ export class EditRevenueComponent implements OnInit {
     this._location.back();
   }
 
-  getConstructionNames() {
-    this.constructionNames = [];
-    const clientsCategory = this.origins.find(originItem => originItem.label === 'Clientes');
-
-    if (clientsCategory && clientsCategory.items.some(item => item.value === this.selectedOrigin)) {
-      this.constructionService.getConstructionNamesForClient(this.selectedOrigin).subscribe((constructionNames) => {
-        this.constructionNames = constructionNames;
-      });
-    }
-  }
-
   saveRevenue() {
-    this.revenue = new RevenueCreation(this.date, this.selectedRevenueType, this.documentNumber, this.selectedOrigin, this.selectedAccount, this.selectedPaymentMethod, this.netValue, this.iva, this.selectedConstruction);
+    this.revenue = new RevenueCreation(this.date, this.selectedRevenueType, this.documentNumber, this.selectedOrigin, this.selectedAccount, this.selectedPaymentMethod, this.totalValue, this.iva, this.selectedSale);
 
     if (this.revenue != null) {
       this.revenueService.updateRevenue(this.revenueId, this.revenue).subscribe({

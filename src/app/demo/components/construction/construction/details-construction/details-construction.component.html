@@ -14,13 +14,6 @@
 
     <!-- ===== Caixa branca ===== -->
     <div class="obra-card">
-      <a class="obra-edit-lupa"
-         [routerLink]="['/constructions/edit-construction', constructionId]"
-         pTooltip="Editar obra"
-         tooltipPosition="left">
-        <i class="pi pi-search"></i>
-      </a>
-
       <div class="obra-main">
         <div class="obra-id">
           <p-tag value="Em curso" severity="warning"></p-tag>
@@ -71,6 +64,13 @@
   <!-- ========== KPIs ========== -->
   <section class="kpi-grid">
     <div *ngFor="let k of kpis()" class="card mb-0" [style.border-top]="'3px solid ' + k.accent">
+      <a *ngIf="k.label === 'Orçamento'"
+         class="obra-edit-lupa"
+         [routerLink]="['/constructions/edit-construction', constructionId]"
+         pTooltip="Editar obra"
+         tooltipPosition="left">
+        <i class="pi pi-search"></i>
+      </a>
       <span class="font-semibold text-lg">{{ k.label }}</span>
       <div class="mt-3">
         <span class="text-2xl font-bold text-900">{{ k.value }}</span>

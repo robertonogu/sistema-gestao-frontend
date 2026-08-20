@@ -49,8 +49,7 @@ export class AppMenuComponent implements OnInit {
                     {
                         label: 'Nova Deslocação',
                         icon: 'pi pi-fw pi-plus',
-                        routerLink: ['/constructions/vehicleCosts'],
-                        queryParams: { new: true }
+                        routerLink: ['/constructions/vehicleCosts/create-vehicleCost']
                     },
                 ]
             },

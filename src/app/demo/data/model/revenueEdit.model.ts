@@ -12,5 +12,5 @@ export interface RevenueEdit {
     paymentMethod: PaymentMethod;
     originId: number;
     accountId: number;
-    constructionId: number | null;
+    saleId: number | null;
 }

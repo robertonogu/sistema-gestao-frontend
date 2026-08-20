@@ -10,6 +10,7 @@ import { Origin } from 'src/app/demo/api/origin';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { EquipmentStatus } from 'src/app/demo/data/enum/equipmentStatus';
+import { PaymentCondition } from 'src/app/demo/data/enum/paymentCondition';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
 import { ToolStatus } from 'src/app/demo/data/enum/toolStatus';
@@ -173,7 +174,7 @@ export class CreateExpenseComponent implements OnInit {
   categoriesAndSubCategories = {
     [CategoryType.BANK]: [SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.IMMEDIATE_TRANSFERS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS, SubCategoryType.CREDIT],
     [CategoryType.TAXES]: [SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.FEES, SubCategoryType.IES, SubCategoryType.FONT_RETENTION],
-    [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE_PEOPLE, SubCategoryType.SAFETY],
+    [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE_PEOPLE, SubCategoryType.SAFETY, SubCategoryType.MEALS],
     [CategoryType.OPERATION]: [SubCategoryType.ELECTRICITY, SubCategoryType.COMMUNICATIONS, SubCategoryType.CONSUMABLES],
     [CategoryType.VEHICLES]: [SubCategoryType.INSURANCE_VEHICLES, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE_VEHICLES, SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS],
     [CategoryType.EQUIPMENTS]: [SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.EQUIPMENTS_MAINTENANCE],
@@ -190,15 +191,15 @@ export class CreateExpenseComponent implements OnInit {
   documentTypes = DocumentType;
   validIvaRates: number[];
   disablePaidValue: boolean = false;
-  disablePaymentDeadline: boolean = false;
   accountNames: ObjectName[] = [];
   paymentMethods = PaymentMethod;
+  paymentConditions = PaymentCondition;
 
   date!: Date;
   selectedOrigin!: number;
   selectedDocumentType!: DocumentType;
   documentNumber!: string;
-  paymentDeadline!: Date;
+  selectedPaymentCondition!: PaymentCondition;
   isIntegralPayment: boolean = false;
   private _paymentValue: number = 0;
   selectedAccount!: number;
@@ -404,14 +405,25 @@ export class CreateExpenseComponent implements OnInit {
   onCheckboxChange() {
     if (this.isIntegralPayment) {
       this.disablePaidValue = true;
-      this.disablePaymentDeadline = true;
     }
     else {
       this.disablePaidValue = false;
-      this.disablePaymentDeadline = false;
       this._paymentValue = this.totalValue;
     }
   }
+
+  onPaymentConditionChange() {
+    if ((this.selectedPaymentCondition as unknown as string) === 'IMMEDIATE') {
+      this.isIntegralPayment = true;
+      this.disablePaidValue = true;
+    } else {
+      this.isIntegralPayment = false;
+      this.disablePaidValue = false;
+      this.paymentValue = 0;
+    }
+  }
+
+  originalOrder = (): number => 0;
 
   getConstructionNames() {
     this.constructionService.getConstructionNames().subscribe((constructionNames) => {
@@ -539,7 +551,11 @@ export class CreateExpenseComponent implements OnInit {
   }
 
   showConstructionLink(subCategoryType: SubCategoryType | null): boolean {
-    return subCategoryType === SubCategoryType.EXTERNAL_SERVICES || this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
+    return subCategoryType === SubCategoryType.EXTERNAL_SERVICES || subCategoryType === SubCategoryType.MEALS || this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
+  }
+
+  showBudgetItemLink(subCategoryType: SubCategoryType | null): boolean {
+    return this.showConstructionLink(subCategoryType) && subCategoryType !== SubCategoryType.MEALS;
   }
 
   showVehicleLink(subCategoryType: SubCategoryType | null): boolean {
@@ -615,9 +631,11 @@ export class CreateExpenseComponent implements OnInit {
 
     if (this.showConstructionLink(subCategoryType)) {
       this.getConstructionNames();
-      if (row.constructionId) this.onLinkConstructionChange(row.constructionId, false);
-      if (row.allocationQuantity == null) {
-        this.itemInputs.at(index).patchValue({ allocationQuantity: row.quantity });
+      if (this.showBudgetItemLink(subCategoryType)) {
+        if (row.constructionId) this.onLinkConstructionChange(row.constructionId, false);
+        if (row.allocationQuantity == null) {
+          this.itemInputs.at(index).patchValue({ allocationQuantity: row.quantity });
+        }
       }
     }
 
@@ -642,7 +660,7 @@ export class CreateExpenseComponent implements OnInit {
   linkValidationAttempted: boolean = false;
 
   get linkItemRequired(): boolean {
-    return !!this.linkRowGroup?.value.constructionId;
+    return !!this.linkRowGroup?.value.constructionId && this.showBudgetItemLink(this.linkRowSubCategory);
   }
 
   get linkAllocationQuantityInvalid(): boolean {
@@ -756,6 +774,7 @@ export class CreateExpenseComponent implements OnInit {
         iva: control.value.iva,
         totalValue: this.itemTotal(index),
         costAllocations: costAllocations,
+        constructionId: control.value.budgetItemId ? undefined : (control.value.constructionId ?? undefined),
         vehicleId: control.value.vehicleId,
         toolId: control.value.toolId,
         equipmentId: control.value.equipmentId
@@ -765,7 +784,7 @@ export class CreateExpenseComponent implements OnInit {
 
     this.expenseCreation = {
       date: this.date, originId: this.selectedOrigin, documentType: this.selectedDocumentType, documentNumber: this.documentNumber,
-      paymentDeadline: this.paymentDeadline, netValue: this.netValue, iva: this.iva, totalValue: this.totalValue, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
+      paymentCondition: this.selectedPaymentCondition, netValue: this.netValue, iva: this.iva, totalValue: this.totalValue, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
       accountId: this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList
     } as ExpenseCreation;
 

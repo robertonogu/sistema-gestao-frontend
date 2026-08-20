@@ -8,9 +8,9 @@ export class RevenueCreation {
     originId: number;
     accountId: number;
     paymentMethod: PaymentMethod;
-    netValue: number;
+    totalValue: number;
     iva: number;
-    constructionId: number;
+    saleId: number;
 
     constructor(
         date: Date,
@@ -19,9 +19,9 @@ export class RevenueCreation {
         originId: number,
         accountId: number,
         paymentMethod: PaymentMethod,
-        netValue: number,
+        totalValue: number,
         iva: number,
-        constructionId: number
+        saleId: number
     ) {
         this.date = date;
         this.revenueType = revenueType;
@@ -29,9 +29,9 @@ export class RevenueCreation {
         this.originId = originId;
         this.accountId = accountId;
         this.paymentMethod = paymentMethod;
-        this.netValue = netValue;
+        this.totalValue = totalValue;
         this.iva = iva;
-        this.constructionId = constructionId;
+        this.saleId = saleId;
     }
-  
+
 }

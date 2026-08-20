@@ -56,7 +56,6 @@
 				<div class="field col-12 md:col-4">
 					<label>Origem</label>
 					<p-dropdown
-						(onChange)="getConstructionNames()"
 						[(ngModel)]="selectedOrigin"
                         [options]="origins"
                         placeholder="Selecione uma origem"
@@ -101,18 +100,6 @@
 				</div>
 
 				<div class="field col-12 md:col-4">
-					<label>Valor s/ IVA</label>
-					<p-inputNumber
-						[(ngModel)]="netValue"
-                        mode="currency"
-                        inputId="currency-germany"
-                        currency="EUR"
-                        locale="de-DE"
-						[ngClass]="{ 'ng-dirty ng-invalid': !netValue }"
-					/>
-				</div>
-
-				<div class="field col-12 md:col-4">
 					<label>IVA</label>
 					<p-dropdown
 						[(ngModel)]="iva"
@@ -131,13 +118,14 @@
 				</div>
 
 				<div class="field col-12 md:col-4">
-					<label>Obra</label>
-					<p-dropdown
-						[(ngModel)]="selectedConstruction"
-                        [options]="constructionNames"
-                        optionLabel="name"
-						optionValue="constructionId"
-                        placeholder="Selecione uma Obra"
+					<label>Valor Total</label>
+					<p-inputNumber
+						[(ngModel)]="totalValue"
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR"
+                        locale="de-DE"
+						[ngClass]="{ 'ng-dirty ng-invalid': !totalValue }"
 					/>
 				</div>
 

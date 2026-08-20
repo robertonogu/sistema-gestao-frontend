@@ -27,12 +27,13 @@
 
 				<div class="field col-12 md:col-4">
 					<label>Tipo</label>
-					<p-dropdown 
+					<p-dropdown
 						[(ngModel)]="selectedRevenueType"
-                        [options]="revenueTypes | keyvalue" 
-                        optionLabel="value" 
+						(onChange)="onRevenueTypeChange()"
+                        [options]="revenueTypes | keyvalue"
+                        optionLabel="value"
 						optionValue="key"
-                        placeholder="Selecione um Tipo" 
+                        placeholder="Selecione um Tipo"
 						[ngClass]="{ 'ng-dirty ng-invalid': !selectedRevenueType }"
 					/>
 				</div>
@@ -51,11 +52,24 @@
 				</div>
 
 				<div class="field col-12 md:col-4">
+					<label>Número de Venda</label>
+					<p-dropdown
+						[(ngModel)]="selectedSale"
+						(onChange)="onSaleChange()"
+                        [options]="sales"
+                        optionLabel="documentNumber"
+						optionValue="saleId"
+                        placeholder="Selecione uma Venda"
+						[disabled]="!isSalesRevenueType || !selectedOrigin"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
 					<label>Origem</label>
 					<p-dropdown
-						(onChange)="getConstructionNames()"
+						(onChange)="onOriginChange()"
 						[(ngModel)]="selectedOrigin"
-                        [options]="origins" 
+                        [options]="origins"
                         placeholder="Selecione uma origem" 
                         [group]="true"
                         [filter]="true"
@@ -98,25 +112,14 @@
 				</div>
 
 				<div class="field col-12 md:col-4">
-					<label>Valor s/ IVA</label>
-					<p-inputNumber
-						[(ngModel)]="netValue"
-                        mode="currency"
-                        inputId="currency-germany"
-                        currency="EUR"
-                        locale="de-DE"
-						[ngClass]="{ 'ng-dirty ng-invalid': !netValue }"
-					/>
-				</div>
-
-				<div class="field col-12 md:col-4">
 					<label>IVA</label>
-					<p-dropdown 
+					<p-dropdown
 						[(ngModel)]="iva"
-                        [options]="validIvaRates | keyvalue" 
-                        optionLabel="value" 
+                        [options]="validIvaRates | keyvalue"
+                        optionLabel="value"
 						optionValue="value"
-                        placeholder="Selecione uma Taxa" 
+                        placeholder="Selecione uma Taxa"
+						[disabled]="isSalesRevenueType"
 					>
 						<ng-template let-option pTemplate="item">
 							{{ option.value }}%
@@ -128,13 +131,14 @@
 				</div>
 
 				<div class="field col-12 md:col-4">
-					<label>Obra</label>
-					<p-dropdown 
-						[(ngModel)]="selectedConstruction"
-                        [options]="constructionNames" 
-                        optionLabel="name" 
-						optionValue="constructionId"
-                        placeholder="Selecione uma Obra" 
+					<label>Valor Total</label>
+					<p-inputNumber
+						[(ngModel)]="totalValue"
+                        mode="currency"
+                        inputId="currency-germany"
+                        currency="EUR"
+                        locale="de-DE"
+						[ngClass]="{ 'ng-dirty ng-invalid': !totalValue }"
 					/>
 				</div>
 

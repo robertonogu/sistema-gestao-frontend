@@ -1,4 +1,5 @@
 import { DocumentType } from "../enum/documentType";
+import { PaymentCondition } from "../enum/paymentCondition";
 import { PaymentMethod } from "../enum/paymentMethod";
 import { ItemCreation } from "./itemCreation.model";
 
@@ -7,7 +8,7 @@ export interface ExpenseCreation {
     originId: number;
     documentType: DocumentType;
     documentNumber: string;
-    paymentDeadline: Date;
+    paymentCondition: PaymentCondition;
     netValue: number;
     iva: number;
     totalValue: number;

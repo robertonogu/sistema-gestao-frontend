@@ -11,6 +11,7 @@ export interface ItemCreation {
     iva: number;
     totalValue: number;
     costAllocations?: CostAllocationCreation[];
+    constructionId?: number;
     vehicleId?: number;
     toolId?: number;
     equipmentId?: number;
