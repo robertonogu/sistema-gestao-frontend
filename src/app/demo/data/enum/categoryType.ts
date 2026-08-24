@@ -1,12 +1,11 @@
 export enum CategoryType {
     BANK = 'Banco',
-    TAXES = 'Taxas',
+    TAXES = 'Impostos',
     PEOPLE = 'Pessoal',
     OPERATION = 'Funcionamento',
     VEHICLES = 'Veículos',
     EQUIPMENTS = 'Equipamentos',
     TOOLS = 'Ferramentas',
     INVENTORY = 'Inventário',
-    ASSOCIATIONS = 'Associações',
     CONSTRUCTIONS = 'Obras',
 }

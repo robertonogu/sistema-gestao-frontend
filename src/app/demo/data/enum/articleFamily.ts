@@ -1,7 +1,11 @@
 export enum ArticleFamily {
-    WOOD = 'Madeiras', 
-    GLASS_MIRRORS  = 'Vidros e Espelhos', 
-    PLUMBING = 'Pichelaria', 
-    CIVIL_CONSTRUCTION = 'Construção Civil', 
-    COATINGS = 'Revestimentos'
+    CONSTRUCTION = 'Construção',
+    PLUMBING = 'Pichelaria',
+    ELECTRICAL_MATERIALS = 'Eletricidade',
+    HARDWARE = 'Ferragens',
+    GLASS_MIRRORS = 'Vidros e Espelhos',
+    METALS = 'Metais',
+    PAINTS_GLUES_VARNISHES = 'Tintas / Colas / Vernizes',
+    WOOD = 'Madeiras',
+    REAL_ESTATE = 'Imóveis'
 }

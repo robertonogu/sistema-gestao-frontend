@@ -172,17 +172,44 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 export class CreateExpenseComponent implements OnInit {
 
   categoriesAndSubCategories = {
-    [CategoryType.BANK]: [SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.IMMEDIATE_TRANSFERS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS, SubCategoryType.CREDIT],
-    [CategoryType.TAXES]: [SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.FEES, SubCategoryType.IES, SubCategoryType.FONT_RETENTION],
-    [CategoryType.PEOPLE]: [SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS, SubCategoryType.INSURANCE_PEOPLE, SubCategoryType.SAFETY, SubCategoryType.MEALS],
-    [CategoryType.OPERATION]: [SubCategoryType.ELECTRICITY, SubCategoryType.COMMUNICATIONS, SubCategoryType.CONSUMABLES],
-    [CategoryType.VEHICLES]: [SubCategoryType.INSURANCE_VEHICLES, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE_VEHICLES, SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS],
-    [CategoryType.EQUIPMENTS]: [SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.EQUIPMENTS_MAINTENANCE],
-    [CategoryType.TOOLS]: [SubCategoryType.TOOLS_PURCHASE, SubCategoryType.TOOLS_MAINTENANCE],
-    [CategoryType.INVENTORY]: [SubCategoryType.FEEDSTOCK, SubCategoryType.WOOD, SubCategoryType.GLASS_MIRRORS, SubCategoryType.PLUMBING, SubCategoryType
-      .CIVIL_CONSTRUCTION, SubCategoryType.COATINGS
+    [CategoryType.BANK]: [
+      SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.IMMEDIATE_TRANSFERS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS,
+      SubCategoryType.CREDIT, SubCategoryType.CARD_COMMISSIONS, SubCategoryType.OTHER_BANK_COMMISSIONS, SubCategoryType.LOAN_INTEREST,
+      SubCategoryType.OTHER_INTEREST, SubCategoryType.BANK_GUARANTEES, SubCategoryType.FINANCING_CHARGES, SubCategoryType.BANK_OPERATING_COSTS
     ],
-    [CategoryType.ASSOCIATIONS]: [SubCategoryType.DUES],
+    [CategoryType.TAXES]: [
+      SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.IES, SubCategoryType.FONT_RETENTION,
+      SubCategoryType.IMI, SubCategoryType.FINES_PENALTIES, SubCategoryType.OTHER_TAXES
+    ],
+    [CategoryType.PEOPLE]: [
+      SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS,
+      SubCategoryType.INSURANCE_PEOPLE, SubCategoryType.SAFETY, SubCategoryType.MEALS, SubCategoryType.WORK_ACCIDENT_INSURANCE,
+      SubCategoryType.OTHER_INSURANCES, SubCategoryType.PROFESSIONAL_TRAINING, SubCategoryType.PERSONAL_PROTECTIVE_EQUIPMENT,
+      SubCategoryType.OCCUPATIONAL_HEALTH, SubCategoryType.EMPLOYEE_TRAVEL, SubCategoryType.OTHER_PEOPLE_EXPENSES
+    ],
+    [CategoryType.OPERATION]: [
+      SubCategoryType.FACILITY_RENT, SubCategoryType.ELECTRICITY, SubCategoryType.WATER, SubCategoryType.COMMUNICATIONS,
+      SubCategoryType.OFFICE_SUPPLIES, SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION, SubCategoryType.OFFICE_EQUIPMENT_REPAIR,
+      SubCategoryType.CLOUD_STORAGE, SubCategoryType.SOFTWARE, SubCategoryType.ACCOUNTING_SERVICES, SubCategoryType.LEGAL_SERVICES,
+      SubCategoryType.CONSULTING_SERVICES, SubCategoryType.COMPANY_INSURANCE, SubCategoryType.CLEANING, SubCategoryType.FACILITY_SECURITY,
+      SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.GRAPHIC_DESIGN, SubCategoryType.ADVERTISING,
+      SubCategoryType.DUES, SubCategoryType.CLIENT_SUPPLIER_MEALS
+    ],
+    [CategoryType.VEHICLES]: [
+      SubCategoryType.INSURANCE_VEHICLES, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE_VEHICLES,
+      SubCategoryType.INSPECTION, SubCategoryType.PARKING, SubCategoryType.TOLLS, SubCategoryType.TIRES,
+      SubCategoryType.VEHICLE_LEASING, SubCategoryType.VEHICLE_RENTAL
+    ],
+    [CategoryType.EQUIPMENTS]: [
+      SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.EQUIPMENTS_MAINTENANCE, SubCategoryType.EQUIPMENT_CONSUMABLES,
+      SubCategoryType.EQUIPMENT_RENTAL, SubCategoryType.EQUIPMENT_FUEL
+    ],
+    [CategoryType.TOOLS]: [SubCategoryType.TOOLS_PURCHASE, SubCategoryType.TOOLS_MAINTENANCE],
+    [CategoryType.INVENTORY]: [
+      SubCategoryType.CONSTRUCTION, SubCategoryType.PLUMBING, SubCategoryType.ELECTRICAL_MATERIALS, SubCategoryType.HARDWARE,
+      SubCategoryType.GLASS_MIRRORS, SubCategoryType.METALS, SubCategoryType.PAINTS_GLUES_VARNISHES, SubCategoryType.WOOD,
+      SubCategoryType.REAL_ESTATE, SubCategoryType.INVENTORY_EXPENSES, SubCategoryType.INVENTORY_INVESTMENT
+    ],
     [CategoryType.CONSTRUCTIONS]: [SubCategoryType.EXTERNAL_SERVICES],
   };
 
