@@ -192,8 +192,10 @@ export class CreateExpenseComponent implements OnInit {
       SubCategoryType.OFFICE_SUPPLIES, SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION, SubCategoryType.OFFICE_EQUIPMENT_REPAIR,
       SubCategoryType.CLOUD_STORAGE, SubCategoryType.SOFTWARE, SubCategoryType.ACCOUNTING_SERVICES, SubCategoryType.LEGAL_SERVICES,
       SubCategoryType.CONSULTING_SERVICES, SubCategoryType.COMPANY_INSURANCE, SubCategoryType.CLEANING, SubCategoryType.FACILITY_SECURITY,
-      SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.GRAPHIC_DESIGN, SubCategoryType.ADVERTISING,
-      SubCategoryType.DUES, SubCategoryType.CLIENT_SUPPLIER_MEALS
+      SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.DUES
+    ],
+    [CategoryType.COMMERCIAL]: [
+      SubCategoryType.GRAPHIC_DESIGN, SubCategoryType.CLIENT_SUPPLIER_MEALS, SubCategoryType.ADVERTISING
     ],
     [CategoryType.VEHICLES]: [
       SubCategoryType.INSURANCE_VEHICLES, SubCategoryType.IUC, SubCategoryType.FUEL, SubCategoryType.MAINTENANCE_VEHICLES,

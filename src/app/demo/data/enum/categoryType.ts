@@ -3,6 +3,7 @@ export enum CategoryType {
     TAXES = 'Impostos',
     PEOPLE = 'Pessoal',
     OPERATION = 'Funcionamento',
+    COMMERCIAL = 'Comercial',
     VEHICLES = 'Veículos',
     EQUIPMENTS = 'Equipamentos',
     TOOLS = 'Ferramentas',
