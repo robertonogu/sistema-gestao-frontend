@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { Component, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { forkJoin } from 'rxjs';
 import { CashflowMonth } from 'src/app/demo/api/cashflowMonth';
 import { ConstructionCalendarEvent } from 'src/app/demo/api/constructionCalendarEvent';
@@ -429,7 +429,7 @@ export class DetailsConstructionComponent implements OnInit {
           return;
         }
 
-        const workbook = XLSX.read(template, { type: 'array' });
+        const workbook = XLSX.read(template, { type: 'array', cellStyles: true });
         const worksheet = workbook.Sheets[this.materialsTemplateSheet];
         if (!worksheet) {
           this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O template de Excel não tem a folha esperada.' });
