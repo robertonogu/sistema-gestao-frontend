@@ -148,9 +148,20 @@
             <i [class]="col.icon"></i>
             {{ col.title }}
           </div>
-          <p-tag [value]="itemsSplit.length + ' itens'"
-                 [style.background]="col.soft"
-                 [style.color]="col.color"></p-tag>
+          <div class="source-actions">
+            <button *ngIf="col.key === 'materials'"
+                    type="button"
+                    class="export-materials-btn"
+                    (click)="exportMaterials()"
+                    [disabled]="exportingMaterials"
+                    pTooltip="Exportar materiais para Excel"
+                    tooltipPosition="top">
+              <i class="pi" [ngClass]="exportingMaterials ? 'pi-spin pi-spinner' : 'pi-file-excel'"></i>
+            </button>
+            <p-tag [value]="itemsSplit.length + ' itens'"
+                   [style.background]="col.soft"
+                   [style.color]="col.color"></p-tag>
+          </div>
         </div>
         <div class="source-totals mono">
           <span>Real
@@ -206,3 +217,5 @@
     </p-card>
   </section>
 </div>
+
+<p-toast />

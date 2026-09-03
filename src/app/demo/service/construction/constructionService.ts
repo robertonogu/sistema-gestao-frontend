@@ -11,6 +11,7 @@ import { ConstructionDetails } from '../../api/constructionDetails';
 import { BudgetItem } from '../../api/budgetItem';
 import { MaterialAllocationDetail } from '../../data/model/materialAllocationDetail.model';
 import { WorkLogDetail } from '../../data/model/workLogDetail.model';
+import { MaterialExport } from '../../api/materialExport';
 
 @Injectable({
     providedIn: 'root'
@@ -63,6 +64,11 @@ export class ConstructionService {
         let url = this.constructionDetailsUrl + constructionId;
         return this.http.get<ConstructionDetails>(url);
       }
+
+    getMaterialsExport(constructionId: number) : Observable<MaterialExport[]> {
+        let url = this.constructionDetailsUrl + constructionId + "/materialsExport";
+        return this.http.get<MaterialExport[]>(url);
+    }
 
     createConstruction(construction: ConstructionInput, image?: File) : Observable<Construction> {
         return this.http.post<Construction>(this.constructionsUrl, this.buildConstructionFormData(construction, image));

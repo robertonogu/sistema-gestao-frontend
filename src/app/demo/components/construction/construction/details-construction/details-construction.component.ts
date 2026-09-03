@@ -1,10 +1,14 @@
+import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { Component, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import * as XLSX from 'xlsx';
+import { forkJoin } from 'rxjs';
 import { CashflowMonth } from 'src/app/demo/api/cashflowMonth';
 import { ConstructionCalendarEvent } from 'src/app/demo/api/constructionCalendarEvent';
 import { ConstructionDetails } from 'src/app/demo/api/constructionDetails';
 import { ItemCost } from 'src/app/demo/api/itemCost';
+import { MessageService } from 'primeng/api';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 
 interface CostBucket { budgeted: number; actual: number; }
@@ -23,6 +27,7 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 
 @Component({
   templateUrl: './details-construction.component.html',
+  providers: [MessageService],
   styles: [`
   :host {
   --bg: #ffffff;
@@ -263,6 +268,18 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   padding: 14px 16px 4px;
   .source-title { display: flex; gap: 8px; align-items: center; font-weight: 600; }
   .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .source-actions { display: flex; align-items: center; gap: 8px; }
+}
+.export-materials-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  border: none; background: transparent;
+  color: var(--text-3); cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+  &:hover:not(:disabled) { background: var(--surface-2); color: oklch(0.55 0.13 155); }
+  &:disabled { cursor: default; opacity: 0.6; }
+  i { font-size: 13px; }
 }
 .source-totals {
   display: flex; justify-content: space-between;
@@ -369,11 +386,18 @@ export class DetailsConstructionComponent implements OnInit {
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
   constructionId = -1;
+  exportingMaterials = false;
+
+  private readonly materialsTemplateUrl = 'assets/Mapa Materiais - Template.xlsx';
+  private readonly materialsTemplateSheet = 'Mapa de materiais';
+  private readonly materialsTemplateFirstDataRow = 4;
 
   constructor(
     private constructionService: ConstructionService,
+    private http: HttpClient,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -389,6 +413,52 @@ export class DetailsConstructionComponent implements OnInit {
   private hoje(): number { return Date.now(); }
 
   back(): void { this.location.back(); }
+
+  exportMaterials(): void {
+    this.exportingMaterials = true;
+
+    forkJoin({
+      materials: this.constructionService.getMaterialsExport(this.constructionId),
+      template: this.http.get(this.materialsTemplateUrl, { responseType: 'arraybuffer' })
+    }).subscribe({
+      next: ({ materials, template }) => {
+        this.exportingMaterials = false;
+
+        if (!materials.length) {
+          this.messageService.add({ severity: 'info', summary: 'Sem materiais', detail: 'Não há materiais para exportar nesta obra.' });
+          return;
+        }
+
+        const workbook = XLSX.read(template, { type: 'array' });
+        const worksheet = workbook.Sheets[this.materialsTemplateSheet];
+        if (!worksheet) {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O template de Excel não tem a folha esperada.' });
+          return;
+        }
+
+        const rows = materials.map(m => ([
+          m.date ? new Date(m.date).toLocaleDateString('pt-PT') : '',
+          m.supplier,
+          m.documentNumber,
+          m.description,
+          m.quantity,
+          m.unit,
+          m.netValue,
+          m.rubrica,
+          m.item ?? ''
+        ]));
+
+        XLSX.utils.sheet_add_aoa(worksheet, rows, { origin: `A${this.materialsTemplateFirstDataRow}` });
+
+        const constructionLabel = this.constructionDetails?.constructionNumber || this.constructionId;
+        XLSX.writeFile(workbook, `materiais_obra_${constructionLabel}.xlsx`);
+      },
+      error: () => {
+        this.exportingMaterials = false;
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível exportar os materiais.' });
+      }
+    });
+  }
 
   readonly sourceCols: { key: SourceKey; title: string; icon: string; color: string; soft: string }[] = [
     { key: 'materials',        title: 'Materiais',         icon: 'pi pi-box',    color: 'oklch(0.62 0.13 250)', soft: 'oklch(0.92 0.03 250)' },
