@@ -6,7 +6,15 @@ import { ConstructionService } from 'src/app/demo/service/construction/construct
 
 @Component({
   templateUrl: './list-constructions.component.html',
-  providers: [MessageService]
+  providers: [MessageService],
+  styles: [`
+    .favourite-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+  `]
 })
 
 export class ListConstructionsComponent implements OnInit {

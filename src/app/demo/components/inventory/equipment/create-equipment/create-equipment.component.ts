@@ -54,10 +54,25 @@ export class CreateEquipmentComponent {
     if (this.equipment != null) {
       this.equipmentService.createEquipment(this.equipment).subscribe(() => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Equipamento adicionado com sucesso.' });
+        this.resetForm();
       });
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
+  }
+
+  private resetForm(): void {
+    this.code = undefined as any;
+    this.name = undefined as any;
+    this.brand = undefined as any;
+    this.model = undefined as any;
+    this.serialNumber = undefined as any;
+    this.purchaseDate = undefined as any;
+    this.purchaseValue = undefined as any;
+    this.warrantyStart = undefined as any;
+    this.warrantyEnd = undefined as any;
+    this.power = undefined as any;
+    this.selectedStatus = undefined as any;
   }
 }

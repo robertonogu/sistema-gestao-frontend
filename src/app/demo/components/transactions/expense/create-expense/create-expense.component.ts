@@ -62,7 +62,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 300px 90px 130px 130px 130px 130px 76px;
+  grid-template-columns: minmax(220px, 1fr) 300px 90px 130px 130px 130px 130px 100px;
   align-items: center;
   column-gap: 8px;
   min-width: fit-content;
@@ -94,7 +94,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-col-num { text-align: right; font-family: var(--font-mono); }
 .item-col-total { font-weight: 600; }
-.item-col-actions { display: flex; justify-content: center; }
+.item-col-actions { display: flex; align-items: center; justify-content: center; gap: 4px; }
 
 :host ::ng-deep .item-row {
   input.p-inputtext,
@@ -615,6 +615,27 @@ export class CreateExpenseComponent implements OnInit {
     return this.showConstructionLink(subCategoryType) || this.showVehicleLink(subCategoryType) || this.showToolEquipmentLink(subCategoryType);
   }
 
+  rowHasAssociation(index: number): boolean {
+    const row = this.itemInputs.at(index).value;
+    const subCategoryType = row.subCategoryType;
+
+    if (this.showConstructionLink(subCategoryType)) {
+      return this.showBudgetItemLink(subCategoryType)
+        ? !!row.constructionId && !!row.budgetItemId
+        : !!row.constructionId;
+    }
+
+    if (this.showVehicleLink(subCategoryType)) {
+      return !!row.vehicleId;
+    }
+
+    if (this.showToolEquipmentLink(subCategoryType)) {
+      return !!row.toolId || !!row.equipmentId;
+    }
+
+    return false;
+  }
+
   get linkRowGroup(): FormGroup | null {
     return this.linkDialogIndex !== null ? this.asFormGroup(this.itemInputs.at(this.linkDialogIndex)) : null;
   }
@@ -821,7 +842,26 @@ export class CreateExpenseComponent implements OnInit {
 
     this.expenseService.createExpense(this.expenseCreation).subscribe(newExpense => {
       this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa adicionada com sucesso.' });
+      this.resetForm();
     })
+  }
+
+  private resetForm(): void {
+    this.date = undefined as any;
+    this.selectedOrigin = undefined as any;
+    this.selectedDocumentType = undefined as any;
+    this.documentNumber = undefined as any;
+    this.selectedPaymentCondition = undefined as any;
+    this.isIntegralPayment = false;
+    this.paymentValue = 0;
+    this.disablePaidValue = false;
+    this.selectedAccount = undefined as any;
+    this.selectedPaymentMethod = undefined as any;
+
+    this.inputs.clear();
+
+    this.itemInputs.clear();
+    this.itemInputs.push(this.buildItemInput());
   }
 
 }

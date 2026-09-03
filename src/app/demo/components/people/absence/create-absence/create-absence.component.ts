@@ -55,10 +55,18 @@ export class CreateAbsenceComponent {
     if (this.absence != null) {
       this.absenceService.createAbsence(this.absence).subscribe(newAbsence => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Ausência adicionada com sucesso.' });
-      })      
+        this.resetForm();
+      })
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
+  }
+
+  private resetForm(): void {
+    this.date = undefined as any;
+    this.hours = undefined as any;
+    this.selectedAbsenceType = undefined as any;
+    this.selectedEmployee = undefined as any;
   }
 }

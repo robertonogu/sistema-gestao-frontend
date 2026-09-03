@@ -74,26 +74,27 @@
 
 				<div class="field col-12 md:col-6">
 					<label>Adicionar Destino</label>
-					<div class="flex gap-2">
-						<p-dropdown
-							[options]="destinationOptions"
-							[(ngModel)]="destinationToAdd"
-							optionLabel="label"
-							optionValue="value"
-							[filter]="true"
-							filterBy="label"
-							placeholder="Selecione um destino"
-							styleClass="flex-1"
-						/>
-						<button
-							pButton
-							type="button"
-							icon="pi pi-plus"
-							label="Adicionar"
-							[disabled]="!destinationToAdd"
-							(click)="addDestination()"
-						></button>
-					</div>
+					<p-dropdown
+						[options]="destinationOptions"
+						[(ngModel)]="destinationToAdd"
+						optionLabel="label"
+						optionValue="value"
+						[filter]="true"
+						filterBy="label"
+						placeholder="Selecione um destino"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-6 flex align-items-end">
+					<button
+						pButton
+						type="button"
+						icon="pi pi-plus"
+						label="Adicionar"
+						class="p-button-sm add-destination-btn"
+						[disabled]="!destinationToAdd"
+						(click)="addDestination()"
+					></button>
 				</div>
 
 			</div>

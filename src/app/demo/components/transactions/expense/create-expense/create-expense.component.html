@@ -267,6 +267,11 @@
 								</div>
 
 								<div class="item-col-actions">
+									<i *ngIf="canOpenLinkDialog(itemInput.value.subCategoryType)"
+									   class="pi"
+									   [ngClass]="rowHasAssociation(j) ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"
+									   [pTooltip]="rowHasAssociation(j) ? 'Associado' : 'Sem associação'"
+									   tooltipPosition="top"></i>
 									<p-button [text]="true" icon="pi pi-link" title="Associar" [disabled]="!canOpenLinkDialog(itemInput.value.subCategoryType)" (click)="openLinkDialog(j)"></p-button>
 									<p-button severity="danger" [text]="true" icon="pi pi-trash" (click)="removeItemInput(j)"></p-button>
 								</div>

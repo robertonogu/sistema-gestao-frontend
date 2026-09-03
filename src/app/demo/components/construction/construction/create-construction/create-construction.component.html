@@ -35,8 +35,20 @@
 
         <div class="field col-12 md:col-4">
           <label>Cliente</label>
-          <p-dropdown [(ngModel)]="selectedClient" [options]="clientNames" optionLabel="name" optionValue="id"
-            placeholder="Selecione um Cliente" [ngClass]="{ 'ng-dirty ng-invalid': !selectedClient }" />
+          <div class="flex gap-2">
+            <p-dropdown [(ngModel)]="selectedClient" [options]="clientNames" optionLabel="name" optionValue="id"
+              placeholder="Selecione um Cliente" styleClass="flex-1"
+              [ngClass]="{ 'ng-dirty ng-invalid': !selectedClient }" />
+            <button
+              pButton
+              type="button"
+              icon="pi pi-plus"
+              class="p-button-outlined"
+              pTooltip="Criar novo cliente"
+              tooltipPosition="bottom"
+              (click)="openQuickAddClient()"
+            ></button>
+          </div>
         </div>
 
         <div class="field col-12 md:col-4">
@@ -58,7 +70,7 @@
 
         <div class="field col-12 md:col-2">
           <label>Imagem</label>
-          <p-fileUpload mode="basic" chooseLabel="Escolher" chooseIcon="pi pi-upload" [auto]="false"
+          <p-fileUpload #fileUpload mode="basic" chooseLabel="Escolher" chooseIcon="pi pi-upload" [auto]="false"
             accept="image/*" (onSelect)="onImageSelect($event)" />
         </div>
 
@@ -280,5 +292,41 @@
     </div>
   </div>
 </div>
+
+<p-dialog
+  header="Novo Cliente"
+  [(visible)]="quickAddClientDialogVisible"
+  [style]="{ width: '450px' }"
+  [modal]="true"
+  class="p-fluid"
+  (onHide)="closeQuickAddClient()"
+>
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="quickAddClientName" class="block font-bold mb-4">Nome</label>
+      <input
+        type="text"
+        pInputText
+        id="quickAddClientName"
+        [(ngModel)]="quickAddClientName"
+        [ngModelOptions]="{ standalone: true }"
+        required
+        autofocus
+        [ngClass]="{ 'ng-invalid ng-dirty': quickAddClientSubmitted && !quickAddClientName }"
+      />
+      <small class="p-error" *ngIf="quickAddClientSubmitted && !quickAddClientName">Nome é obrigatório.</small>
+    </div>
+
+    <div class="field">
+      <label for="quickAddClientNif" class="block font-bold mb-4">NIF</label>
+      <p-inputNumber id="quickAddClientNif" [(ngModel)]="quickAddClientNif" [ngModelOptions]="{ standalone: true }" [useGrouping]="false"></p-inputNumber>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="closeQuickAddClient()"></button>
+    <button pButton label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveQuickAddClient()"></button>
+  </ng-template>
+</p-dialog>
 
 <p-toast />

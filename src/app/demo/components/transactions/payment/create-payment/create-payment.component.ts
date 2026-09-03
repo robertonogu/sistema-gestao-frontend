@@ -127,10 +127,25 @@ export class CreatePaymentComponent {
     if (this.paymentCreationDTOList != null) {
       this.paymentService.createPayment(listPayments).subscribe(newPayment => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pagamento(s) registado(s) com sucesso.' });
-      })      
+        this.resetForm();
+      })
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
+  }
+
+  private resetForm(): void {
+    this.date = undefined as any;
+    this.documentNumber = undefined as any;
+    this.selectedAccount = undefined as any;
+    this.selectedPaymentMethod = undefined as any;
+    this.selectedOrigin = undefined as any;
+    this.expenses = undefined as any;
+    this.selectedExpenses = [];
+    this.expensesSelected = [];
+    this.expenseValues = [];
+    this.sumTotalValues = 0;
+    this.paymentCreationDTOList = [];
   }
 }

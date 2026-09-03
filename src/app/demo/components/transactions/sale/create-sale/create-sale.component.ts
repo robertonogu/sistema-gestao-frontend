@@ -59,10 +59,21 @@ export class CreateSaleComponent {
     if (this.sale != null) {
       this.saleService.createSale(this.sale).subscribe(newSale => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Venda adicionada com sucesso.' });
-      })      
+        this.resetForm();
+      })
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
+  }
+
+  private resetForm(): void {
+    this.date = undefined;
+    this.selectedClient = undefined as any;
+    this.documentNumber = undefined;
+    this.selectedConstruction = undefined;
+    this.constructionNames = [];
+    this.netValue = 0;
+    this.iva = 0;
   }
 }

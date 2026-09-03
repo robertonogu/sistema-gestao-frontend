@@ -14,6 +14,7 @@ import { DividerModule } from 'primeng/divider';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
 import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
 
 @NgModule({
@@ -33,6 +34,7 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
     TableModule,
     TooltipModule,
     CheckboxModule,
+    DialogModule,
     GooglePlaceAutocompleteDirective
   ],
   declarations: [CreateConstructionComponent]

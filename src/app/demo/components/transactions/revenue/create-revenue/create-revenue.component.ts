@@ -104,10 +104,24 @@ export class CreateRevenueComponent {
     if (this.revenue != null) {
       this.revenueService.createRevenue(this.revenue).subscribe(newRevenue => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Receita adicionada com sucesso.' });
+        this.resetForm();
       })
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher' });
     }
+  }
+
+  private resetForm(): void {
+    this.date = undefined as any;
+    this.selectedRevenueType = undefined as any;
+    this.documentNumber = undefined as any;
+    this.selectedOrigin = undefined as any;
+    this.selectedAccount = undefined as any;
+    this.selectedPaymentMethod = undefined as any;
+    this.iva = undefined as any;
+    this.totalValue = undefined as any;
+    this.selectedSale = undefined as any;
+    this.sales = [];
   }
 }

@@ -1,12 +1,14 @@
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { MenuItem, MessageService } from 'primeng/api';
+import { FileUpload } from 'primeng/fileupload';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { Unit } from 'src/app/demo/data/enum/unit';
 import { Construction } from 'src/app/demo/data/model/construction.model';
 import { BudgetItem } from 'src/app/demo/data/model/budgetItem.model';
+import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
 import { VehicleCostCreation } from 'src/app/demo/data/model/vehicleCostCreation';
 import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { ClientService } from 'src/app/demo/service/company/clientService';
@@ -193,6 +195,8 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
 export class CreateConstructionComponent {
   [x: string]: any;
 
+  @ViewChild('fileUpload') fileUpload?: FileUpload;
+
   clientNames!: ItemName[];
 
   dynamicForm!: FormGroup; // Your main form group
@@ -210,6 +214,11 @@ export class CreateConstructionComponent {
   construction!: Construction;
 
   selectedImageFile?: File;
+
+  quickAddClientDialogVisible: boolean = false;
+  quickAddClientSubmitted: boolean = false;
+  quickAddClientName: string | null = null;
+  quickAddClientNif: number | null = null;
 
   units: Record<string, string> = {
     un: 'un',
@@ -256,6 +265,35 @@ export class CreateConstructionComponent {
 
   onImageSelect(event: any): void {
     this.selectedImageFile = event.files?.[0];
+  }
+
+  openQuickAddClient(): void {
+    this.quickAddClientSubmitted = false;
+    this.quickAddClientName = null;
+    this.quickAddClientNif = null;
+    this.quickAddClientDialogVisible = true;
+  }
+
+  closeQuickAddClient(): void {
+    this.quickAddClientDialogVisible = false;
+  }
+
+  saveQuickAddClient(): void {
+    this.quickAddClientSubmitted = true;
+    if (!this.quickAddClientName?.trim()) return;
+
+    const name = this.quickAddClientName;
+    const nif = this.quickAddClientNif as number;
+
+    this.clientService.createClient({ name, nif } as ClientCreation).subscribe(client => {
+      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Cliente criado com sucesso.' });
+      this.quickAddClientDialogVisible = false;
+      this.clientService.getClientNames().subscribe(clientNames => {
+        this.clientNames = clientNames;
+        this.selectedClient = client.originId;
+        this.cdr.markForCheck();
+      });
+    });
   }
 
   asFormGroup(c: any): FormGroup { return c as FormGroup; }
@@ -514,11 +552,28 @@ export class CreateConstructionComponent {
     this.constructionService.createConstruction(this.construction, this.selectedImageFile).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Construção adicionada com sucesso.' });
+        this.resetForm();
       },
       error: () => {
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
       }
     });
+  }
+
+  private resetForm(): void {
+    this.name = undefined as any;
+    this.address = undefined as any;
+    this.placeId = undefined as any;
+    this.selectedClient = undefined as any;
+    this.adjudicationDate = undefined as any;
+    this.initialDate = undefined as any;
+    this.estimatedDays = undefined as any;
+    this.selectedImageFile = undefined;
+    this.fileUpload?.clear();
+
+    this.inputs.clear();
+    this.inputs.push(this.buildInput());
+    this.cdr.markForCheck();
   }
 
 }

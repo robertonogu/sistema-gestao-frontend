@@ -39,10 +39,22 @@ export class CreateToolComponent {
     if (this.tool != null) {
       this.toolService.createTool(this.tool).subscribe(() => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Ferramenta adicionada com sucesso.' });
+        this.resetForm();
       });
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
+  }
+
+  private resetForm(): void {
+    this.code = undefined as any;
+    this.name = undefined as any;
+    this.brand = undefined as any;
+    this.model = undefined as any;
+    this.purchaseDate = undefined as any;
+    this.purchaseValue = undefined as any;
+    this.location = undefined as any;
+    this.selectedStatus = undefined as any;
   }
 }

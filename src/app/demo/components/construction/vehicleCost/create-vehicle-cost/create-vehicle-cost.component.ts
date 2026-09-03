@@ -70,6 +70,9 @@ interface DestinationOption {
     .route-stop-fixed .route-stop-index {
       background: #fde9c8;
     }
+    .add-destination-btn {
+      width: auto;
+    }
   `]
 })
 export class CreateVehicleCostComponent implements OnInit {
@@ -173,11 +176,21 @@ export class CreateVehicleCostComponent implements OnInit {
     if (this.vehicleCost != null) {
       this.vehicleCostService.createVehicleCost(this.vehicleCost).subscribe(() => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Deslocação adicionada com sucesso.' });
+        this.resetForm();
       });
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
+  }
+
+  private resetForm(): void {
+    this.date = undefined as any;
+    this.selectedVehicle = undefined as any;
+    this.selectedConstruction = undefined as any;
+    this.destinations = [];
+    this.destinationToAdd = null;
+    this.refreshDestinationOptions();
   }
 
 }

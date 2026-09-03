@@ -45,10 +45,21 @@ export class CreateVehicleComponent {
     if (this.vehicle != null) {
       this.vehicleService.createVehicle(this.vehicle).subscribe(newVehicleCost => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Veículo adicionado com sucesso.' });
-      })      
+        this.resetForm();
+      })
     }
     else {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
     }
+  }
+
+  private resetForm(): void {
+    this.selectedVehicleType = undefined as any;
+    this.registration = undefined as any;
+    this.registrationDate = undefined as any;
+    this.inspectionDate = undefined as any;
+    this.insuranceDate = undefined as any;
+    this.selectedInsurancePeriodicity = undefined as any;
+    this.valueKilometer = undefined as any;
   }
 }
