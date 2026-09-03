@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
 import { Component, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import * as XLSX from 'xlsx-js-style';
+import * as ExcelJS from 'exceljs';
 import { forkJoin } from 'rxjs';
 import { CashflowMonth } from 'src/app/demo/api/cashflowMonth';
 import { ConstructionCalendarEvent } from 'src/app/demo/api/constructionCalendarEvent';
@@ -422,36 +422,11 @@ export class DetailsConstructionComponent implements OnInit {
       template: this.http.get(this.materialsTemplateUrl, { responseType: 'arraybuffer' })
     }).subscribe({
       next: ({ materials, template }) => {
-        this.exportingMaterials = false;
-
-        if (!materials.length) {
-          this.messageService.add({ severity: 'info', summary: 'Sem materiais', detail: 'Não há materiais para exportar nesta obra.' });
-          return;
-        }
-
-        const workbook = XLSX.read(template, { type: 'array', cellStyles: true });
-        const worksheet = workbook.Sheets[this.materialsTemplateSheet];
-        if (!worksheet) {
-          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O template de Excel não tem a folha esperada.' });
-          return;
-        }
-
-        const rows = materials.map(m => ([
-          m.date ? new Date(m.date).toLocaleDateString('pt-PT') : '',
-          m.supplier,
-          m.documentNumber,
-          m.description,
-          m.quantity,
-          m.unit,
-          m.netValue,
-          m.rubrica,
-          m.item ?? ''
-        ]));
-
-        this.writeRowsPreservingStyle(worksheet, rows, this.materialsTemplateFirstDataRow);
-
-        const constructionLabel = this.constructionDetails?.constructionNumber || this.constructionId;
-        XLSX.writeFile(workbook, `materiais_obra_${constructionLabel}.xlsx`);
+        this.generateMaterialsWorkbook(materials, template)
+          .catch(() => {
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível gerar o ficheiro de materiais.' });
+          })
+          .finally(() => { this.exportingMaterials = false; });
       },
       error: () => {
         this.exportingMaterials = false;
@@ -460,36 +435,74 @@ export class DetailsConstructionComponent implements OnInit {
     });
   }
 
-  // Escreve valores célula a célula, preservando o objeto de célula existente do template
-  // (estilo, formato, borders, etc.) em vez de o substituir por completo — o que é o que
-  // XLSX.utils.sheet_add_aoa/json_to_sheet fazem por omissão.
-  private writeRowsPreservingStyle(worksheet: XLSX.WorkSheet, rows: (string | number)[][], firstDataRow: number): void {
-    let maxRow = firstDataRow - 1;
-    let maxCol = 0;
+  private async generateMaterialsWorkbook(materials: any[], template: ArrayBuffer): Promise<void> {
+    if (!materials.length) {
+      this.messageService.add({ severity: 'info', summary: 'Sem materiais', detail: 'Não há materiais para exportar nesta obra.' });
+      return;
+    }
 
-    rows.forEach((row, rowIndex) => {
-      const rowNumber = firstDataRow + rowIndex;
-      row.forEach((value, colIndex) => {
-        const cellRef = XLSX.utils.encode_cell({ r: rowNumber - 1, c: colIndex });
-        const existing = worksheet[cellRef] || {};
-        const type = typeof value === 'number' ? 'n' : 's';
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(template);
 
-        worksheet[cellRef] = { ...existing, v: value, t: type };
-        delete worksheet[cellRef].w; // texto formatado em cache, fica desatualizado
-        delete worksheet[cellRef].r; // rich text em cache
-        delete worksheet[cellRef].h;
+    const worksheet = workbook.getWorksheet(this.materialsTemplateSheet);
+    if (!worksheet) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O template de Excel não tem a folha esperada.' });
+      return;
+    }
 
-        maxCol = Math.max(maxCol, colIndex);
-      });
-      maxRow = Math.max(maxRow, rowNumber);
+    const rows = materials.map(m => ([
+      m.date ? new Date(m.date).toLocaleDateString('pt-PT') : '',
+      m.supplier,
+      m.documentNumber,
+      m.description,
+      m.quantity,
+      m.unit,
+      m.netValue,
+      m.rubrica,
+      m.item ?? ''
+    ]));
+
+    this.writeRowsPreservingStyle(worksheet, rows, this.materialsTemplateFirstDataRow);
+
+    const constructionLabel = this.constructionDetails?.constructionNumber || this.constructionId;
+    const buffer = await workbook.xlsx.writeBuffer();
+    this.downloadBlob(buffer, `materiais_obra_${constructionLabel}.xlsx`);
+  }
+
+  // Escreve valores célula a célula. Com o ExcelJS o load() do template mantém intactos
+  // largura de colunas, fontes, borders, preenchimentos (incl. cores de tema) e formatos
+  // numéricos; ao atribuir apenas `cell.value` o estilo existente da célula é preservado.
+  // As linhas escritas além das que o template já traz formatadas recebem uma cópia do
+  // estilo da 1.ª linha de dados, para manter a formatação consistente.
+  private writeRowsPreservingStyle(worksheet: ExcelJS.Worksheet, rows: (string | number)[][], firstDataRow: number): void {
+    const templateRow = worksheet.getRow(firstDataRow);
+    const templateStyles: (Partial<ExcelJS.Style> | undefined)[] = (rows[0] ?? []).map((_, colIndex) => {
+      const style = templateRow.getCell(colIndex + 1).style;
+      return style ? JSON.parse(JSON.stringify(style)) : undefined;
     });
 
-    const currentRange = worksheet['!ref'] ? XLSX.utils.decode_range(worksheet['!ref']) : { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
-    const newRange: XLSX.Range = {
-      s: { r: Math.min(currentRange.s.r, 0), c: Math.min(currentRange.s.c, 0) },
-      e: { r: Math.max(currentRange.e.r, maxRow - 1), c: Math.max(currentRange.e.c, maxCol) }
-    };
-    worksheet['!ref'] = XLSX.utils.encode_range(newRange);
+    rows.forEach((row, rowIndex) => {
+      const excelRow = worksheet.getRow(firstDataRow + rowIndex);
+      row.forEach((value, colIndex) => {
+        const cell = excelRow.getCell(colIndex + 1);
+        const templateStyle = templateStyles[colIndex];
+        if (templateStyle) {
+          cell.style = JSON.parse(JSON.stringify(templateStyle));
+        }
+        cell.value = value === '' ? null : value;
+      });
+      excelRow.commit();
+    });
+  }
+
+  private downloadBlob(buffer: ExcelJS.Buffer, fileName: string): void {
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   readonly sourceCols: { key: SourceKey; title: string; icon: string; color: string; soft: string }[] = [
