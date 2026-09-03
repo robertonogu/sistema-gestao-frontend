@@ -97,7 +97,7 @@ export enum SubCategoryType {
 
     CONSTRUCTION = 'Construção',
     PLUMBING = 'Pichelaria',
-    ELECTRICAL_MATERIALS = 'Eletricidade',
+    ELECTRICAL_MATERIALS = 'Instalações Elétricas',
     HARDWARE = 'Ferragens',
     GLASS_MIRRORS = 'Vidros e Espelhos',
     METALS = 'Metais',

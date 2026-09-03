@@ -397,12 +397,12 @@ export class DetailsConstructionComponent implements OnInit {
   ];
 
   // ===== Computados =====
-  pctFaturado = computed(() => Math.round((this.constructionDetails.invoicedValue / this.constructionDetails.initialBudget) * 100));
+  pctFaturado = computed(() => Math.round((this.constructionDetails.invoicedNetValue / this.constructionDetails.initialBudget) * 100));
   pctPago     = computed(() => Math.round((this.constructionDetails.paymentValue     / this.constructionDetails.initialBudget)  * 100));
 
   kpis = computed(() => [
     { label: 'Orçamento',    value: this.fmtEUR(this.constructionDetails.initialBudget), accent: 'oklch(0.85 0.07 250)', sub: 'valor adjudicado' },
-    { label: 'Faturado',     value: this.fmtEUR(this.constructionDetails.invoicedValue),  accent: 'oklch(0.65 0.13 250)', sub: `${this.pctFaturado()}% do orçamentado`,  delta:  12, deltaLabel: 'vs. mês ant.' },
+    { label: 'Faturado',     value: this.fmtEUR(this.constructionDetails.invoicedNetValue),  accent: 'oklch(0.65 0.13 250)', sub: `${this.pctFaturado()}% do orçamentado`,  delta:  12, deltaLabel: 'vs. mês ant.' },
     { label: 'Pago',         value: this.fmtEUR(this.constructionDetails.paymentValue),      accent: 'oklch(0.5 0.13 155)',  sub: `${this.pctPago()}% do faturado`,    delta:   8, deltaLabel: 'vs. mês ant.' },
     { label: 'Custos reais', value: this.fmtEUR(this.constructionDetails.costValueWorks),    accent: 'oklch(0.62 0.18 25)',  sub: 'acumulado',                          delta:  -3, deltaLabel: 'abaixo do plano' },
     { label: 'Lucro',        value: this.fmtEUR(this.constructionDetails.profit),       accent: 'oklch(0.55 0.15 75)',  sub: `margem ${((this.constructionDetails.profit / this.constructionDetails.initialBudget) * 100).toFixed(1)}%`, delta: 14, deltaLabel: 'vs. estimado' },
@@ -410,8 +410,8 @@ export class DetailsConstructionComponent implements OnInit {
 
   execSegments = computed(() => {
     const pago        = this.constructionDetails.paymentValue;
-    const naoPago     = this.constructionDetails.invoicedValue - this.constructionDetails.paymentValue;
-    const porFaturar  = this.constructionDetails.initialBudget - this.constructionDetails.invoicedValue;
+    const naoPago     = this.constructionDetails.invoicedNetValue - this.constructionDetails.paymentValue;
+    const porFaturar  = this.constructionDetails.initialBudget - this.constructionDetails.invoicedNetValue;
     const max         = this.constructionDetails.initialBudget || 1;
     return [
       { label: 'Pago',              value: pago,       color: 'oklch(0.5 0.13 155)',  pct: (pago       / max) * 100 },

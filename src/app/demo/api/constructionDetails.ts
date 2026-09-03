@@ -20,7 +20,7 @@ export interface ConstructionDetails {
     adjudicationDate: string;
     endDate: string;
     margin: number;
-    invoicedValue: number;
+    invoicedNetValue: number;
     daysElapsed: number; 
     totalDays: number; 
     timeProgress: number;

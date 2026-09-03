@@ -62,7 +62,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 300px 90px 130px 130px 130px 130px 100px;
+  grid-template-columns: minmax(220px, 1fr) 300px 90px 130px 130px 130px 130px 84px;
   align-items: center;
   column-gap: 8px;
   min-width: fit-content;
@@ -94,7 +94,19 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-col-num { text-align: right; font-family: var(--font-mono); }
 .item-col-total { font-weight: 600; }
-.item-col-actions { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.item-col-actions {
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  padding-left: 4px !important; padding-right: 4px !important;
+
+  .assoc-icon { font-size: 12px; flex-shrink: 0; }
+}
+
+:host ::ng-deep .item-col-actions .p-button.p-button-icon-only {
+  width: 1.75rem;
+  height: 1.75rem;
+
+  .p-button-icon { font-size: 12px; }
+}
 
 :host ::ng-deep .item-row {
   input.p-inputtext,
