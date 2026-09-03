@@ -448,7 +448,7 @@ export class DetailsConstructionComponent implements OnInit {
           m.item ?? ''
         ]));
 
-        XLSX.utils.sheet_add_aoa(worksheet, rows, { origin: `A${this.materialsTemplateFirstDataRow}` });
+        this.writeRowsPreservingStyle(worksheet, rows, this.materialsTemplateFirstDataRow);
 
         const constructionLabel = this.constructionDetails?.constructionNumber || this.constructionId;
         XLSX.writeFile(workbook, `materiais_obra_${constructionLabel}.xlsx`);
@@ -458,6 +458,38 @@ export class DetailsConstructionComponent implements OnInit {
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível exportar os materiais.' });
       }
     });
+  }
+
+  // Escreve valores célula a célula, preservando o objeto de célula existente do template
+  // (estilo, formato, borders, etc.) em vez de o substituir por completo — o que é o que
+  // XLSX.utils.sheet_add_aoa/json_to_sheet fazem por omissão.
+  private writeRowsPreservingStyle(worksheet: XLSX.WorkSheet, rows: (string | number)[][], firstDataRow: number): void {
+    let maxRow = firstDataRow - 1;
+    let maxCol = 0;
+
+    rows.forEach((row, rowIndex) => {
+      const rowNumber = firstDataRow + rowIndex;
+      row.forEach((value, colIndex) => {
+        const cellRef = XLSX.utils.encode_cell({ r: rowNumber - 1, c: colIndex });
+        const existing = worksheet[cellRef] || {};
+        const type = typeof value === 'number' ? 'n' : 's';
+
+        worksheet[cellRef] = { ...existing, v: value, t: type };
+        delete worksheet[cellRef].w; // texto formatado em cache, fica desatualizado
+        delete worksheet[cellRef].r; // rich text em cache
+        delete worksheet[cellRef].h;
+
+        maxCol = Math.max(maxCol, colIndex);
+      });
+      maxRow = Math.max(maxRow, rowNumber);
+    });
+
+    const currentRange = worksheet['!ref'] ? XLSX.utils.decode_range(worksheet['!ref']) : { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
+    const newRange: XLSX.Range = {
+      s: { r: Math.min(currentRange.s.r, 0), c: Math.min(currentRange.s.c, 0) },
+      e: { r: Math.max(currentRange.e.r, maxRow - 1), c: Math.max(currentRange.e.c, maxCol) }
+    };
+    worksheet['!ref'] = XLSX.utils.encode_range(newRange);
   }
 
   readonly sourceCols: { key: SourceKey; title: string; icon: string; color: string; soft: string }[] = [
