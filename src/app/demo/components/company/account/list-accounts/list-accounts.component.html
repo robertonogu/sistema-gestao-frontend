@@ -78,7 +78,7 @@
 </div>
 
 <p-dialog
-    [header]="account.originId ? 'Editar Conta' : 'Nova Conta'"
+    [header]="account.accountId ? 'Editar Conta' : 'Nova Conta'"
     [(visible)]="accountDialog"
     [style]="{ width: '450px' }"
     [modal]="true"
@@ -107,7 +107,9 @@
                 [(ngModel)]="account.initialBalance"
                 mode="currency"
                 currency="EUR"
-                locale="de-DE"
+                locale="en-US"
+                [useGrouping]="false"
+                [disabled]="!!account.accountId"
             />
         </div>
 

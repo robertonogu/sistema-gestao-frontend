@@ -109,7 +109,8 @@
                 [(ngModel)]="movement.value"
                 mode="currency"
                 currency="EUR"
-                locale="de-DE"
+                locale="en-US"
+                [useGrouping]="false"
                 autocomplete="off"
                 [ngClass]="{ 'ng-dirty ng-invalid': submitted && !movement.value }"
             />

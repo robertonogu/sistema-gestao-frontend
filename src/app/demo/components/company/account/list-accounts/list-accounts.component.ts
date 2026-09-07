@@ -68,8 +68,8 @@ export class ListAccountsComponent {
         cashBox: this.account.cashBox ?? false
       } as AccountCreation;
 
-      if (this.account.originId) {
-        this.accountService.updateAccount(this.account.originId, accountCreation).subscribe({
+      if (this.account.accountId) {
+        this.accountService.updateAccount(this.account.accountId, accountCreation).subscribe({
           next: () => {
             this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Conta atualizada com sucesso.' });
             this.accountDialog = false;
@@ -103,9 +103,15 @@ export class ListAccountsComponent {
       header: 'Tem a certeza que pretende eliminar a conta ' + account.name + '?',
       message: 'Confirme para prosseguir.',
       accept: () => {
-        this.accountService.deleteAccount(account.originId).subscribe(() => {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Conta eliminada com sucesso.' });
-          this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+        this.accountService.deleteAccount(account.accountId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Conta eliminada com sucesso.' });
+            this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+          },
+          error: (err: HttpErrorResponse) => {
+            const detail = err.error?.message || 'Não foi possível eliminar a conta.';
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail });
+          }
         });
       },
       reject: () => {

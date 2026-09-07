@@ -5,6 +5,7 @@ export interface Sale {
     netValue: number;
     iva: number;
     totalValue: number;
+    pendingValue: number;
     client: string;
     clientId: number;
     construction: string | null;

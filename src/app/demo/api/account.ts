@@ -1,5 +1,5 @@
 export interface Account {
-    originId: number;
+    accountId: number;
     name: string;
     initialBalance: number;
     cashBox: boolean;

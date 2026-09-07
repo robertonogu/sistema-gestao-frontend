@@ -138,7 +138,7 @@
                         mode="currency"
                         inputId="currency-germany"
                         currency="EUR"
-                        locale="de-DE"
+                        locale="en-US" [useGrouping]="false"
 						[disabled]="disablePaidValue"
 					/>
 				</div>
@@ -230,7 +230,7 @@
 										formControlName="value"
 										mode="currency"
 										currency="EUR"
-										locale="de-DE"
+										locale="en-US" [useGrouping]="false"
 										styleClass="item-col-num"
 										(onInput)="onItemValueChange(j)"
 									/>
@@ -260,7 +260,7 @@
 										formControlName="total"
 										mode="currency"
 										currency="EUR"
-										locale="de-DE"
+										locale="en-US" [useGrouping]="false"
 										styleClass="item-col-num"
 										(onInput)="onItemTotalChange(j)"
 									/>

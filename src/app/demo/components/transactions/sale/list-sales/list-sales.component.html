@@ -45,6 +45,7 @@
                         <th>Documento</th>
                         <th>Cliente</th>
                         <th>Valor Total</th>
+                        <th>Valor Pendente</th>
                         <th>Obra</th>
                         <th>Ações</th>
                     </tr>
@@ -56,6 +57,7 @@
                         <td>{{ sale.documentNumber }}</td>
                         <td>{{ sale.client }}</td>
                         <td>{{ sale.totalValue | currency: 'EUR' }}</td>
+                        <td>{{ sale.pendingValue | currency: 'EUR' }}</td>
                         <td>{{ sale.construction }}</td>
                         <td>
                             <p-button

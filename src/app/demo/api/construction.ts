@@ -4,7 +4,7 @@ export interface Construction {
     name: string;
     client: string;
     initialBudget: number;
-    amountReceived: number;
+    netValueReceived: number;
     amountToReceive: number;
     favourite: boolean;
     imageUrl?: string;

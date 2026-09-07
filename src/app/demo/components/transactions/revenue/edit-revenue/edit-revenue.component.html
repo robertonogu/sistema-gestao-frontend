@@ -32,6 +32,7 @@
 					<label>Tipo</label>
 					<p-dropdown
 						[(ngModel)]="selectedRevenueType"
+						(onChange)="onRevenueTypeChange()"
                         [options]="revenueTypes | keyvalue"
                         optionLabel="value"
 						optionValue="key"
@@ -41,21 +42,9 @@
 				</div>
 
 				<div class="field col-12 md:col-4">
-                    <label>Número de Documento</label>
-					<span class="p-input-icon-left">
-						<i class="pi pi-file"></i>
-						<input
-							[(ngModel)]="documentNumber"
-							type="text"
-							pInputText
-							[ngClass]="{ 'ng-dirty ng-invalid': !documentNumber }"
-						/>
-					</span>
-				</div>
-
-				<div class="field col-12 md:col-4">
 					<label>Origem</label>
 					<p-dropdown
+						(onChange)="onOriginChange()"
 						[(ngModel)]="selectedOrigin"
                         [options]="origins"
                         placeholder="Selecione uma origem"
@@ -73,6 +62,32 @@
                             </div>
                         </ng-template>
                     </p-dropdown>
+				</div>
+
+				<div class="field col-12 md:col-4">
+                    <label>Número de Documento</label>
+					<span class="p-input-icon-left">
+						<i class="pi pi-file"></i>
+						<input
+							[(ngModel)]="documentNumber"
+							type="text"
+							pInputText
+							[ngClass]="{ 'ng-dirty ng-invalid': !documentNumber }"
+						/>
+					</span>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Número de Venda</label>
+					<p-dropdown
+						[(ngModel)]="selectedSale"
+						(onChange)="onSaleChange()"
+                        [options]="sales"
+                        optionLabel="documentNumber"
+						optionValue="saleId"
+                        placeholder="Selecione uma Venda"
+						[disabled]="!isSalesRevenueType || !selectedOrigin"
+					/>
 				</div>
 
 				<div class="field col-12 md:col-4">
@@ -107,6 +122,7 @@
                         optionLabel="value"
 						optionValue="value"
                         placeholder="Selecione uma Taxa"
+						[disabled]="isSalesRevenueType"
 					>
 						<ng-template let-option pTemplate="item">
 							{{ option.value }}%
@@ -124,7 +140,7 @@
                         mode="currency"
                         inputId="currency-germany"
                         currency="EUR"
-                        locale="de-DE"
+                        locale="en-US" [useGrouping]="false"
 						[ngClass]="{ 'ng-dirty ng-invalid': !totalValue }"
 					/>
 				</div>

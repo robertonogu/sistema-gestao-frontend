@@ -98,8 +98,11 @@ export class ListConstructionsComponent implements OnInit {
   }
 
   onRowSelect(event: any) {
-    let constructionId = event.data.constructionId;
-    this.router.navigate(['constructions/details/' + constructionId]);
+    this.goToDetails(event.data);
+  }
+
+  goToDetails(construction: Construction) {
+    this.router.navigate(['constructions/details/' + construction.constructionId]);
   }
 
 }

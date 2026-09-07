@@ -4,12 +4,14 @@ import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
+import { SaleForRevenue } from 'src/app/demo/api/saleForRevenue';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { RevenueType } from 'src/app/demo/data/enum/revenueType';
 import { RevenueCreation } from 'src/app/demo/data/model/revenueCreation.model';
 import { AccountService } from 'src/app/demo/service/company/accountService';
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { RevenueService } from 'src/app/demo/service/transactions/revenueService';
+import { SaleService } from 'src/app/demo/service/transactions/saleService';
 
 @Component({
   templateUrl: './edit-revenue.component.html',
@@ -22,6 +24,7 @@ export class EditRevenueComponent implements OnInit {
   accountNames!: ObjectName[];
   paymentMethods = PaymentMethod;
   validIvaRates!: number[];
+  sales: SaleForRevenue[] = [];
 
   loading = true;
   revenueId!: number;
@@ -41,12 +44,17 @@ export class EditRevenueComponent implements OnInit {
   constructor(
     private originService: OriginService,
     private accountService: AccountService,
+    private saleService: SaleService,
     private messageService: MessageService,
     private revenueService: RevenueService,
     private route: ActivatedRoute,
     private _location: Location
   ) {
     this.validIvaRates = [0, 6, 13, 23];
+  }
+
+  get isSalesRevenueType(): boolean {
+    return (this.selectedRevenueType as unknown as string) === 'SALES';
   }
 
   ngOnInit(): void {
@@ -71,6 +79,8 @@ export class EditRevenueComponent implements OnInit {
           this.iva = revenue.netValue > 0 ? Math.round((revenue.iva / revenue.netValue) * 100) : 0;
           this.selectedSale = revenue.saleId ?? (undefined as any);
 
+          this.getSalesForClient();
+
           this.loading = false;
         },
         error: () => {
@@ -83,6 +93,38 @@ export class EditRevenueComponent implements OnInit {
 
   back() {
     this._location.back();
+  }
+
+  private isSelectedOriginAClient(): boolean {
+    const clientsCategory = this.origins.find(originItem => originItem.label === 'Clientes');
+    return !!clientsCategory && clientsCategory.items.some(item => item.value === this.selectedOrigin);
+  }
+
+  getSalesForClient() {
+    this.sales = [];
+
+    if (this.isSalesRevenueType && this.isSelectedOriginAClient()) {
+      this.saleService.getSalesPendingForRevenue(this.selectedOrigin).subscribe((sales) => {
+        this.sales = sales;
+      });
+    }
+  }
+
+  onOriginChange() {
+    this.getSalesForClient();
+  }
+
+  onRevenueTypeChange() {
+    this.selectedSale = undefined as any;
+    this.getSalesForClient();
+  }
+
+  onSaleChange() {
+    const sale = this.sales.find(s => s.saleId === this.selectedSale);
+    if (!sale) return;
+
+    this.iva = sale.ivaRate;
+    this.totalValue = sale.pendingValue;
   }
 
   saveRevenue() {

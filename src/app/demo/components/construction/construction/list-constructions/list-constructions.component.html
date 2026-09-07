@@ -1,11 +1,11 @@
 ﻿<div class="grid">
     <div class="col-12 lg:col-6 xl:col-3" *ngFor="let construction of favouriteConstructions">
-        <div *ngIf="construction.favourite">
+        <div *ngIf="construction.favourite" class="cursor-pointer" (click)="goToDetails(construction)">
             <p-card header="{{ construction.name }}" subheader="{{ construction.client }}">
                 <ng-template pTemplate="header">
                     <div class="relative mx-auto">
-                        <i 
-                            (click)="addFavorite(construction)"
+                        <i
+                            (click)="addFavorite(construction); $event.stopPropagation()"
                             class="absolute pi pi-star text-yellow-300 text-2xl cursor-pointer"
                             [ngStyle]="{ 'left.px': 5, 'top.px': 5 }" 
                         >
@@ -15,7 +15,7 @@
                 </ng-template>
                 <div class="flex justify-content-around">
                     <div class="text-center">
-                        <p class="text-green-500 font-semibold">{{ construction.amountReceived | currency: 'EUR' }}</p>
+                        <p class="text-green-500 font-semibold">{{ construction.netValueReceived | currency: 'EUR' }}</p>
                         <p class="font-bold">Recebido</p>
                     </div>
                     <p-divider layout="vertical" />
@@ -87,7 +87,7 @@
                 </ng-template>
 
                 <ng-template pTemplate="body" let-construction>
-                    <tr [pSelectableRow]="construction">
+                    <tr [pSelectableRow]="construction" class="cursor-pointer">
                         <td>
                             <i
                                 (click)="addFavorite(construction); $event.stopPropagation()"
@@ -100,7 +100,7 @@
                         <td>{{ construction.name }}</td>
                         <td>{{ construction.clientName }}</td>
                         <td>{{ construction.initialBudget | currency: 'EUR' }}</td>
-                        <td>{{ construction.amountReceived | currency: 'EUR' }}</td>
+                        <td>{{ construction.netValueReceived | currency: 'EUR' }}</td>
                         <td>{{ construction.amountToReceive | currency: 'EUR' }}</td>
                         <td>
                             <p-button

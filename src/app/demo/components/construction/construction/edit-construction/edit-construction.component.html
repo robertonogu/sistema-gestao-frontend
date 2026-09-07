@@ -106,28 +106,28 @@
 
                 <div class="col-num">
                   <ng-container *ngIf="getSubInputs(rowIndex).length === 0; else parentLaborAgg">
-                    <p-inputNumber formControlName="laborCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                    <p-inputNumber formControlName="laborCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                   </ng-container>
                   <ng-template #parentLaborAgg><span class="muted small">{{ fmtEUR(capituloLaborCost(rowIndex)) }}</span></ng-template>
                 </div>
 
                 <div class="col-num">
                   <ng-container *ngIf="getSubInputs(rowIndex).length === 0; else parentMatAgg">
-                    <p-inputNumber formControlName="materialCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                    <p-inputNumber formControlName="materialCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                   </ng-container>
                   <ng-template #parentMatAgg><span class="muted small">{{ fmtEUR(capituloMaterialCost(rowIndex)) }}</span></ng-template>
                 </div>
 
                 <div class="col-num">
                   <ng-container *ngIf="getSubInputs(rowIndex).length === 0; else parentExtAgg">
-                    <p-inputNumber formControlName="externalServiceCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                    <p-inputNumber formControlName="externalServiceCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                   </ng-container>
                   <ng-template #parentExtAgg><span class="muted small">{{ fmtEUR(capituloExternalServiceCost(rowIndex)) }}</span></ng-template>
                 </div>
 
                 <div class="col-num">
                   <ng-container *ngIf="getSubInputs(rowIndex).length === 0; else parentIndAgg">
-                    <p-inputNumber formControlName="indirectCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                    <p-inputNumber formControlName="indirectCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                   </ng-container>
                   <ng-template #parentIndAgg><span class="muted small">{{ fmtEUR(capituloIndirectCost(rowIndex)) }}</span></ng-template>
                 </div>
@@ -162,28 +162,28 @@
 
                       <div class="col-num">
                         <ng-container *ngIf="getSubSubInputs(rowIndex, subIndex).length === 0; else subLaborAgg">
-                          <p-inputNumber formControlName="subLaborCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subLaborCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </ng-container>
                         <ng-template #subLaborAgg><span class="muted small">{{ fmtEUR(subItemLaborCost(rowIndex, subIndex)) }}</span></ng-template>
                       </div>
 
                       <div class="col-num">
                         <ng-container *ngIf="getSubSubInputs(rowIndex, subIndex).length === 0; else subMatAgg">
-                          <p-inputNumber formControlName="subMaterialCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subMaterialCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </ng-container>
                         <ng-template #subMatAgg><span class="muted small">{{ fmtEUR(subItemMaterialCost(rowIndex, subIndex)) }}</span></ng-template>
                       </div>
 
                       <div class="col-num">
                         <ng-container *ngIf="getSubSubInputs(rowIndex, subIndex).length === 0; else subExtAgg">
-                          <p-inputNumber formControlName="subExternalServiceCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subExternalServiceCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </ng-container>
                         <ng-template #subExtAgg><span class="muted small">{{ fmtEUR(subItemExternalServiceCost(rowIndex, subIndex)) }}</span></ng-template>
                       </div>
 
                       <div class="col-num">
                         <ng-container *ngIf="getSubSubInputs(rowIndex, subIndex).length === 0; else subIndAgg">
-                          <p-inputNumber formControlName="subIndirectCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subIndirectCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </ng-container>
                         <ng-template #subIndAgg><span class="muted small">{{ fmtEUR(subItemIndirectCost(rowIndex, subIndex)) }}</span></ng-template>
                       </div>
@@ -214,19 +214,19 @@
                         </div>
 
                         <div class="col-num">
-                          <p-inputNumber formControlName="subSubLaborCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subSubLaborCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </div>
 
                         <div class="col-num">
-                          <p-inputNumber formControlName="subSubMaterialCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subSubMaterialCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </div>
 
                         <div class="col-num">
-                          <p-inputNumber formControlName="subSubExternalServiceCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subSubExternalServiceCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </div>
 
                         <div class="col-num">
-                          <p-inputNumber formControlName="subSubIndirectCost" mode="currency" currency="EUR" locale="pt-PT" styleClass="cell-num"></p-inputNumber>
+                          <p-inputNumber formControlName="subSubIndirectCost" mode="currency" currency="EUR" locale="en-US" [useGrouping]="false" styleClass="cell-num"></p-inputNumber>
                         </div>
 
                         <div class="col-num strong">
