@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Table } from 'primeng/table';
 import { ConfirmationService, MessageService, TreeNode } from 'primeng/api';
 import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
@@ -14,7 +15,7 @@ import { WorkLogService } from 'src/app/demo/service/people/workLogService';
   templateUrl: './list-worklogs.component.html',
   providers: [ConfirmationService, MessageService]
 })
-export class ListWorkLogsComponent {
+export class ListWorkLogsComponent implements OnInit {
 
   loading: boolean = true;
   totalRecords: number = 0;
@@ -28,6 +29,14 @@ export class ListWorkLogsComponent {
   constructionNames!: ConstructionNames[];
   budgetTree: TreeNode[] = [];
   employeeNames!: ItemName[];
+
+  // ===== Filtros =====
+  @ViewChild('dt') table?: Table;
+  allEmployeeNames: ItemName[] = [];
+  filterBudgetTree: TreeNode[] = [];
+  filterConstruction?: number;
+  filterBudgetNode?: TreeNode;
+  filterEmployee?: number;
 
   workLogDialog: boolean = false;
   submitted: boolean = false;
@@ -48,17 +57,59 @@ export class ListWorkLogsComponent {
     private messageService: MessageService
   ) {}
 
+  ngOnInit(): void {
+    this.constructionService.getConstructionNames().subscribe((constructionNames) => {
+      this.constructionNames = constructionNames;
+    });
+    this.employeeService.getEmployeeNames().subscribe((employeeNames) => {
+      this.allEmployeeNames = employeeNames;
+    });
+  }
+
+  private filterValue(filters: any, field: string) {
+    const meta = Array.isArray(filters?.[field]) ? filters[field][0] : filters?.[field];
+    return meta?.value ?? undefined;
+  }
+
   nextPage(event: any) {
     this.loading = true;
 
     this.currentPage = event.first / event.rows;
     this.pageSize = event.rows;
 
-    this.workLogService.getWorkLogs(this.currentPage, this.pageSize).subscribe((workLogs) => {
+    const filters = event.filters ?? this.table?.filters ?? {};
+    const constructionId = this.filterValue(filters, 'construction');
+    const budgetItemId = this.filterValue(filters, 'budgetItem');
+    const employeeId = this.filterValue(filters, 'employee');
+
+    // Obra mudou → recarrega a árvore de itens para o filtro por item
+    if (constructionId !== this.filterConstruction) {
+      this.filterConstruction = constructionId;
+      this.filterBudgetNode = undefined;
+      this.filterBudgetTree = [];
+      if (constructionId) {
+        this.constructionService.getBudgetItemsForConstruction(constructionId).subscribe((budgetItems) => {
+          this.filterBudgetTree = this.mapBudgetItemsToTreeNodes(budgetItems);
+        });
+      }
+    }
+    this.filterEmployee = employeeId;
+
+    this.workLogService.getWorkLogs(this.currentPage, this.pageSize, { constructionId, budgetItemId, employeeId }).subscribe((workLogs) => {
       this.workLogs = workLogs.objectList;
       this.totalRecords = workLogs.totalElements;
       this.loading = false;
     });
+  }
+
+  // ao mudar a obra, limpa o filtro de item (pertence à obra anterior)
+  clearItemColumnFilter() {
+    this.filterBudgetNode = undefined;
+    const meta: any = this.table?.filters?.['budgetItem'];
+    const current = Array.isArray(meta) ? meta[0]?.value : meta?.value;
+    if (current != null) {
+      this.table!.filter(null, 'budgetItem', 'equals');
+    }
   }
 
   getBudgetItemsAndEmployees() {

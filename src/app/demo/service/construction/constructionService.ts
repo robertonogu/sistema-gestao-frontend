@@ -10,7 +10,6 @@ import { Construction } from '../../api/construction';
 import { ConstructionDetails } from '../../api/constructionDetails';
 import { BudgetItem } from '../../api/budgetItem';
 import { MaterialAllocationDetail } from '../../data/model/materialAllocationDetail.model';
-import { WorkLogDetail } from '../../data/model/workLogDetail.model';
 import { MaterialExport } from '../../api/materialExport';
 
 @Injectable({
@@ -104,9 +103,15 @@ export class ConstructionService {
         return this.http.get<MaterialAllocationDetail[]>(url);
     }
 
-    getWorkLogDetails(budgetItemId: number) : Observable<WorkLogDetail[]> {
-        let url = this.budgetItemsUrl + budgetItemId + "/workLogDetails";
-        return this.http.get<WorkLogDetail[]>(url);
+    getWorkLogDetails(budgetItemId: number, pageNo: number, pageSize: number, employeeId?: number) : Observable<ObjectList> {
+        let url = this.budgetItemsUrl + budgetItemId + "/workLogDetails?pageNo=" + pageNo + "&pageSize=" + pageSize;
+        if (employeeId != null) url += "&employeeId=" + employeeId;
+        return this.http.get<ObjectList>(url);
+    }
+
+    getWorkLogEmployees(budgetItemId: number) : Observable<ItemName[]> {
+        let url = this.budgetItemsUrl + budgetItemId + "/workLogEmployees";
+        return this.http.get<ItemName[]>(url);
     }
 
 }

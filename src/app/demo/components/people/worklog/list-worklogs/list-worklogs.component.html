@@ -25,6 +25,7 @@
             </div>
 
 			<p-table
+                #dt
                 currentPageReportTemplate="{first} de {last} de {totalRecords} registos de trabalho"
                 [lazy]="true"
                 [loading]="loading"
@@ -41,11 +42,49 @@
 
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="name">Data<p-sortIcon field="name"></p-sortIcon></th>
-                        <th>Funcionário</th>
+                        <th>Data</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Funcionário
+                                <p-columnFilter field="employee" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="allEmployeeNames" optionLabel="name" optionValue="id"
+                                            placeholder="Todos" [showClear]="true" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                            (onChange)="filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Horas</th>
-                        <th>Obra</th>
-                        <th>Item</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Obra
+                                <p-columnFilter field="construction" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="constructionNames" optionLabel="name" optionValue="constructionId"
+                                            placeholder="Todas" [showClear]="true" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                            (onChange)="clearItemColumnFilter(); filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Item
+                                <p-columnFilter field="budgetItem" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-treeSelect [ngModel]="filterBudgetNode" [options]="filterBudgetTree"
+                                            placeholder="Todos" [showClear]="true" [disabled]="!filterConstruction"
+                                            appendTo="body" containerStyleClass="w-full" [style]="{ 'min-width': '16rem' }"
+                                            (onNodeSelect)="filterBudgetNode = $event.node; filter($event.node.data)"
+                                            (onClear)="filterBudgetNode = undefined; filter(null)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Local</th>
                         <th>Ações</th>
                     </tr>

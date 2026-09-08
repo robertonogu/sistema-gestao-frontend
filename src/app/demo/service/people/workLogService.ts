@@ -18,8 +18,11 @@ export class WorkLogService {
 
     constructor(private http: HttpClient) { }
 
-    getWorkLogs(currentPage: number, pageSize: number) : Observable<ObjectList> {
+    getWorkLogs(currentPage: number, pageSize: number, filters?: { constructionId?: number; budgetItemId?: number; employeeId?: number }) : Observable<ObjectList> {
         let url = this.workLogsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        if (filters?.constructionId != null) url += "&constructionId=" + filters.constructionId;
+        if (filters?.budgetItemId != null) url += "&budgetItemId=" + filters.budgetItemId;
+        if (filters?.employeeId != null) url += "&employeeId=" + filters.employeeId;
         return this.http.get<ObjectList>(url);
     }
 

@@ -117,14 +117,22 @@
 
         <div class="field">
             <label for="initialDate" class="block font-bold mb-4">Data Inicial</label>
+            <input
+                *ngIf="account.accountId"
+                id="initialDate"
+                type="text"
+                pInputText
+                [value]="account.initialDate | date: 'dd/MM/yyyy'"
+                disabled
+            />
             <p-calendar
+                *ngIf="!account.accountId"
                 inputId="initialDate"
                 [(ngModel)]="account.initialDate"
                 dateFormat="dd/mm/yy"
                 [iconDisplay]="'input'"
                 [showIcon]="true"
                 appendTo="body"
-                [disabled]="!!account.accountId"
             />
         </div>
 

@@ -10,14 +10,38 @@
           pButton
           type="button"
         ></button>
-        <div class="text-900 text-xl font-semibold">Mão-de-obra · {{ itemName }}</div>
+        <div class="text-900 text-xl font-semibold">{{ itemName }}</div>
       </div>
 
-      <p-table [value]="workLogs" [loading]="loading" styleClass="p-datatable-striped">
+      <p-table
+        [value]="workLogs"
+        [lazy]="true"
+        [loading]="loading"
+        (onLazyLoad)="loadPage($event)"
+        [paginator]="true"
+        [rows]="20"
+        [rowsPerPageOptions]="[5, 10, 20, 50, 100]"
+        [totalRecords]="totalRecords"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} de {last} de {totalRecords} registos"
+        styleClass="p-datatable-striped"
+      >
         <ng-template pTemplate="header">
           <tr>
             <th>Data</th>
-            <th>Funcionário</th>
+            <th>
+              <div class="flex align-items-center">
+                Funcionário
+                <p-columnFilter field="employee" matchMode="equals" display="menu"
+                  [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <p-dropdown [ngModel]="value" [options]="employeeOptions" optionLabel="name" optionValue="id"
+                      placeholder="Todos" [showClear]="true" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                      (onChange)="filter($event.value)" />
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </th>
             <th>Horas</th>
             <th>Sub-item</th>
           </tr>

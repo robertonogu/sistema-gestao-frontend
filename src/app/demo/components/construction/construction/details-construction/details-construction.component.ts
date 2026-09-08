@@ -604,15 +604,19 @@ export class DetailsConstructionComponent implements OnInit {
   }
 
   get costBreakdownTotals() {
-    return this.costBreakdownRows.reduce(
-      (acc, row) => ({
-        materials: acc.materials + row.materials,
-        labor: acc.labor + row.labor,
-        externalServices: acc.externalServices + row.externalServices,
-        indirect: acc.indirect + row.indirect,
-        subtotal: acc.subtotal + row.subtotal,
-      }),
-      { materials: 0, labor: 0, externalServices: 0, indirect: 0, subtotal: 0 }
-    );
+    // As linhas com filhos já trazem a soma dos descendentes, por isso o total
+    // são só as raízes (nível 0) para não contar duas vezes.
+    return this.costBreakdownRows
+      .filter(row => row.level === 0)
+      .reduce(
+        (acc, row) => ({
+          materials: acc.materials + row.materials,
+          labor: acc.labor + row.labor,
+          externalServices: acc.externalServices + row.externalServices,
+          indirect: acc.indirect + row.indirect,
+          subtotal: acc.subtotal + row.subtotal,
+        }),
+        { materials: 0, labor: 0, externalServices: 0, indirect: 0, subtotal: 0 }
+      );
   }
 }
