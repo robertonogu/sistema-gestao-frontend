@@ -136,6 +136,54 @@
     </p-card>
   </section>-->
 
+  <!-- ========== Custos por budget item (com indiretos rateados) ========== -->
+  <h3 class="section-title">Custos por budget item</h3>
+
+  <p-card>
+    <p-table [value]="costBreakdownRows" styleClass="p-datatable-striped p-datatable-sm" [tableStyle]="{ 'min-width': '40rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Descrição</th>
+          <th class="text-right">Materiais</th>
+          <th class="text-right">Mão-de-obra</th>
+          <th class="text-right">Serviços Externos</th>
+          <th class="text-right">Indiretos</th>
+          <th class="text-right">Subtotal</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr [class.font-bold]="row.level === 0">
+          <td [style.padding-left.rem]="0.75 + row.level * 1.5">
+            <span class="mono text-500 mr-2">{{ row.number }}</span>{{ row.description }}
+          </td>
+          <td class="text-right mono">{{ fmtEUR(row.materials) }}</td>
+          <td class="text-right mono">{{ fmtEUR(row.labor) }}</td>
+          <td class="text-right mono">{{ fmtEUR(row.externalServices) }}</td>
+          <td class="text-right mono">{{ fmtEUR(row.indirect) }}</td>
+          <td class="text-right mono font-semibold">{{ fmtEUR(row.subtotal) }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <tr *ngIf="costBreakdownRows.length">
+          <td class="font-semibold">Total</td>
+          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.materials) }}</td>
+          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.labor) }}</td>
+          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.externalServices) }}</td>
+          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.indirect) }}</td>
+          <td class="text-right mono font-semibold">{{ fmtEUR(costBreakdownTotals.subtotal) }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td class="text-center muted" colspan="6">Sem custos lançados.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
   <!-- ========== Custos por item · 3 colunas por fonte ========== -->
   <h3 class="section-title">Custos por item</h3>
 
@@ -216,52 +264,6 @@
       </div>
     </p-card>
   </section>
-
-  <!-- ========== Custos por budget item (com indiretos rateados) ========== -->
-  <h3 class="section-title">Custos por budget item</h3>
-
-  <p-card>
-    <p-table [value]="costBreakdownRows" styleClass="p-datatable-striped p-datatable-sm" [tableStyle]="{ 'min-width': '40rem' }">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Descrição</th>
-          <th class="text-right">Materiais</th>
-          <th class="text-right">Mão de obra</th>
-          <th class="text-right">Serviços</th>
-          <th class="text-right">Indiretos</th>
-          <th class="text-right">Subtotal</th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-row>
-        <tr>
-          <td>{{ row.description }}</td>
-          <td class="text-right mono">{{ fmtEUR(row.materials) }}</td>
-          <td class="text-right mono">{{ fmtEUR(row.labor) }}</td>
-          <td class="text-right mono">{{ fmtEUR(row.externalServices) }}</td>
-          <td class="text-right mono">{{ fmtEUR(row.indirect) }}</td>
-          <td class="text-right mono font-semibold">{{ fmtEUR(row.subtotal) }}</td>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="footer">
-        <tr *ngIf="costBreakdownRows.length">
-          <td class="font-semibold">Total</td>
-          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.materials) }}</td>
-          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.labor) }}</td>
-          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.externalServices) }}</td>
-          <td class="text-right mono">{{ fmtEUR(costBreakdownTotals.indirect) }}</td>
-          <td class="text-right mono font-semibold">{{ fmtEUR(costBreakdownTotals.subtotal) }}</td>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td class="text-center muted" colspan="6">Sem custos lançados.</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </p-card>
 </div>
 
 <p-toast />
