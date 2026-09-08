@@ -42,6 +42,7 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th pSortableColumn="name">Nome<p-sortIcon field="name"></p-sortIcon></th>
+                        <th>Data Inicial</th>
                         <th>Ações</th>
                     </tr>
                 </ng-template>
@@ -49,6 +50,7 @@
                 <ng-template pTemplate="body" let-account>
                     <tr>
                         <td>{{ account.name }}</td>
+                        <td>{{ account.initialDate | date: 'dd/MM/yyyy' }}</td>
                         <td>
                             <p-button
                                 pRipple
@@ -113,9 +115,30 @@
             />
         </div>
 
-        <div class="field flex align-items-center gap-2">
-            <p-checkbox [(ngModel)]="account.cashBox" [binary]="true" inputId="cashBox" />
-            <label for="cashBox" class="mb-0">Caixa?</label>
+        <div class="field">
+            <label for="initialDate" class="block font-bold mb-4">Data Inicial</label>
+            <p-calendar
+                inputId="initialDate"
+                [(ngModel)]="account.initialDate"
+                dateFormat="dd/mm/yy"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                appendTo="body"
+                [disabled]="!!account.accountId"
+            />
+        </div>
+
+        <div class="field">
+            <label for="accountType" class="block font-bold mb-4">Tipo de Conta</label>
+            <p-dropdown
+                inputId="accountType"
+                [options]="accountTypeOptions"
+                [(ngModel)]="account.cashBox"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecione o tipo"
+                appendTo="body"
+            />
         </div>
     </ng-template>
 

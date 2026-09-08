@@ -12,6 +12,8 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
 import { FormsModule } from '@angular/forms';
 import { RippleModule } from 'primeng/ripple';
 
@@ -29,6 +31,8 @@ import { RippleModule } from 'primeng/ripple';
     InputTextModule,
     InputNumberModule,
     CheckboxModule,
+    DropdownModule,
+    CalendarModule,
     FormsModule,
     RippleModule
   ],

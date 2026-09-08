@@ -22,6 +22,11 @@ export class ListAccountsComponent {
   submitted: boolean = false;
   account: Partial<Account> = {};
 
+  accountTypeOptions = [
+    { label: 'Caixa', value: true },
+    { label: 'Banco', value: false }
+  ];
+
   constructor(
     private accountService: AccountService,
     private confirmationService: ConfirmationService,
@@ -42,13 +47,13 @@ export class ListAccountsComponent {
   }
 
   openNew() {
-    this.account = { cashBox: false };
+    this.account = { cashBox: false, initialDate: new Date() };
     this.submitted = false;
     this.accountDialog = true;
   }
 
   editAccount(account: Account) {
-    this.account = { ...account };
+    this.account = { ...account, initialDate: account.initialDate ? new Date(account.initialDate) : undefined };
     this.submitted = false;
     this.accountDialog = true;
   }
@@ -65,6 +70,7 @@ export class ListAccountsComponent {
       const accountCreation = {
         name: this.account.name,
         initialBalance: this.account.initialBalance,
+        initialDate: this.account.initialDate,
         cashBox: this.account.cashBox ?? false
       } as AccountCreation;
 
