@@ -104,7 +104,7 @@ export class EditRevenueComponent implements OnInit {
     this.sales = [];
 
     if (this.isSalesRevenueType && this.isSelectedOriginAClient()) {
-      this.saleService.getSalesPendingForRevenue(this.selectedOrigin).subscribe((sales) => {
+      this.saleService.getSalesPendingForRevenue(this.selectedOrigin, this.revenueId).subscribe((sales) => {
         this.sales = sales;
       });
     }

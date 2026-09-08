@@ -1,3 +1,4 @@
+import { BudgetItemCostBreakdown } from './budgetItemCostBreakdown';
 import { CashflowMonth } from './cashflowMonth';
 import { ConstructionCalendarEvent } from './constructionCalendarEvent';
 import { ItemCost } from './itemCost';
@@ -26,5 +27,6 @@ export interface ConstructionDetails {
     timeProgress: number;
     cashflowData: CashflowMonth[];
     calendarEvents: ConstructionCalendarEvent[];
+    costBreakdownByItem: BudgetItemCostBreakdown[];
     imageUrl?: string;
 }

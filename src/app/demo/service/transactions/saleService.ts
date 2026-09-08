@@ -28,8 +28,11 @@ export class SaleService {
       return this.http.get<Sale>(url);
     }
 
-    getSalesPendingForRevenue(clientId: number) : Observable<SaleForRevenue[]> {
+    getSalesPendingForRevenue(clientId: number, excludeRevenueId?: number) : Observable<SaleForRevenue[]> {
       let url = `${environment.apiUrl}/sales/pendingForRevenue/${clientId}`;
+      if (excludeRevenueId != null) {
+        url += `?excludeRevenueId=${excludeRevenueId}`;
+      }
       return this.http.get<SaleForRevenue[]>(url);
     }
 

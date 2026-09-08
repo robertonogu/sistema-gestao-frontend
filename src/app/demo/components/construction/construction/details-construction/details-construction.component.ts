@@ -598,4 +598,21 @@ export class DetailsConstructionComponent implements OnInit {
   totalActual(key: SourceKey): number {
     return this.itemsSplit.reduce((s, it) => s + it[key].actual, 0);
   }
+
+  get costBreakdownRows() {
+    return this.constructionDetails?.costBreakdownByItem ?? [];
+  }
+
+  get costBreakdownTotals() {
+    return this.costBreakdownRows.reduce(
+      (acc, row) => ({
+        materials: acc.materials + row.materials,
+        labor: acc.labor + row.labor,
+        externalServices: acc.externalServices + row.externalServices,
+        indirect: acc.indirect + row.indirect,
+        subtotal: acc.subtotal + row.subtotal,
+      }),
+      { materials: 0, labor: 0, externalServices: 0, indirect: 0, subtotal: 0 }
+    );
+  }
 }

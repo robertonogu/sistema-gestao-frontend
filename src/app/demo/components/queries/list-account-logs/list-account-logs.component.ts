@@ -38,26 +38,33 @@ export class ListAccountLogsComponent {
 
   nextPage(event: any) {
     if (this.selectedAccount != null) {
-      this.loading = true;
-      
       this.currentPage = event.first / event.rows;
       this.pageSize = event.rows;
-      
-      this.accountLogService.getAccountLogs(this.selectedAccount, this.currentPage, this.pageSize).subscribe((accountLogs) => {
-        this.accountLogs = accountLogs.objectList;
-        this.totalRecords = accountLogs.totalElements;
-        this.loading = false;
-        this.balance = this.accountLogs[0].balance;
-        
-      });
+
+      this.loadAccountLogs();
     }
   }
 
   changeValue(event: any) {
     this.selectedAccount = event.value.objectId;
+    this.currentPage = 0;
+
+    this.loadAccountLogs();
+  }
+
+  private loadAccountLogs() {
+    this.loading = true;
+
     this.accountLogService.getAccountLogs(this.selectedAccount, this.currentPage, this.pageSize).subscribe((accountLogs) => {
       this.accountLogs = accountLogs.objectList;
       this.totalRecords = accountLogs.totalElements;
+
+      // The list comes newest-first, so the first row on page 0 holds the account's current balance.
+      if (this.currentPage === 0) {
+        this.balance = this.accountLogs.length > 0 ? this.accountLogs[0].balance : 0;
+      }
+
+      this.loading = false;
     });
   }
 
