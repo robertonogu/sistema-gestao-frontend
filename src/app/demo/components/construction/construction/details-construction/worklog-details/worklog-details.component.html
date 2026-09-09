@@ -53,9 +53,10 @@
                 <p-columnFilter field="subItem" matchMode="equals" display="menu"
                   [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                    <p-dropdown [ngModel]="value" [options]="subItemOptions" optionLabel="name" optionValue="id"
-                      placeholder="Todos" [showClear]="true" appendTo="body" [style]="{ 'min-width': '16rem' }"
-                      (onChange)="filter($event.value)" />
+                    <p-treeSelect [(ngModel)]="selectedSubItemNode" [options]="subItemTree"
+                      placeholder="Todos" [showClear]="true" appendTo="body" containerStyleClass="w-full" [style]="{ 'min-width': '18rem' }"
+                      (onNodeSelect)="filter($event.node.data)"
+                      (onClear)="selectedSubItemNode = undefined; filter(null)" />
                   </ng-template>
                 </p-columnFilter>
               </div>

@@ -1,6 +1,8 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { TreeNode } from 'primeng/api';
+import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { WorkLogDetail } from 'src/app/demo/data/model/workLogDetail.model';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
@@ -15,7 +17,8 @@ export class WorkLogDetailsComponent implements OnInit {
   itemName = '';
   workLogs: WorkLogDetail[] = [];
   employeeOptions: ItemName[] = [];
-  subItemOptions: ItemName[] = [];
+  subItemTree: TreeNode[] = [];
+  selectedSubItemNode?: TreeNode;
   totalRecords = 0;
   totalHours = 0;
   pageSize = 20;
@@ -40,12 +43,32 @@ export class WorkLogDetailsComponent implements OnInit {
       this.employeeOptions = employees;
     });
 
-    const subItems$ = this.budgetItemId != null
-      ? this.constructionService.getWorkLogSubItems(this.budgetItemId)
-      : this.constructionService.getConstructionWorkLogSubItems(this.constructionId);
-    subItems$.subscribe((subItems) => {
-      this.subItemOptions = subItems;
+    this.constructionService.getBudgetItemsForConstruction(this.constructionId).subscribe((budgetItems) => {
+      let items = budgetItems;
+      if (this.budgetItemId != null) {
+        const node = this.findBudgetItem(budgetItems, this.budgetItemId);
+        items = node ? (node.children?.length ? node.children : [node]) : [];
+      }
+      this.subItemTree = this.mapToTreeNodes(items);
     });
+  }
+
+  private mapToTreeNodes(items: BudgetItem[]): TreeNode[] {
+    return items.map((item) => ({
+      key: item.id.toString(),
+      label: item.name,
+      data: item.id,
+      children: item.children?.length ? this.mapToTreeNodes(item.children) : undefined,
+    }));
+  }
+
+  private findBudgetItem(items: BudgetItem[], id: number): BudgetItem | undefined {
+    for (const item of items) {
+      if (item.id === id) return item;
+      const found = item.children?.length ? this.findBudgetItem(item.children, id) : undefined;
+      if (found) return found;
+    }
+    return undefined;
   }
 
   loadPage(event: any): void {

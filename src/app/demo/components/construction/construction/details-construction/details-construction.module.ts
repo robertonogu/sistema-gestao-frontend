@@ -22,6 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ChartModule } from 'primeng/chart';
 import { CardModule } from "primeng/card";
 import { TagModule } from "primeng/tag";
+import { TreeSelectModule } from 'primeng/treeselect';
 
 @NgModule({
 	imports: [
@@ -43,7 +44,8 @@ import { TagModule } from "primeng/tag";
     ToastModule,
     DetailsConstructionRoutingModule,
     CardModule,
-    TagModule
+    TagModule,
+    TreeSelectModule
 ],
 	declarations: [DetailsConstructionComponent, MaterialDetailsComponent, WorkLogDetailsComponent, ExternalServiceDetailsComponent]
 })
