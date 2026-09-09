@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
+import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -23,6 +24,7 @@ import { TooltipModule } from 'primeng/tooltip';
     InputNumberModule,
     CalendarModule,
     DropdownModule,
+    DialogModule,
     FormsModule,
     ToolbarModule,
     ToastModule,

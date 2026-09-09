@@ -135,9 +135,9 @@
 					<label>Valor Pago</label>
 					<p-inputNumber
 						[(ngModel)]="paymentValue"
-                        mode="currency"
+                        mode="decimal"
                         inputId="currency-germany"
-                        currency="EUR"
+                        [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                         locale="en-US" [useGrouping]="false"
 						[disabled]="disablePaidValue"
 					/>
@@ -228,8 +228,8 @@
 								<div class="item-col-num">
 									<p-inputNumber
 										formControlName="value"
-										mode="currency"
-										currency="EUR"
+										mode="decimal"
+										[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 										locale="en-US" [useGrouping]="false"
 										styleClass="item-col-num"
 										(onInput)="onItemValueChange(j)"
@@ -258,8 +258,8 @@
 								<div class="item-col-num item-col-total">
 									<p-inputNumber
 										formControlName="total"
-										mode="currency"
-										currency="EUR"
+										mode="decimal"
+										[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 										locale="en-US" [useGrouping]="false"
 										styleClass="item-col-num"
 										(onInput)="onItemTotalChange(j)"

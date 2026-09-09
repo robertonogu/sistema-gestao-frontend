@@ -505,10 +505,10 @@ export class DetailsConstructionComponent implements OnInit {
     URL.revokeObjectURL(url);
   }
 
-  readonly sourceCols: { key: SourceKey; title: string; icon: string; color: string; soft: string }[] = [
-    { key: 'materials',        title: 'Materiais',         icon: 'pi pi-box',    color: 'oklch(0.62 0.13 250)', soft: 'oklch(0.92 0.03 250)' },
-    { key: 'workLog',          title: 'Mão-de-obra',       icon: 'pi pi-users',  color: 'oklch(0.55 0.13 155)', soft: 'oklch(0.92 0.04 155)' },
-    { key: 'externalServices', title: 'Serviços externos', icon: 'pi pi-wrench', color: 'oklch(0.55 0.15 75)',  soft: 'oklch(0.94 0.04 75)'  },
+  readonly sourceCols: { key: SourceKey; route: string; title: string; icon: string; color: string; soft: string }[] = [
+    { key: 'materials',        route: 'materials',        title: 'Materiais',         icon: 'pi pi-box',    color: 'oklch(0.62 0.13 250)', soft: 'oklch(0.92 0.03 250)' },
+    { key: 'workLog',          route: 'workLogs',         title: 'Mão-de-obra',       icon: 'pi pi-users',  color: 'oklch(0.55 0.13 155)', soft: 'oklch(0.92 0.04 155)' },
+    { key: 'externalServices', route: 'externalServices', title: 'Serviços externos', icon: 'pi pi-wrench', color: 'oklch(0.55 0.15 75)',  soft: 'oklch(0.94 0.04 75)'  },
   ];
 
   // ===== Computados =====

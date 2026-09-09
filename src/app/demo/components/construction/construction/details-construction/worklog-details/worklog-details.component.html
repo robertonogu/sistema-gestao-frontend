@@ -10,7 +10,11 @@
           pButton
           type="button"
         ></button>
-        <div class="text-900 text-xl font-semibold">{{ itemName }}</div>
+        <div class="text-900 text-xl font-semibold">{{ title }}</div>
+        <div class="ml-auto text-right">
+          <div class="text-500 text-sm">Total de horas</div>
+          <div class="text-900 text-xl font-bold">{{ totalHours | number: '1.0-2' }} h</div>
+        </div>
       </div>
 
       <p-table
@@ -43,7 +47,19 @@
               </div>
             </th>
             <th>Horas</th>
-            <th>Sub-item</th>
+            <th>
+              <div class="flex align-items-center">
+                Sub-item
+                <p-columnFilter field="subItem" matchMode="equals" display="menu"
+                  [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                  <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                    <p-dropdown [ngModel]="value" [options]="subItemOptions" optionLabel="name" optionValue="id"
+                      placeholder="Todos" [showClear]="true" appendTo="body" [style]="{ 'min-width': '16rem' }"
+                      (onChange)="filter($event.value)" />
+                  </ng-template>
+                </p-columnFilter>
+              </div>
+            </th>
           </tr>
         </ng-template>
 

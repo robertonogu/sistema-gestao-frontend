@@ -166,8 +166,8 @@
             <p-inputNumber
                 id="baseSalary"
                 [(ngModel)]="employee.baseSalary"
-                mode="currency"
-                currency="EUR"
+                mode="decimal"
+                [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                 locale="en-US"
                 [useGrouping]="false"
             />
@@ -178,8 +178,8 @@
             <p-inputNumber
                 id="allowance"
                 [(ngModel)]="employee.allowance"
-                mode="currency"
-                currency="EUR"
+                mode="decimal"
+                [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                 locale="en-US"
                 [useGrouping]="false"
             />
@@ -190,8 +190,8 @@
             <p-inputNumber
                 id="foodAllowance"
                 [(ngModel)]="employee.foodAllowance"
-                mode="currency"
-                currency="EUR"
+                mode="decimal"
+                [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                 locale="en-US"
                 [useGrouping]="false"
             />
@@ -202,8 +202,8 @@
             <p-inputNumber
                 id="healthInsurance"
                 [(ngModel)]="employee.healthInsurance"
-                mode="currency"
-                currency="EUR"
+                mode="decimal"
+                [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                 locale="en-US"
                 [useGrouping]="false"
             />

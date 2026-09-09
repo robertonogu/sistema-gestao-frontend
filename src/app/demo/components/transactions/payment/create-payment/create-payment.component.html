@@ -150,9 +150,9 @@
 									[(ngModel)]="expenseValues[i]" 
 									(onBlur)="changeValue()"
 									placeholder="Insira valor a pagar"
-									mode="currency"
+									mode="decimal"
 									inputId="currency-germany"
-									currency="EUR" 
+									[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €" 
 									locale="en-US" [useGrouping]="false" 
 								/>
 							</td>

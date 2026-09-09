@@ -83,10 +83,10 @@
 					<label>Valor s/ IVA</label>
 					<p-inputNumber
 						autocomplete="off"
-						currency="EUR"
+						[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 						inputId="currency-germany"
                         locale="en-US" [useGrouping]="false"
-						mode="currency"
+						mode="decimal"
 						[(ngModel)]="netValue"
 					/>
 				</div>

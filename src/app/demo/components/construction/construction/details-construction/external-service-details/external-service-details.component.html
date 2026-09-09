@@ -14,7 +14,7 @@
       </div>
 
       <p-table
-        [value]="materials"
+        [value]="services"
         [lazy]="true"
         [loading]="loading"
         (onLazyLoad)="loadPage($event)"
@@ -28,24 +28,24 @@
       >
         <ng-template pTemplate="header">
           <tr>
-            <th>Material</th>
+            <th>Serviço</th>
             <th>Quantidade Alocada</th>
             <th>Valor Unitário</th>
             <th>Preço Total</th>
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-material>
+        <ng-template pTemplate="body" let-service>
           <tr>
-            <td>{{ material.name }}</td>
-            <td>{{ material.quantity }}</td>
-            <td>{{ fmtEUR(material.unitValue) }}</td>
-            <td>{{ fmtEUR(material.totalValue) }}</td>
+            <td>{{ service.name }}</td>
+            <td>{{ service.quantity }}</td>
+            <td>{{ fmtEUR(service.unitValue) }}</td>
+            <td>{{ fmtEUR(service.totalValue) }}</td>
           </tr>
         </ng-template>
 
         <ng-template pTemplate="emptymessage">
-          <tr><td colspan="4">Sem materiais alocados.</td></tr>
+          <tr><td colspan="4">Sem serviços externos alocados.</td></tr>
         </ng-template>
       </p-table>
 

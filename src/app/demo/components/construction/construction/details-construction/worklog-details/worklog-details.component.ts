@@ -10,11 +10,14 @@ import { ConstructionService } from 'src/app/demo/service/construction/construct
 })
 export class WorkLogDetailsComponent implements OnInit {
 
-  budgetItemId = -1;
+  budgetItemId?: number;
+  constructionId = -1;
   itemName = '';
   workLogs: WorkLogDetail[] = [];
   employeeOptions: ItemName[] = [];
+  subItemOptions: ItemName[] = [];
   totalRecords = 0;
+  totalHours = 0;
   pageSize = 20;
   loading = true;
 
@@ -25,11 +28,23 @@ export class WorkLogDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.budgetItemId = Number(this.route.snapshot.paramMap.get('budgetItemId'));
+    const bid = this.route.snapshot.paramMap.get('budgetItemId');
+    this.budgetItemId = bid != null ? Number(bid) : undefined;
     this.itemName = this.route.snapshot.queryParamMap.get('name') ?? '';
+    this.constructionId = this.resolveConstructionId();
 
-    this.constructionService.getWorkLogEmployees(this.budgetItemId).subscribe((employees) => {
+    const employees$ = this.budgetItemId != null
+      ? this.constructionService.getWorkLogEmployees(this.budgetItemId)
+      : this.constructionService.getConstructionWorkLogEmployees(this.constructionId);
+    employees$.subscribe((employees) => {
       this.employeeOptions = employees;
+    });
+
+    const subItems$ = this.budgetItemId != null
+      ? this.constructionService.getWorkLogSubItems(this.budgetItemId)
+      : this.constructionService.getConstructionWorkLogSubItems(this.constructionId);
+    subItems$.subscribe((subItems) => {
+      this.subItemOptions = subItems;
     });
   }
 
@@ -39,17 +54,40 @@ export class WorkLogDetailsComponent implements OnInit {
     const pageNo = event.first / event.rows;
     this.pageSize = event.rows;
 
-    const meta = Array.isArray(event.filters?.['employee']) ? event.filters['employee'][0] : event.filters?.['employee'];
-    const employeeId = meta?.value ?? undefined;
+    const filterValue = (field: string) => {
+      const meta = Array.isArray(event.filters?.[field]) ? event.filters[field][0] : event.filters?.[field];
+      return meta?.value ?? undefined;
+    };
+    const employeeId = filterValue('employee');
+    const subItemId = filterValue('subItem');
 
-    this.constructionService.getWorkLogDetails(this.budgetItemId, pageNo, this.pageSize, employeeId).subscribe((res) => {
+    const req = this.budgetItemId != null
+      ? this.constructionService.getWorkLogDetails(this.budgetItemId, pageNo, this.pageSize, employeeId, subItemId)
+      : this.constructionService.getConstructionWorkLogDetails(this.constructionId, pageNo, this.pageSize, employeeId, subItemId);
+
+    req.subscribe((res) => {
       this.workLogs = res.objectList;
       this.totalRecords = res.totalElements;
+      this.totalHours = res.totalHours;
       this.loading = false;
     });
   }
 
+  private resolveConstructionId(): number {
+    let r: ActivatedRoute | null = this.route;
+    while (r) {
+      const id = r.snapshot.paramMap.get('constructionId');
+      if (id) return Number(id);
+      r = r.parent;
+    }
+    return -1;
+  }
+
   back(): void {
     this.location.back();
+  }
+
+  get title(): string {
+    return this.budgetItemId != null ? this.itemName : 'Mão-de-obra';
   }
 }

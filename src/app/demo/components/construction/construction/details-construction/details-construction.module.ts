@@ -15,6 +15,7 @@ import { RatingModule } from 'primeng/rating';
 import { DetailsConstructionComponent } from './details-construction.component';
 import { MaterialDetailsComponent } from './material-details/material-details.component';
 import { WorkLogDetailsComponent } from './worklog-details/worklog-details.component';
+import { ExternalServiceDetailsComponent } from './external-service-details/external-service-details.component';
 import { DetailsConstructionRoutingModule } from './details-construction-routing.module';
 import { TimelineModule } from 'primeng/timeline';
 import { TooltipModule } from 'primeng/tooltip';
@@ -44,6 +45,6 @@ import { TagModule } from "primeng/tag";
     CardModule,
     TagModule
 ],
-	declarations: [DetailsConstructionComponent, MaterialDetailsComponent, WorkLogDetailsComponent]
+	declarations: [DetailsConstructionComponent, MaterialDetailsComponent, WorkLogDetailsComponent, ExternalServiceDetailsComponent]
 })
 export class DetailsConstructionModule { }

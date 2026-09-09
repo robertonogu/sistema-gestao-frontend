@@ -9,7 +9,7 @@ import { Construction as ConstructionInput } from '../../data/model/construction
 import { Construction } from '../../api/construction';
 import { ConstructionDetails } from '../../api/constructionDetails';
 import { BudgetItem } from '../../api/budgetItem';
-import { MaterialAllocationDetail } from '../../data/model/materialAllocationDetail.model';
+import { WorkLogDetailsResponse } from '../../data/model/workLogDetail.model';
 import { MaterialExport } from '../../api/materialExport';
 
 @Injectable({
@@ -98,20 +98,54 @@ export class ConstructionService {
         return this.http.patch<Construction>(url, null, { params });
     }
 
-    getMaterialDetails(budgetItemId: number) : Observable<MaterialAllocationDetail[]> {
-        let url = this.budgetItemsUrl + budgetItemId + "/materialDetails";
-        return this.http.get<MaterialAllocationDetail[]>(url);
+    // ===== Detalhes por budget item =====
+
+    getMaterialDetails(budgetItemId: number, pageNo: number, pageSize: number) : Observable<ObjectList> {
+        return this.http.get<ObjectList>(`${this.budgetItemsUrl}${budgetItemId}/materialDetails?pageNo=${pageNo}&pageSize=${pageSize}`);
     }
 
-    getWorkLogDetails(budgetItemId: number, pageNo: number, pageSize: number, employeeId?: number) : Observable<ObjectList> {
-        let url = this.budgetItemsUrl + budgetItemId + "/workLogDetails?pageNo=" + pageNo + "&pageSize=" + pageSize;
+    getExternalServiceDetails(budgetItemId: number, pageNo: number, pageSize: number) : Observable<ObjectList> {
+        return this.http.get<ObjectList>(`${this.budgetItemsUrl}${budgetItemId}/externalServiceDetails?pageNo=${pageNo}&pageSize=${pageSize}`);
+    }
+
+    getWorkLogDetails(budgetItemId: number, pageNo: number, pageSize: number, employeeId?: number, subItemId?: number) : Observable<WorkLogDetailsResponse> {
+        let url = `${this.budgetItemsUrl}${budgetItemId}/workLogDetails?pageNo=${pageNo}&pageSize=${pageSize}`;
         if (employeeId != null) url += "&employeeId=" + employeeId;
-        return this.http.get<ObjectList>(url);
+        if (subItemId != null) url += "&subItemId=" + subItemId;
+        return this.http.get<WorkLogDetailsResponse>(url);
     }
 
     getWorkLogEmployees(budgetItemId: number) : Observable<ItemName[]> {
-        let url = this.budgetItemsUrl + budgetItemId + "/workLogEmployees";
-        return this.http.get<ItemName[]>(url);
+        return this.http.get<ItemName[]>(`${this.budgetItemsUrl}${budgetItemId}/workLogEmployees`);
+    }
+
+    getWorkLogSubItems(budgetItemId: number) : Observable<ItemName[]> {
+        return this.http.get<ItemName[]>(`${this.budgetItemsUrl}${budgetItemId}/workLogSubItems`);
+    }
+
+    // ===== Detalhes ao nível da obra =====
+
+    getConstructionMaterialDetails(constructionId: number, pageNo: number, pageSize: number) : Observable<ObjectList> {
+        return this.http.get<ObjectList>(`${this.constructionsUrl}/${constructionId}/materialDetails?pageNo=${pageNo}&pageSize=${pageSize}`);
+    }
+
+    getConstructionExternalServiceDetails(constructionId: number, pageNo: number, pageSize: number) : Observable<ObjectList> {
+        return this.http.get<ObjectList>(`${this.constructionsUrl}/${constructionId}/externalServiceDetails?pageNo=${pageNo}&pageSize=${pageSize}`);
+    }
+
+    getConstructionWorkLogDetails(constructionId: number, pageNo: number, pageSize: number, employeeId?: number, budgetItemId?: number) : Observable<WorkLogDetailsResponse> {
+        let url = `${this.constructionsUrl}/${constructionId}/workLogDetails?pageNo=${pageNo}&pageSize=${pageSize}`;
+        if (employeeId != null) url += "&employeeId=" + employeeId;
+        if (budgetItemId != null) url += "&budgetItemId=" + budgetItemId;
+        return this.http.get<WorkLogDetailsResponse>(url);
+    }
+
+    getConstructionWorkLogEmployees(constructionId: number) : Observable<ItemName[]> {
+        return this.http.get<ItemName[]>(`${this.constructionsUrl}/${constructionId}/workLogEmployees`);
+    }
+
+    getConstructionWorkLogSubItems(constructionId: number) : Observable<ItemName[]> {
+        return this.http.get<ItemName[]>(`${this.constructionsUrl}/${constructionId}/workLogSubItems`);
     }
 
 }

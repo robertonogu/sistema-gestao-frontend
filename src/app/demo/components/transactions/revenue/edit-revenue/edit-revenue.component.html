@@ -137,9 +137,9 @@
 					<label>Valor Total</label>
 					<p-inputNumber
 						[(ngModel)]="totalValue"
-                        mode="currency"
+                        mode="decimal"
                         inputId="currency-germany"
-                        currency="EUR"
+                        [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                         locale="en-US" [useGrouping]="false"
 						[ngClass]="{ 'ng-dirty ng-invalid': !totalValue }"
 					/>

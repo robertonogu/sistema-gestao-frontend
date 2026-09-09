@@ -92,9 +92,9 @@
                     <label>Valor de Compra</label>
                     <p-inputNumber
                         [(ngModel)]="purchaseValue"
-                        mode="currency"
+                        mode="decimal"
                         inputId="currency-germany"
-                        currency="EUR"
+                        [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                         locale="en-US"
                         [useGrouping]="false"
                     />

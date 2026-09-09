@@ -4,3 +4,9 @@ export interface WorkLogDetail {
     hours: number;
     subItemName: string | null;
 }
+
+export interface WorkLogDetailsResponse {
+    objectList: WorkLogDetail[];
+    totalElements: number;
+    totalHours: number;
+}

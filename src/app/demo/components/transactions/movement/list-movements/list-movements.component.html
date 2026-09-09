@@ -107,8 +107,8 @@
             <label class="block font-bold mb-4">Valor</label>
             <p-inputNumber
                 [(ngModel)]="movement.value"
-                mode="currency"
-                currency="EUR"
+                mode="decimal"
+                [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                 locale="en-US"
                 [useGrouping]="false"
                 autocomplete="off"

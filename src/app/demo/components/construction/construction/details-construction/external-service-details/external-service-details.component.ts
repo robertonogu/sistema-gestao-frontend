@@ -5,14 +5,14 @@ import { MaterialAllocationDetail } from 'src/app/demo/data/model/materialAlloca
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 
 @Component({
-  templateUrl: './material-details.component.html'
+  templateUrl: './external-service-details.component.html'
 })
-export class MaterialDetailsComponent implements OnInit {
+export class ExternalServiceDetailsComponent implements OnInit {
 
   budgetItemId?: number;
   constructionId = -1;
   itemName = '';
-  materials: MaterialAllocationDetail[] = [];
+  services: MaterialAllocationDetail[] = [];
   totalRecords = 0;
   pageSize = 20;
   loading = true;
@@ -37,11 +37,11 @@ export class MaterialDetailsComponent implements OnInit {
     this.pageSize = event.rows;
 
     const req = this.budgetItemId != null
-      ? this.constructionService.getMaterialDetails(this.budgetItemId, pageNo, this.pageSize)
-      : this.constructionService.getConstructionMaterialDetails(this.constructionId, pageNo, this.pageSize);
+      ? this.constructionService.getExternalServiceDetails(this.budgetItemId, pageNo, this.pageSize)
+      : this.constructionService.getConstructionExternalServiceDetails(this.constructionId, pageNo, this.pageSize);
 
     req.subscribe((res) => {
-      this.materials = res.objectList;
+      this.services = res.objectList;
       this.totalRecords = res.totalElements;
       this.loading = false;
     });
@@ -62,7 +62,7 @@ export class MaterialDetailsComponent implements OnInit {
   }
 
   get title(): string {
-    return this.budgetItemId != null ? this.itemName : 'Materiais';
+    return this.budgetItemId != null ? this.itemName : 'Serviços Externos';
   }
 
   fmtEUR(n: number): string {

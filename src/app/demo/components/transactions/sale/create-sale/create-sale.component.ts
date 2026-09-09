@@ -4,6 +4,7 @@ import { MessageService } from 'primeng/api';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { SaleCreation } from 'src/app/demo/api/saleCreation';
+import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
 import { ClientService } from 'src/app/demo/service/company/clientService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 import { SaleService } from 'src/app/demo/service/transactions/saleService';
@@ -27,6 +28,11 @@ export class CreateSaleComponent {
 
   sale: SaleCreation | undefined;
 
+  quickAddClientDialogVisible: boolean = false;
+  quickAddClientSubmitted: boolean = false;
+  quickAddClientName: string | null = null;
+  quickAddClientNif: number | null = null;
+
   constructor(
     private clientService: ClientService,
     private constructionService: ConstructionService,
@@ -45,6 +51,39 @@ export class CreateSaleComponent {
 
   back() {
     this._location.back();
+  }
+
+  get totalValue(): number {
+    return (this.netValue || 0) + (this.netValue || 0) * (this.iva || 0) / 100;
+  }
+
+  openQuickAddClient(): void {
+    this.quickAddClientSubmitted = false;
+    this.quickAddClientName = null;
+    this.quickAddClientNif = null;
+    this.quickAddClientDialogVisible = true;
+  }
+
+  closeQuickAddClient(): void {
+    this.quickAddClientDialogVisible = false;
+  }
+
+  saveQuickAddClient(): void {
+    this.quickAddClientSubmitted = true;
+    if (!this.quickAddClientName?.trim()) return;
+
+    const name = this.quickAddClientName;
+    const nif = this.quickAddClientNif as number;
+
+    this.clientService.createClient({ name, nif } as ClientCreation).subscribe(client => {
+      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Cliente criado com sucesso.' });
+      this.quickAddClientDialogVisible = false;
+      this.clientService.getClientNames().subscribe(clientNames => {
+        this.clientNames = clientNames;
+        this.selectedClient = client.originId;
+        this.getConstructions();
+      });
+    });
   }
 
   getConstructions() {
