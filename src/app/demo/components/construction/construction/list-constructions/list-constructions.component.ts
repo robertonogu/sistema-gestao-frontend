@@ -14,6 +14,10 @@ import { ConstructionService } from 'src/app/demo/service/construction/construct
       object-fit: cover;
       display: block;
     }
+    :host ::ng-deep p-card > .p-card {
+      border-radius: 12px;
+      overflow: hidden;
+    }
   `]
 })
 

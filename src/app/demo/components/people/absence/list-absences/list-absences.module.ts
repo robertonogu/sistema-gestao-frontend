@@ -11,6 +11,8 @@ import { ToastModule } from 'primeng/toast';
 import { SliderModule } from 'primeng/slider';
 import { RatingModule } from 'primeng/rating';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { CalendarModule } from 'primeng/calendar';
 import { ListAbsencesComponent } from './list-absences.component';
 import { ListAbsencesRoutingModule } from './list-absences-routing.module';
 import { TagModule } from 'primeng/tag';
@@ -32,6 +34,8 @@ import { TooltipModule } from 'primeng/tooltip';
 		TagModule,
 		TooltipModule,
 		ConfirmDialogModule,
+		DialogModule,
+		CalendarModule,
 		ListAbsencesRoutingModule
 	],
 	declarations: [ListAbsencesComponent]

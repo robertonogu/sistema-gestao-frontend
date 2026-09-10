@@ -4,6 +4,7 @@ import { ItemName } from 'src/app/demo/api/itemName';
 import { MonthlySummary } from 'src/app/demo/api/monthlySummary';
 import { TimeMap } from 'src/app/demo/api/timemap';
 import { HolidayService, NationalHoliday } from 'src/app/demo/service/company/holidayService';
+import { AbsenceService } from 'src/app/demo/service/people/absence.service';
 import { EmployeeService } from 'src/app/demo/service/people/employee.service';
 import { WorkLogService } from 'src/app/demo/service/people/workLogService';
 
@@ -33,7 +34,7 @@ export class TimeMapComponent implements OnInit {
   months: string[]
   daysPerMonth: number[];
 
-  days: number[] = Array.from({ length: 31 }, (_, i) => i);
+  days: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
   timeMaps: (TimeMap | null)[][] = Array(12).fill(null).map(() => Array(31).fill(null));
   monthlySummaries: MonthlySummary[] = [];
 
@@ -41,6 +42,7 @@ export class TimeMapComponent implements OnInit {
   years: number[] = [];
 
   holidays: NationalHoliday[] = [];
+  vacationDays = new Set<string>();
 
   employeeNames: ItemName[] = [];
   selectedEmployee: number | null = null;
@@ -55,7 +57,8 @@ export class TimeMapComponent implements OnInit {
   constructor(
     private workLogService: WorkLogService,
     private holidayService: HolidayService,
-    private employeeService: EmployeeService
+    private employeeService: EmployeeService,
+    private absenceService: AbsenceService
   ) {
     this.months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     this.daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -85,7 +88,24 @@ export class TimeMapComponent implements OnInit {
 
   onYearChange(): void {
     this.loadHolidays();
+    this.loadVacationDays();
     this.loadTimeMap();
+  }
+
+  loadVacationDays(): void {
+    if (this.selectedEmployee == null) {
+      this.vacationDays = new Set<string>();
+      return;
+    }
+    this.absenceService.getVacationDays(this.selectedEmployee, this.year).subscribe((days) => {
+      this.vacationDays = new Set(days);
+    });
+  }
+
+  isVacation(day: number, month: string): boolean {
+    const m = (this.months.indexOf(month) + 1).toString().padStart(2, '0');
+    const d = day.toString().padStart(2, '0');
+    return this.vacationDays.has(`${this.year}-${m}-${d}`);
   }
 
   onScopeTabChange(item: MenuItem): void {
@@ -95,6 +115,8 @@ export class TimeMapComponent implements OnInit {
   }
 
   loadTimeMap(): void {
+    this.loadVacationDays();
+
     if (this.selectedEmployee == null) {
       this.timeMaps = Array(12).fill(null).map(() => Array(31).fill(null));
       this.monthlySummaries = [];

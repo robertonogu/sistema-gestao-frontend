@@ -184,13 +184,14 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   --success: oklch(0.55 0.13 155);
   --radius: 10px;
   --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
-  display: block;
-  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
   color: var(--text);
   font-size: 14px;
 }
 
-.dash { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
 .muted { color: var(--text-3); }
 .mono  { font-family: var(--font-mono); }
 

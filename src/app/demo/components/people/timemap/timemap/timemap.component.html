@@ -74,18 +74,22 @@
           <tr>
             <td class="font-bold text-center">{{ day }}</td>
             <ng-container *ngFor="let month of months; let k = index">
-              <ng-container *ngIf="isHoliday(day, month); else normalDay">
-                <td colspan="3" class="bg-green-400 text-white text-center font-bold">{{ getHolidayName(day, month) }}
-                </td>
+              <ng-container *ngIf="day > daysPerMonth[k]">
+                <td colspan="3" class="bg-gray-100"></td>
               </ng-container>
-              <ng-template #normalDay>
-                <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day]?.workedHours }}
-                </td>
-                <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day]?.extraHours }}
-                </td>
-                <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day]?.absenceHours }}
-                </td>
-              </ng-template>
+              <ng-container *ngIf="day <= daysPerMonth[k]">
+                <ng-container *ngIf="isHoliday(day, month)">
+                  <td colspan="3" class="bg-green-400 text-white text-center font-bold">{{ getHolidayName(day, month) }}</td>
+                </ng-container>
+                <ng-container *ngIf="!isHoliday(day, month) && isVacation(day, month)">
+                  <td colspan="3" class="bg-blue-300 text-blue-900 text-center font-bold">Férias</td>
+                </ng-container>
+                <ng-container *ngIf="!isHoliday(day, month) && !isVacation(day, month)">
+                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day - 1]?.workedHours }}</td>
+                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day - 1]?.extraHours }}</td>
+                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day - 1]?.absenceHours }}</td>
+                </ng-container>
+              </ng-container>
             </ng-container>
           </tr>
         </ng-template>

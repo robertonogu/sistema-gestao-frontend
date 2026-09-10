@@ -54,6 +54,7 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Data</th>
+                        <th>Categoria</th>
                         <th>Estado</th>
                         <th>Documento</th>
                         <th>Origem</th>
@@ -67,6 +68,15 @@
                 <ng-template pTemplate="body" let-expense>
                     <tr [pSelectableRow]="expense">
                         <td>{{ expense.date | date: 'dd/MM/yyyy' }}</td>
+                        <td>
+                            <span *ngFor="let c of expense.categories"
+                                  class="category-dot"
+                                  [style.background]="categoryColor(c)"
+                                  [pTooltip]="categoryLabel(c)"
+                                  tooltipPosition="top">
+                                {{ categoryInitial(c) }}
+                            </span>
+                        </td>
                         <td><span [class]="'expense-badge status-' + expense.paymentStatus.toLowerCase()">{{ PaymentStatus[expense.paymentStatus] }}</span></td>
                         <td>{{ expense.documentNumber }}</td>
                         <td>{{ expense.origin.name }}</td>

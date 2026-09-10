@@ -29,4 +29,8 @@ export class AbsenceService {
         let url = this.deleteAbsenceUrl + absenceId;
         return this.http.delete(url);
     }
+
+    getVacationDays(employeeId: number, year: number) : Observable<string[]> {
+        return this.http.get<string[]>(`${this.absencesUrl}/employee/${employeeId}/vacationDays/${year}`);
+    }
 }

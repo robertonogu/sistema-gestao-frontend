@@ -9,6 +9,21 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 @Component({
   templateUrl: 'list-expenses.component.html',
+  styles: [`
+    .category-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .category-dot + .category-dot { margin-left: 4px; }
+  `]
 })
 
 export class ListExpensesComponent {
@@ -22,6 +37,31 @@ export class ListExpensesComponent {
 
   currentPage: number = 0;
   pageSize: number = 20;
+
+  readonly categoryMeta: Record<string, { label: string; color: string }> = {
+    BANK:          { label: 'Banco',        color: '#3b82f6' },
+    TAXES:         { label: 'Impostos',     color: '#ef4444' },
+    PEOPLE:        { label: 'Pessoal',      color: '#22c55e' },
+    OPERATION:     { label: 'Operação',     color: '#8b5cf6' },
+    COMMERCIAL:    { label: 'Comercial',    color: '#ec4899' },
+    VEHICLES:      { label: 'Veículos',     color: '#f59e0b' },
+    EQUIPMENTS:    { label: 'Equipamentos', color: '#14b8a6' },
+    TOOLS:         { label: 'Ferramentas',  color: '#a16207' },
+    INVENTORY:     { label: 'Inventário',   color: '#0ea5e9' },
+    CONSTRUCTIONS: { label: 'Obras',        color: '#64748b' },
+  };
+
+  categoryLabel(code: string): string {
+    return this.categoryMeta[code]?.label ?? code;
+  }
+
+  categoryColor(code: string): string {
+    return this.categoryMeta[code]?.color ?? '#9ca3af';
+  }
+
+  categoryInitial(code: string): string {
+    return this.categoryLabel(code).charAt(0).toUpperCase();
+  }
 
   constructor(private expenseService: ExpenseService, private router: Router) {}
 

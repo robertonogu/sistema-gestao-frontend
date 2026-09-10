@@ -83,6 +83,78 @@
 	</div>
 </div>
 
+<p-dialog
+    header="Registo de Ausência"
+    [(visible)]="absenceDialog"
+    [style]="{ width: '550px' }"
+    [modal]="true"
+    class="p-fluid"
+    (onHide)="hideDialog()"
+>
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="absenceEmployee" class="block font-bold mb-4">Funcionário</label>
+            <p-dropdown
+                inputId="absenceEmployee"
+                [(ngModel)]="selectedEmployee"
+                [options]="employeeNames"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Selecione um Funcionário"
+                appendTo="body"
+                [ngClass]="{ 'ng-dirty ng-invalid': submitted && !selectedEmployee }"
+            />
+        </div>
+
+        <div class="field">
+            <label for="absenceType" class="block font-bold mb-4">Tipo</label>
+            <p-dropdown
+                inputId="absenceType"
+                [(ngModel)]="selectedAbsenceType"
+                [options]="absenceTypes | keyvalue"
+                optionLabel="value"
+                optionValue="key"
+                placeholder="Selecione um Tipo"
+                appendTo="body"
+                [ngClass]="{ 'ng-dirty ng-invalid': submitted && !selectedAbsenceType }"
+            />
+        </div>
+
+        <div class="field">
+            <label for="absencePeriod" class="block font-bold mb-4">Período</label>
+            <p-calendar
+                inputId="absencePeriod"
+                [(ngModel)]="dateRange"
+                (onSelect)="onDateChange()"
+                dateFormat="dd/mm/yy"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                selectionMode="range"
+                [readonlyInput]="true"
+                appendTo="body"
+                [ngClass]="{ 'ng-dirty ng-invalid': submitted && !dateRange[0] }"
+            />
+        </div>
+
+        <div class="field">
+            <label for="absenceHours" class="block font-bold mb-4">Horas</label>
+            <input
+                id="absenceHours"
+                pInputText
+                type="number"
+                [(ngModel)]="hours"
+                [disabled]="!isSingleDay"
+            />
+            <small class="text-500" *ngIf="!isSingleDay">Só disponível quando o período é de um único dia.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveAbsence()"></button>
+    </ng-template>
+</p-dialog>
+
 <p-confirmDialog #cd>
     <ng-template pTemplate="headless" let-message>
         <div class="flex flex-column align-items-center p-5 surface-overlay border-round">

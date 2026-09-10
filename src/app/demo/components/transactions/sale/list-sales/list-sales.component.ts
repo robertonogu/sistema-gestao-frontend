@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Sale } from 'src/app/demo/api/sale';
@@ -8,7 +8,7 @@ import { SaleService } from 'src/app/demo/service/transactions/saleService';
   templateUrl: './list-sales.component.html',
   providers: [ConfirmationService, MessageService]
 })
-export class ListSalesComponent {
+export class ListSalesComponent implements OnInit {
 
   loading: boolean = true;
   totalRecords: number = 0;
@@ -17,24 +17,40 @@ export class ListSalesComponent {
   currentPage: number = 0;
   pageSize: number = 20;
 
+  years: number[] = [];
+  selectedYear: number | null = null;
+  totalValue: number = 0;
+
   constructor(
     private confirmationService: ConfirmationService,
-    private messageService: MessageService, 
+    private messageService: MessageService,
     private router: Router,
     private saleService: SaleService
   ) {}
 
+  ngOnInit(): void {
+    this.saleService.getSaleYears().subscribe((years) => {
+      this.years = years;
+    });
+  }
+
   nextPage(event: any) {
     this.loading = true;
-    
+
     this.currentPage = event.first / event.rows;
     this.pageSize = event.rows;
-    
-    this.saleService.getSales(this.currentPage, this.pageSize).subscribe((sales) => {
+
+    this.saleService.getSales(this.currentPage, this.pageSize, this.selectedYear ?? undefined).subscribe((sales) => {
       this.sales = sales.objectList;
       this.totalRecords = sales.totalElements;
+      this.totalValue = sales.totalValue;
       this.loading = false;
     });
+  }
+
+  onYearChange() {
+    this.currentPage = 0;
+    this.nextPage({ first: 0, rows: this.pageSize });
   }
 
   newSale() {

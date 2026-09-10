@@ -12,4 +12,5 @@ export interface Expense {
     paymentDeadline: number;
     paymentStatus: PaymentStatus;
     itemList: Item[];
+    categories: string[];
 }
