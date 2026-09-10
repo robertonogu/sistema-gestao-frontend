@@ -13,22 +13,18 @@
 					<span class="font-semibold mr-6">Data</span>
 					<span>{{ expense.date | date:'dd/MM/yyyy' }}</span>
 				</div>
-				<div class="flex justify-content-between align-items-center mb-2">
+				<div class="flex justify-content-between align-items-center">
 					<span class="font-semibold mr-6">Número de Fatura #</span>
 					<span>{{ expense.documentNumber }}</span>
-				</div>
-				<div class="flex justify-content-between align-items-center">
-					<span class="font-semibold mr-6">CUSTOMER ID</span>
-					<span>C1613</span>
 				</div>
 			</div>
 		</div>	
 	</div>
 
 	<div class="mt-5 mb-8 flex flex-column">
-		<div class="mb-3 text-2xl font-medium">BILL TO</div>
-		<span class="mb-2">Claire Williams, 148 Hope Lane</span>
-		<span>Palo Alto, CA 94304.</span>
+		<div class="mb-3 text-2xl font-medium">Fatura de</div>
+		<span class="mb-2">{{ expense.origin?.name }}</span>
+		<span *ngIf="expense.origin?.address">{{ expense.origin?.address }}</span>
 	</div>
 
 	<div class="overflow-x-auto">
@@ -36,6 +32,7 @@
 			<thead>
 				<tr>
 					<th class="text-left font-semibold py-3 border-bottom-1 surface-border white-space-nowrap">Nome</th>
+					<th class="text-left font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Categoria</th>
 					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Quantidade</th>
 					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">Preço Unitário</th>
 					<th class="text-right font-semibold py-3 border-bottom-1 surface-border white-space-nowrap px-3">IVA</th>
@@ -45,6 +42,10 @@
 			<tbody>
 				<tr *ngFor="let item of expense.itemList">
 					<td class="text-left py-3 border-bottom-1 surface-border white-space-nowrap">{{ item.name }}</td>
+					<td class="text-left py-3 border-bottom-1 surface-border white-space-nowrap px-3">
+						{{ categoryLabel(item.category) }}
+						<div class="text-500 text-sm mt-1">{{ subCategoryLabel(item.subCategoryType) }}</div>
+					</td>
 					<td class="text-right py-3 border-bottom-1 surface-border px-3">{{ item.quantity }} {{ item.unit }}</td>
 					<td class="text-right py-3 border-bottom-1 surface-border px-3">{{ fmt(item.unitValue) }}</td>
 					<td class="text-right py-3 border-bottom-1 surface-border px-3">{{ item.iva }}%</td>

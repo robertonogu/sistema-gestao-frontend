@@ -80,8 +80,8 @@
                         <td><span [class]="'expense-badge status-' + expense.paymentStatus.toLowerCase()">{{ PaymentStatus[expense.paymentStatus] }}</span></td>
                         <td>{{ expense.documentNumber }}</td>
                         <td>{{ expense.origin.name }}</td>
-                        <td>{{ expense.totalValue | currency: 'EUR' }}</td>
-                        <td>{{ expense.iva | currency: 'EUR' }}</td>
+                        <td>{{ expense.totalValue | number: '1.2-2' }} €</td>
+                        <td>{{ expense.iva | number: '1.2-2' }} €</td>
                         <td>{{ expense.paymentDeadline | date: 'dd/MM/yyyy' }}</td>
                         <td>
                             <p-button 
@@ -92,19 +92,38 @@
                                 [text]="true" 
                                 severity="success" 
                             />
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-trash" 
-                                severity="danger" 
-                                [rounded]="true" 
-                                [text]="true" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-trash"
+                                severity="danger"
+                                [rounded]="true"
+                                [text]="true"
+                                (click)="deleteExpense(expense); $event.stopPropagation()"
                             />
                         </td>
                     </tr>
                 </ng-template>
-                
+
             </p-table>
 
 		</div>
 	</div>
 </div>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">{{ message.header }}</span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton label="Eliminar" (click)="cd.accept()" class="bg-red-500 border-transparent text-white w-8rem"></button>
+                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-toast />

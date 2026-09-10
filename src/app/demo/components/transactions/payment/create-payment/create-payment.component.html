@@ -120,7 +120,7 @@
 					<ng-template pTemplate="caption">
 						<div class="flex align-items-center justify-content-between">
 							Faturas em Débito
-							<small>Valor total: {{ sumTotalValues | currency: 'EUR' }}</small>
+							<small>Valor total: {{ sumTotalValues | number: '1.2-2' }} €</small>
 						</div>
 					</ng-template>
 
@@ -142,8 +142,8 @@
 							</td>
 							<td class=font-bold>{{ expense.documentNumber }}</td>
 							<td>{{ expense.paymentDeadline | date: 'dd/MM/yyyy' }}</td>
-							<td>{{ expense.totalValue | currency: 'EUR' }}</td>
-							<td>{{ expense.debtValue | currency: 'EUR' }}</td>
+							<td>{{ expense.totalValue | number: '1.2-2' }} €</td>
+							<td>{{ expense.debtValue | number: '1.2-2' }} €</td>
 							<td>
 								<p-inputNumber
 									[disabled]="!isSelected(expense)"

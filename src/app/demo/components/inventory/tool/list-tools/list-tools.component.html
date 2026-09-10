@@ -59,7 +59,7 @@
                         <td>{{ tool.brand }}</td>
                         <td>{{ tool.model }}</td>
                         <td>{{ tool.location }}</td>
-                        <td>{{ tool.purchaseValue | currency: 'EUR' }}</td>
+                        <td>{{ tool.purchaseValue | number: '1.2-2' }} €</td>
                         <td><span [class]="'tool-badge status-' + tool.status.toLowerCase()">{{ toolStatus[tool.status] }}</span></td>
                         <td>
                             <p-button

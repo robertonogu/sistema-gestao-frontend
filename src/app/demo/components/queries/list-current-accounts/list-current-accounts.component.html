@@ -68,9 +68,9 @@
                         <td *ngIf="currentAccountLog.paymentMethod !== null; else emptyPaymentMethod"><span [class]="'payment-badge status-' + currentAccountLog.paymentMethod.toLowerCase()">{{ PaymentMethod[currentAccountLog.paymentMethod] }}</span></td>
                         <ng-template #emptyPaymentMethod><td></td></ng-template>
                         <td>{{ currentAccountLog.description }}</td>
-                        <td class="text-green-500 font-semibold">{{ currentAccountLog.credit !== 0 ? (currentAccountLog.credit | currency: 'EUR') : '' }}</td>
-                        <td class="text-red-500 font-semibold">{{ currentAccountLog.debt !== 0 ? (currentAccountLog.debt | currency: 'EUR') : '' }}</td>
-                        <td class="font-semibold" [ngStyle]="{'color' : getBalanceColor(currentAccountLog.balance)}">{{ currentAccountLog.balance | currency: 'EUR' }}</td>
+                        <td class="text-green-500 font-semibold">{{ currentAccountLog.credit !== 0 ? (currentAccountLog.credit | number: '1.2-2') + ' €' : '' }}</td>
+                        <td class="text-red-500 font-semibold">{{ currentAccountLog.debt !== 0 ? (currentAccountLog.debt | number: '1.2-2') + ' €' : '' }}</td>
+                        <td class="font-semibold" [ngStyle]="{'color' : getBalanceColor(currentAccountLog.balance)}">{{ currentAccountLog.balance | number: '1.2-2' }} €</td>
                     </tr>
                 </ng-template>
                 

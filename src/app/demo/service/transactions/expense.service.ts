@@ -42,4 +42,8 @@ export class ExpenseService {
         return this.http.post<Expense>(this.expensesUrl, expense, environment.httpOptions);
     }
 
+    deleteExpense(expenseId: number) : Observable<void> {
+        return this.http.delete<void>(this.expensesUrl + "/" + expenseId);
+    }
+
 }

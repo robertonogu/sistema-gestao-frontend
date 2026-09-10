@@ -1,7 +1,6 @@
-﻿import { Component, OnInit, ViewChild } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { LazyLoadEvent } from 'primeng/api';
-import { Table } from 'primeng/table';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Expense } from 'src/app/demo/api/expense';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { PaymentStatus } from 'src/app/demo/data/enum/paymentStatus';
@@ -9,6 +8,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 @Component({
   templateUrl: 'list-expenses.component.html',
+  providers: [ConfirmationService, MessageService],
   styles: [`
     .category-dot {
       display: inline-flex;
@@ -63,7 +63,12 @@ export class ListExpensesComponent {
     return this.categoryLabel(code).charAt(0).toUpperCase();
   }
 
-  constructor(private expenseService: ExpenseService, private router: Router) {}
+  constructor(
+    private expenseService: ExpenseService,
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
+  ) {}
 
   nextPage(event: any) {
     this.loading = true;
@@ -87,6 +92,25 @@ export class ListExpensesComponent {
 
   newExpense() {
     this.router.navigate(['./transactions/expenses/create-expense']);
+  }
+
+  deleteExpense(expense: Expense) {
+    this.confirmationService.confirm({
+      header: `Apagar a despesa ${expense.documentNumber}?`,
+      message: 'Confirme para prosseguir.',
+      accept: () => {
+        this.expenseService.deleteExpense(expense.expenseId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa eliminada com sucesso.' });
+            this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+          },
+          error: (err) => {
+            const detail = err?.error?.message || 'Não foi possível eliminar a despesa.';
+            this.messageService.add({ severity: 'error', summary: 'Erro', detail });
+          }
+        });
+      }
+    });
   }
 
   getPaymentStatusSeverity(paymentStatus: PaymentStatus) {

@@ -54,7 +54,7 @@
                         <td>{{ movement.date | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ movement.originAccount }}</td>
                         <td>{{ movement.targetAccount }}</td>
-                        <td>{{ movement.value | currency: 'EUR' }}</td>
+                        <td>{{ movement.value | number: '1.2-2' }} €</td>
                         <td>
                             <p-button
                                 pRipple

@@ -40,7 +40,7 @@
                         <td>{{ externalService.budgetSubItem }}</td>
                         <td></td>
                         <td>{{ externalService.expense }}</td>
-                        <td>{{ externalService.value | currency: 'EUR' }}</td>
+                        <td>{{ externalService.value | number: '1.2-2' }} €</td>
                     </tr>
                 </ng-template>
                 

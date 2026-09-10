@@ -50,15 +50,15 @@
                         </td>
                         <td>{{ expenseInDebt.documentNumber }}</td>
                         <td>{{ expenseInDebt.origin }}</td>
-                        <td>{{ expenseInDebt.totalValue | currency: 'EUR' }}</td>
-                        <td class="text-red-600 font-semibold">{{ expenseInDebt.debtValue | currency: 'EUR' }}</td>
+                        <td>{{ expenseInDebt.totalValue | number: '1.2-2' }} €</td>
+                        <td class="text-red-600 font-semibold">{{ expenseInDebt.debtValue | number: '1.2-2' }} €</td>
                     </tr>
                 </ng-template>
 
                 <ng-template pTemplate="footer">
                     <tr>
                         <td colspan="4">Valor total em débito</td>
-                        <td>{{ totalInDebt | currency: 'EUR' }}</td>
+                        <td>{{ totalInDebt | number: '1.2-2' }} €</td>
                     </tr>
                 </ng-template>
                 

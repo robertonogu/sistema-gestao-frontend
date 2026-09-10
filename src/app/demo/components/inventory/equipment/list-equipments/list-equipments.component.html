@@ -48,7 +48,7 @@
                         <td>{{ vehicle.inspectionDate | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ vehicle.insuranceDate | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ vehicle.roadTaxDate | date: 'dd/MM/yyyy' }}</td>
-                        <td>{{ vehicle.valueKilometer | currency: 'EUR' }}</td>
+                        <td>{{ vehicle.valueKilometer | number: '1.2-2' }} €</td>
                         <td>
                             <p-button 
                                 pRipple 

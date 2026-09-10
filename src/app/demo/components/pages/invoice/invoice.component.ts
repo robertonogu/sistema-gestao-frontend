@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Expense } from 'src/app/demo/api/expense';
+import { CategoryType } from 'src/app/demo/data/enum/categoryType';
+import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 
 @Component({
@@ -11,6 +13,14 @@ export class InvoiceComponent implements OnInit {
     constructor(private route: ActivatedRoute, private expenseService: ExpenseService) { }
 
     expense!: Expense;
+
+    categoryLabel(code: string): string {
+        return (CategoryType as any)[code] ?? code ?? '';
+    }
+
+    subCategoryLabel(code: string): string {
+        return (SubCategoryType as any)[code] ?? code ?? '';
+    }
 
     ngOnInit() {
         this.route.params.subscribe(params => {

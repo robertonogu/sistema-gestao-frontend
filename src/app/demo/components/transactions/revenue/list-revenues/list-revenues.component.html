@@ -56,8 +56,8 @@
                         <td><span [class]="'revenue-badge status-' + revenue.revenueType.toLowerCase()">{{ RevenueType[revenue.revenueType] }}</span></td>
                         <td>{{ revenue.documentNumber }}</td>
                         <td>{{ revenue.origin }}</td>
-                        <td>{{ revenue.totalValue | currency: 'EUR' }}</td>
-                        <td>{{ revenue.iva | currency: 'EUR' }}</td>
+                        <td>{{ revenue.totalValue | number: '1.2-2' }} €</td>
+                        <td>{{ revenue.iva | number: '1.2-2' }} €</td>
                         <td>
                             <p-button
                                 pRipple

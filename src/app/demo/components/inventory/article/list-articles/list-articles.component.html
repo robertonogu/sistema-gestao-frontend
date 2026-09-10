@@ -50,8 +50,8 @@
                                 <td>{{ article.articleName }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
-                                <td>{{ article.unitValue | currency: 'EUR' }}</td>
-                                <td>{{ article.totalValue | currency: 'EUR' }}</td>
+                                <td>{{ article.unitValue | number: '1.2-2' }} €</td>
+                                <td>{{ article.totalValue | number: '1.2-2' }} €</td>
 
                             </tr>
                         </ng-template>
@@ -101,8 +101,8 @@
                                 <td>{{ article.articleName }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
-                                <td>{{ article.unitValue | currency: 'EUR' }}</td>
-                                <td>{{ article.totalValue | currency: 'EUR' }}</td>
+                                <td>{{ article.unitValue | number: '1.2-2' }} €</td>
+                                <td>{{ article.totalValue | number: '1.2-2' }} €</td>
                                 <td>{{ article.constructionName }}</td>
                             </tr>
                         </ng-template>
@@ -156,8 +156,8 @@
                                 <td>{{ article.name }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
-                                <td>{{ article.unitValue | currency: 'EUR' }}</td>
-                                <td>{{ article.totalValue | currency: 'EUR' }}</td>
+                                <td>{{ article.unitValue | number: '1.2-2' }} €</td>
+                                <td>{{ article.totalValue | number: '1.2-2' }} €</td>
                             </tr>
                         </ng-template>
                         

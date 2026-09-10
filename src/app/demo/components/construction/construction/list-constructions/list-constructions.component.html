@@ -15,12 +15,12 @@
                 </ng-template>
                 <div class="flex justify-content-around">
                     <div class="text-center">
-                        <p class="text-green-500 font-semibold">{{ construction.netValueReceived | currency: 'EUR' }}</p>
+                        <p class="text-green-500 font-semibold">{{ construction.netValueReceived | number: '1.2-2' }} €</p>
                         <p class="font-bold">Recebido</p>
                     </div>
                     <p-divider layout="vertical" />
                     <div class="text-center">
-                        <p class="text-red-500 font-semibold">{{ construction.amountToReceive | currency: 'EUR' }}</p>
+                        <p class="text-red-500 font-semibold">{{ construction.amountToReceive | number: '1.2-2' }} €</p>
                         <p class="font-bold">A Receber</p>
                     </div>
                 </div>
@@ -99,9 +99,9 @@
                         <td>{{ construction.constructionNumber }}</td>
                         <td>{{ construction.name }}</td>
                         <td>{{ construction.clientName }}</td>
-                        <td>{{ construction.initialBudget | currency: 'EUR' }}</td>
-                        <td>{{ construction.netValueReceived | currency: 'EUR' }}</td>
-                        <td>{{ construction.amountToReceive | currency: 'EUR' }}</td>
+                        <td>{{ construction.initialBudget | number: '1.2-2' }} €</td>
+                        <td>{{ construction.netValueReceived | number: '1.2-2' }} €</td>
+                        <td>{{ construction.amountToReceive | number: '1.2-2' }} €</td>
                         <td>
                             <p-button
                                 pRipple

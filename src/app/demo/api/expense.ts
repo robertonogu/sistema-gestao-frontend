@@ -13,4 +13,11 @@ export interface Expense {
     paymentStatus: PaymentStatus;
     itemList: Item[];
     categories: string[];
+    origin?: Origin;
+}
+
+interface Origin {
+    name: string;
+    nif?: number;
+    address?: string;
 }

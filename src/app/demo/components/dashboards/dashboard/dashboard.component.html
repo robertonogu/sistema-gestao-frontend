@@ -4,7 +4,7 @@
             <span class="font-semibold text-lg">Receitas</span>
             <div class="flex justify-content-between align-items-start mt-3">
                 <div class="w-6">
-                    <span class="text-3xl font-bold text-900">{{ revenuesValue | currency: 'EUR' }}</span>
+                    <span class="text-3xl font-bold text-900">{{ revenuesValue | number: '1.2-2' }} €</span>
                     <div class="text-green-500">
                         <span class="font-medium">+12%</span>
                         <i class="pi pi-arrow-up text-xs ml-2"></i>
@@ -24,7 +24,7 @@
             <span class="font-semibold text-lg">Despesas</span>
             <div class="flex justify-content-between align-items-start mt-3">
                 <div class="w-6">
-                    <span class="text-3xl font-bold text-900">{{ expensesValue | currency: 'EUR' }}</span>
+                    <span class="text-3xl font-bold text-900">{{ expensesValue | number: '1.2-2' }} €</span>
                     <div class="text-green-500">
                         <span class="font-medium">+20%</span>
                         <i class="pi pi-arrow-up text-xs ml-2"></i>
@@ -43,7 +43,7 @@
         <div class="card h-full">
             <span class="font-semibold text-lg">Débitos</span>
             <div class="mt-3">
-                <span class="text-4xl font-bold text-900">{{ debtsValue | currency: 'EUR' }}</span>
+                <span class="text-4xl font-bold text-900">{{ debtsValue | number: '1.2-2' }} €</span>
                 <div class="text-pink-500">
                     <span class="font-medium">+24%</span>
                     <i class="pi pi-arrow-down text-xs ml-2"></i>
@@ -55,7 +55,7 @@
         <div class="card h-full">
             <span class="font-semibold text-lg">Saldo</span>
             <div class="mt-3">
-                <span class="text-4xl font-bold text-900">{{ balance | currency: 'EUR' }}</span>
+                <span class="text-4xl font-bold text-900">{{ balance | number: '1.2-2' }} €</span>
                 <div class="text-green-500">
                     <span class="font-medium">+30%</span>
                     <i class="pi pi-arrow-up text-xs ml-2"></i>
@@ -100,7 +100,7 @@
                     <tr>
                         <td>{{ debt.origin }}</td>
                         <td>{{ debt.documentNumber }}</td>
-                        <td>{{ debt.totalValue | currency:'EUR' }}</td>
+                        <td>{{ debt.totalValue | number: '1.2-2' }} €</td>
                         <td>{{ debt.paymentDeadline ? (debt.paymentDeadline | date:'dd/MM/yyyy') : '-' }}</td>
                     </tr>
                 </ng-template>

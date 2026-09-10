@@ -7,7 +7,7 @@
                     <div class="text-900 text-xl font-semibold">Mapa Caixa</div>
                     <div class="text-500 font-medium">
                         Saldo:
-                        <span class="font-semibold" [ngClass]="balance > 0 ? 'text-green-500' : balance < 0 ? 'text-red-500' : 'text-900'">{{ balance | currency: 'EUR' }}</span>
+                        <span class="font-semibold" [ngClass]="balance > 0 ? 'text-green-500' : balance < 0 ? 'text-red-500' : 'text-900'">{{ balance | number: '1.2-2' }} €</span>
                     </div>
                 </div>
                 <div class="flex sm:ml-auto">
@@ -53,9 +53,9 @@
                         <td>{{ accountLog.date | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ accountLog.documentNumber }}</td>
                         <td><span [class]="'movement-badge status-' + accountLog.movementType.toLowerCase()">{{ MovementType[accountLog.movementType] }}</span></td>
-                        <td class="text-green-500 font-semibold">{{ accountLog.credit !== 0 ? (accountLog.credit | currency: 'EUR') : '' }}</td>
-                        <td class="text-red-500 font-semibold">{{ accountLog.debt !== 0 ? (accountLog.debt | currency: 'EUR') : '' }}</td>
-                        <td class="font-semibold" [ngStyle]="{'color' : getBalanceColor(accountLog.balance)}">{{ accountLog.balance | currency: 'EUR' }}</td>
+                        <td class="text-green-500 font-semibold">{{ accountLog.credit !== 0 ? (accountLog.credit | number: '1.2-2') + ' €' : '' }}</td>
+                        <td class="text-red-500 font-semibold">{{ accountLog.debt !== 0 ? (accountLog.debt | number: '1.2-2') + ' €' : '' }}</td>
+                        <td class="font-semibold" [ngStyle]="{'color' : getBalanceColor(accountLog.balance)}">{{ accountLog.balance | number: '1.2-2' }} €</td>
                     </tr>
                 </ng-template>
 

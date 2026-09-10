@@ -7,6 +7,8 @@ import { TagModule } from 'primeng/tag';
 import { ListExpensesComponent } from './list-expenses.component';
 import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   imports: [
@@ -16,7 +18,9 @@ import { TooltipModule } from 'primeng/tooltip';
     PaginatorModule,
 		TableModule,
 		TagModule,
-    TooltipModule
+    TooltipModule,
+    ConfirmDialogModule,
+    ToastModule
   ],
   declarations: [ListExpensesComponent]
 })

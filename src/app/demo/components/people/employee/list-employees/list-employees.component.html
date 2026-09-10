@@ -89,10 +89,10 @@
                             <i *ngIf="employee.internal" class="pi pi-star-fill text-yellow-500" pTooltip="Interno"></i>
                         </td>
                         <td>{{ employee.name }}</td>
-                        <td>{{ employee.baseSalary | currency: 'EUR' }}</td>
-                        <td>{{ employee.allowance | currency: 'EUR' }}</td>
-                        <td>{{ employee.foodAllowance | currency: 'EUR' }}</td>
-                        <td>{{ employee.healthInsurance | currency: 'EUR' }}</td>
+                        <td>{{ employee.baseSalary | number: '1.2-2' }} €</td>
+                        <td>{{ employee.allowance | number: '1.2-2' }} €</td>
+                        <td>{{ employee.foodAllowance | number: '1.2-2' }} €</td>
+                        <td>{{ employee.healthInsurance | number: '1.2-2' }} €</td>
                         <td>
                             <p-button
                                 pRipple

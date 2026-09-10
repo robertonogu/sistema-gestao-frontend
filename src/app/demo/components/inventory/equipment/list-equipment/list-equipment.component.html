@@ -60,7 +60,7 @@
                         <td>{{ equipment.brand }}</td>
                         <td>{{ equipment.model }}</td>
                         <td>{{ equipment.serialNumber }}</td>
-                        <td>{{ equipment.purchaseValue | currency: 'EUR' }}</td>
+                        <td>{{ equipment.purchaseValue | number: '1.2-2' }} €</td>
                         <td>{{ equipment.warrantyEnd | date: 'dd/MM/yyyy' }}</td>
                         <td><span [class]="'equipment-badge status-' + equipment.status.toLowerCase()">{{ equipmentStatus[equipment.status] }}</span></td>
                         <td>

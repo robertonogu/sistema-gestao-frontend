@@ -7,4 +7,6 @@ export interface Item {
     unitValue: number;
     iva: number;
     totalValue: number;
+    category: string;
+    subCategoryType: string;
 }

@@ -54,7 +54,7 @@
                     <tr>
                         <td>{{ payment.date | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ payment.documentNumber }}</td>
-                        <td class="text-red-500 font-semibold">- {{ payment.value | currency: 'EUR' }}</td>
+                        <td class="text-red-500 font-semibold">- {{ payment.value | number: '1.2-2' }} €</td>
                         <td><span [class]="'payment-badge status-' + payment.paymentMethod.toLowerCase()">{{ PaymentMethod[payment.paymentMethod] }}</span></td>
                         <td>{{ payment.account }}</td>
                         <td>
