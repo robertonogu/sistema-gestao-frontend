@@ -62,6 +62,7 @@ export class EditRevenueComponent implements OnInit {
 
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
+      this.refreshPaymentMethodOptions();
     });
 
     this.originService.getOriginsGrouped().subscribe((origins) => {
@@ -79,6 +80,7 @@ export class EditRevenueComponent implements OnInit {
           this.iva = revenue.netValue > 0 ? Math.round((revenue.iva / revenue.netValue) * 100) : 0;
           this.selectedSale = revenue.saleId ?? (undefined as any);
 
+          this.refreshPaymentMethodOptions();
           this.getSalesForClient();
 
           this.loading = false;
@@ -95,19 +97,21 @@ export class EditRevenueComponent implements OnInit {
     this._location.back();
   }
 
-  get selectedAccountObj(): AccountName | undefined {
+  isCashAccountSelected: boolean = false;
+  paymentMethodOptions: { key: string; value: string }[] = getPaymentMethodEntries(undefined);
+
+  private get selectedAccountObj(): AccountName | undefined {
     return this.accountNames?.find(account => account.objectId === this.selectedAccount);
   }
 
-  get isCashAccountSelected(): boolean {
-    return !!this.selectedAccountObj?.cashBox;
-  }
-
-  get paymentMethodOptions(): { key: string; value: string }[] {
-    return getPaymentMethodEntries(this.selectedAccountObj?.cashBox);
+  private refreshPaymentMethodOptions(): void {
+    const cashBox = this.selectedAccountObj?.cashBox;
+    this.isCashAccountSelected = !!cashBox;
+    this.paymentMethodOptions = getPaymentMethodEntries(cashBox);
   }
 
   onAccountChange() {
+    this.refreshPaymentMethodOptions();
     if (this.isCashAccountSelected) {
       this.selectedPaymentMethod = CASH_PAYMENT_METHOD_KEY;
     } else if ((this.selectedPaymentMethod as unknown as string) === 'CASH') {

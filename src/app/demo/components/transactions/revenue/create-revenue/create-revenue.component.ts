@@ -68,19 +68,21 @@ export class CreateRevenueComponent {
     this._location.back();
   }
 
-  get selectedAccountObj(): AccountName | undefined {
+  isCashAccountSelected: boolean = false;
+  paymentMethodOptions: { key: string; value: string }[] = getPaymentMethodEntries(undefined);
+
+  private get selectedAccountObj(): AccountName | undefined {
     return this.accountNames?.find(account => account.objectId === this.selectedAccount);
   }
 
-  get isCashAccountSelected(): boolean {
-    return !!this.selectedAccountObj?.cashBox;
-  }
-
-  get paymentMethodOptions(): { key: string; value: string }[] {
-    return getPaymentMethodEntries(this.selectedAccountObj?.cashBox);
+  private refreshPaymentMethodOptions(): void {
+    const cashBox = this.selectedAccountObj?.cashBox;
+    this.isCashAccountSelected = !!cashBox;
+    this.paymentMethodOptions = getPaymentMethodEntries(cashBox);
   }
 
   onAccountChange() {
+    this.refreshPaymentMethodOptions();
     if (this.isCashAccountSelected) {
       this.selectedPaymentMethod = CASH_PAYMENT_METHOD_KEY;
     } else if ((this.selectedPaymentMethod as unknown as string) === 'CASH') {
@@ -141,6 +143,7 @@ export class CreateRevenueComponent {
     this.selectedOrigin = undefined as any;
     this.selectedAccount = undefined as any;
     this.selectedPaymentMethod = undefined as any;
+    this.refreshPaymentMethodOptions();
     this.iva = undefined as any;
     this.totalValue = undefined as any;
     this.selectedSale = undefined as any;
