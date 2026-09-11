@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ObjectName } from '../../api/objectName';
+import { AccountName } from '../../api/accountName';
 import { ObjectList } from '../../api/objectList';
 import { environment } from 'src/environments/environment';
 import { AccountCreation } from '../../data/model/accountCreation.model';
@@ -25,6 +27,16 @@ export class AccountService {
 
     getAccountNames() : Observable<ObjectName[]> {
         return this.http.get<ObjectName[]>(this.accountNamesUrl);
+    }
+
+    getAccountNamesWithType(): Observable<AccountName[]> {
+        return forkJoin({
+            all: this.getAccountNames(),
+            bank: this.getBankAccountNames()
+        }).pipe(map(({ all, bank }) => {
+            const bankAccountIds = new Set(bank.map(account => account.objectId));
+            return all.map(account => ({ ...account, cashBox: !bankAccountIds.has(account.objectId) }));
+        }));
     }
 
     getAccounts(currentPage: number, pageSize: number) : Observable<ObjectList> {

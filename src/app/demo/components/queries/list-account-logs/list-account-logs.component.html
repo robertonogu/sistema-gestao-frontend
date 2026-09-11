@@ -47,8 +47,8 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Data</th>
-                        <th>Número de Documento</th>
                         <th>Tipo de Movimento</th>
+                        <th>Número de Documento</th>
                         <th>Crédito</th>
                         <th>Débito</th>
                         <th>Saldo</th>
@@ -58,8 +58,8 @@
                 <ng-template pTemplate="body" let-accountLog>
                     <tr>
                         <td>{{ accountLog.date | date: 'dd/MM/yyyy' }}</td>
-                        <td>{{ accountLog.documentNumber }}</td>
                         <td><span [class]="'movement-badge status-' + accountLog.movementType.toLowerCase()">{{ MovementType[accountLog.movementType] }}</span></td>
+                        <td>{{ accountLog.documentNumber }}</td>
                         <td class="text-green-600 font-medium">{{ accountLog.credit !== 0 ? (accountLog.credit | number: '1.2-2') + ' €' : '' }}</td>
                         <td class="text-red-600 font-medium">{{ accountLog.debt !== 0 ? (accountLog.debt | number: '1.2-2') + ' €' : '' }}</td>
                         <td class="font-medium" [ngStyle]="{'color' : getBalanceColor(accountLog.balance)}">{{ accountLog.balance | number: '1.2-2' }} €</td>

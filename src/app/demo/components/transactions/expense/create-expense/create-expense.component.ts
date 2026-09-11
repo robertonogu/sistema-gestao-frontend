@@ -2,16 +2,16 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService, TreeNode } from 'primeng/api';
+import { AccountName } from 'src/app/demo/api/accountName';
 import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
-import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { EquipmentStatus } from 'src/app/demo/data/enum/equipmentStatus';
 import { PaymentCondition } from 'src/app/demo/data/enum/paymentCondition';
-import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
+import { CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries, PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
 import { ToolStatus } from 'src/app/demo/data/enum/toolStatus';
 import { Unit } from 'src/app/demo/data/enum/unit';
@@ -232,7 +232,7 @@ export class CreateExpenseComponent implements OnInit {
   documentTypes = DocumentType;
   validIvaRates: number[];
   disablePaidValue: boolean = false;
-  accountNames: ObjectName[] = [];
+  accountNames: AccountName[] = [];
   paymentMethods = PaymentMethod;
   paymentConditions = PaymentCondition;
 
@@ -306,7 +306,7 @@ export class CreateExpenseComponent implements OnInit {
       this.origins = origins;
     });
 
-    this.accountService.getAccountNames().subscribe((accountNames) => {
+    this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
     });
 
@@ -450,6 +450,26 @@ export class CreateExpenseComponent implements OnInit {
     else {
       this.disablePaidValue = false;
       this._paymentValue = this.totalValue;
+    }
+  }
+
+  get selectedAccountObj(): AccountName | undefined {
+    return this.accountNames.find(account => account.objectId === this.selectedAccount);
+  }
+
+  get isCashAccountSelected(): boolean {
+    return !!this.selectedAccountObj?.cashBox;
+  }
+
+  get paymentMethodOptions(): { key: string; value: string }[] {
+    return getPaymentMethodEntries(this.selectedAccountObj?.cashBox);
+  }
+
+  onAccountChange() {
+    if (this.isCashAccountSelected) {
+      this.selectedPaymentMethod = CASH_PAYMENT_METHOD_KEY;
+    } else if ((this.selectedPaymentMethod as unknown as string) === 'CASH') {
+      this.selectedPaymentMethod = undefined as any;
     }
   }
 

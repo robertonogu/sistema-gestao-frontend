@@ -208,7 +208,7 @@
                     [disabled]="exportingMaterials"
                     pTooltip="Exportar materiais para Excel"
                     tooltipPosition="top">
-              <i class="pi" [ngClass]="exportingMaterials ? 'pi-spin pi-spinner' : 'pi-file-excel'"></i>
+              <i class="pi" [ngClass]="exportingMaterials ? 'pi-spin pi-spinner' : 'pi-download'"></i>
             </button>
             <p-tag [value]="itemsSplit.length + ' itens'"
                    [style.background]="col.soft"

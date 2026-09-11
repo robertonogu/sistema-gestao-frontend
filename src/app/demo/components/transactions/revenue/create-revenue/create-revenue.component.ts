@@ -1,10 +1,10 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { MessageService } from 'primeng/api';
-import { ObjectName } from 'src/app/demo/api/objectName';
+import { AccountName } from 'src/app/demo/api/accountName';
 import { Origin } from 'src/app/demo/api/origin';
 import { SaleForRevenue } from 'src/app/demo/api/saleForRevenue';
-import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
+import { CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries, PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { RevenueType } from 'src/app/demo/data/enum/revenueType';
 import { RevenueCreation } from 'src/app/demo/data/model/revenueCreation.model';
 import { AccountService } from 'src/app/demo/service/company/accountService';
@@ -20,13 +20,15 @@ export class CreateRevenueComponent {
 
   revenueTypes = RevenueType;
   origins!: Origin[];
-  accountNames!: ObjectName[];
+  accountNames!: AccountName[];
   paymentMethods = PaymentMethod;
   validIvaRates!: number[];
   sales: SaleForRevenue[] = [];
 
+  private readonly defaultRevenueType = 'SALES' as unknown as RevenueType;
+
   date!: Date;
-  selectedRevenueType!: RevenueType;
+  selectedRevenueType: RevenueType = this.defaultRevenueType;
   documentNumber!: string
   selectedOrigin!: number;
   selectedAccount!: number;
@@ -57,13 +59,33 @@ export class CreateRevenueComponent {
       this.origins = origins;
     });
 
-    this.accountService.getAccountNames().subscribe((accountNames) => {
+    this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
     });
   }
 
   back() {
     this._location.back();
+  }
+
+  get selectedAccountObj(): AccountName | undefined {
+    return this.accountNames?.find(account => account.objectId === this.selectedAccount);
+  }
+
+  get isCashAccountSelected(): boolean {
+    return !!this.selectedAccountObj?.cashBox;
+  }
+
+  get paymentMethodOptions(): { key: string; value: string }[] {
+    return getPaymentMethodEntries(this.selectedAccountObj?.cashBox);
+  }
+
+  onAccountChange() {
+    if (this.isCashAccountSelected) {
+      this.selectedPaymentMethod = CASH_PAYMENT_METHOD_KEY;
+    } else if ((this.selectedPaymentMethod as unknown as string) === 'CASH') {
+      this.selectedPaymentMethod = undefined as any;
+    }
   }
 
   private isSelectedOriginAClient(): boolean {
@@ -114,7 +136,7 @@ export class CreateRevenueComponent {
 
   private resetForm(): void {
     this.date = undefined as any;
-    this.selectedRevenueType = undefined as any;
+    this.selectedRevenueType = this.defaultRevenueType;
     this.documentNumber = undefined as any;
     this.selectedOrigin = undefined as any;
     this.selectedAccount = undefined as any;
