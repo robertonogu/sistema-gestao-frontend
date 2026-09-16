@@ -48,6 +48,7 @@ export enum SubCategoryType {
     FACILITY_RENT = 'Rendas de Instalações',
     ELECTRICITY = 'Eletricidade',
     WATER = 'Água',
+    GAS = 'Gás',
     COMMUNICATIONS = 'Comunicações',
     OFFICE_SUPPLIES = 'Material de Escritório',
     OFFICE_EQUIPMENT_ACQUISITION = 'Aquisição de Equipamento de Escritório',
