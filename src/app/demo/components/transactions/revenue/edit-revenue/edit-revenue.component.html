@@ -98,6 +98,7 @@
                         optionLabel="name"
 						optionValue="objectId"
                         placeholder="Selecione uma Conta"
+						(onChange)="onAccountChange()"
 						[ngClass]="{ 'ng-dirty ng-invalid': !selectedAccount }"
 					/>
 				</div>
@@ -106,10 +107,11 @@
 					<label>Método de Pagamento</label>
 					<p-dropdown
 						[(ngModel)]="selectedPaymentMethod"
-                        [options]="paymentMethods | keyvalue"
+                        [options]="paymentMethodOptions"
                         optionLabel="value"
 						optionValue="key"
                         placeholder="Selecione um Método de Pagamento"
+						[disabled]="isCashAccountSelected"
 						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaymentMethod }"
 					/>
 				</div>

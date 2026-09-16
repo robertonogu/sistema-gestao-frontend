@@ -104,7 +104,7 @@ export class AppMenuComponent implements OnInit {
                         routerLink: ['/queries/accountLogs']
                     },
                     {
-                        label: 'Mapa Caixa',
+                        label: 'Extrato Caixa',
                         icon: 'pi pi-fw pi-lock',
                         routerLink: ['/queries/cashAccountLogs']
                     },

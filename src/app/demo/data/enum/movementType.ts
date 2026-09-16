@@ -3,6 +3,6 @@ export enum MovementType {
     WITHDRAWAL = "Levantamento",
     PAYMENT = "Pagamento",
     BANK_TRANSFER = "Transferência Bancária",
-    FIRST_INTERACTION = "Início",
+    FIRST_INTERACTION = "Saldo Inicial",
     RECEIPT = "Recebimento"
 }

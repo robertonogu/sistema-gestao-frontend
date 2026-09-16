@@ -2,13 +2,13 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { ObjectName } from 'src/app/demo/api/objectName';
+import { AccountName } from 'src/app/demo/api/accountName';
 import { Origin } from 'src/app/demo/api/origin';
 import { SaleForRevenue } from 'src/app/demo/api/saleForRevenue';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { RevenueType } from 'src/app/demo/data/enum/revenueType';
 import { RevenueCreation } from 'src/app/demo/data/model/revenueCreation.model';
-import { AccountService } from 'src/app/demo/service/company/accountService';
+import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from 'src/app/demo/service/company/accountService';
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { RevenueService } from 'src/app/demo/service/transactions/revenueService';
 import { SaleService } from 'src/app/demo/service/transactions/saleService';
@@ -21,7 +21,7 @@ export class EditRevenueComponent implements OnInit {
 
   revenueTypes = RevenueType;
   origins!: Origin[];
-  accountNames!: ObjectName[];
+  accountNames!: AccountName[];
   paymentMethods = PaymentMethod;
   validIvaRates!: number[];
   sales: SaleForRevenue[] = [];
@@ -60,8 +60,9 @@ export class EditRevenueComponent implements OnInit {
   ngOnInit(): void {
     this.revenueId = Number(this.route.snapshot.params['revenueId']);
 
-    this.accountService.getAccountNames().subscribe((accountNames) => {
+    this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
+      this.refreshPaymentMethodOptions();
     });
 
     this.originService.getOriginsGrouped().subscribe((origins) => {
@@ -79,6 +80,7 @@ export class EditRevenueComponent implements OnInit {
           this.iva = revenue.netValue > 0 ? Math.round((revenue.iva / revenue.netValue) * 100) : 0;
           this.selectedSale = revenue.saleId ?? (undefined as any);
 
+          this.refreshPaymentMethodOptions();
           this.getSalesForClient();
 
           this.loading = false;
@@ -93,6 +95,28 @@ export class EditRevenueComponent implements OnInit {
 
   back() {
     this._location.back();
+  }
+
+  isCashAccountSelected: boolean = false;
+  paymentMethodOptions: { key: string; value: string }[] = getPaymentMethodEntries(undefined);
+
+  private get selectedAccountObj(): AccountName | undefined {
+    return this.accountNames?.find(account => account.objectId === this.selectedAccount);
+  }
+
+  private refreshPaymentMethodOptions(): void {
+    const cashBox = this.selectedAccountObj?.cashBox;
+    this.isCashAccountSelected = !!cashBox;
+    this.paymentMethodOptions = getPaymentMethodEntries(cashBox);
+  }
+
+  onAccountChange() {
+    this.refreshPaymentMethodOptions();
+    if (this.isCashAccountSelected) {
+      this.selectedPaymentMethod = CASH_PAYMENT_METHOD_KEY;
+    } else if ((this.selectedPaymentMethod as unknown as string) === 'CASH') {
+      this.selectedPaymentMethod = undefined as any;
+    }
   }
 
   private isSelectedOriginAClient(): boolean {

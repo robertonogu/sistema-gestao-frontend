@@ -1,8 +1,8 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { AccountName } from 'src/app/demo/api/accountName';
 import { Movement } from 'src/app/demo/api/movement';
-import { ObjectName } from 'src/app/demo/api/objectName';
 import { MovementType } from 'src/app/demo/data/enum/movementType';
 import { MovementCreation } from 'src/app/demo/data/model/movement.model';
 import { AccountService } from 'src/app/demo/service/company/accountService';
@@ -23,7 +23,7 @@ export class ListMovementsComponent implements OnInit {
 
   MovementType = MovementType;
 
-  accountNames: ObjectName[] = [];
+  accountNames: AccountName[] = [];
 
   movementDialog: boolean = false;
   submitted: boolean = false;
@@ -37,13 +37,17 @@ export class ListMovementsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.accountService.getAccountNames().subscribe((accountNames) => {
+    this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
-    });
 
-    if (this.route.snapshot.queryParamMap.get('new') === 'true') {
-      this.openNew();
-    }
+      if (this.route.snapshot.queryParamMap.get('new') === 'true') {
+        this.openNew();
+      }
+    });
+  }
+
+  private get cashAccountId(): number | undefined {
+    return this.accountNames.find(account => account.cashBox)?.objectId;
   }
 
   nextPage(event: any) {
@@ -60,7 +64,7 @@ export class ListMovementsComponent implements OnInit {
   }
 
   openNew() {
-    this.movement = {};
+    this.movement = { targetAccountId: this.cashAccountId };
     this.submitted = false;
     this.movementDialog = true;
   }

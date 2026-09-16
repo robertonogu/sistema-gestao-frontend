@@ -2,10 +2,10 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService, TreeNode } from 'primeng/api';
+import { AccountName } from 'src/app/demo/api/accountName';
 import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
-import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
@@ -24,7 +24,7 @@ import { ItemCreation } from 'src/app/demo/data/model/itemCreation.model';
 import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
 import { ToolCreation } from 'src/app/demo/data/model/toolCreation.model';
 import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
-import { AccountService } from 'src/app/demo/service/company/accountService';
+import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from 'src/app/demo/service/company/accountService';
 import { ClientService } from 'src/app/demo/service/company/clientService';
 import { ExternalEntityService } from 'src/app/demo/service/company/externalEntityService';
 import { OriginService } from 'src/app/demo/service/company/originService';
@@ -232,7 +232,7 @@ export class CreateExpenseComponent implements OnInit {
   documentTypes = DocumentType;
   validIvaRates: number[];
   disablePaidValue: boolean = false;
-  accountNames: ObjectName[] = [];
+  accountNames: AccountName[] = [];
   paymentMethods = PaymentMethod;
   paymentConditions = PaymentCondition;
 
@@ -306,7 +306,7 @@ export class CreateExpenseComponent implements OnInit {
       this.origins = origins;
     });
 
-    this.accountService.getAccountNames().subscribe((accountNames) => {
+    this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
     });
 
@@ -450,6 +450,28 @@ export class CreateExpenseComponent implements OnInit {
     else {
       this.disablePaidValue = false;
       this._paymentValue = this.totalValue;
+    }
+  }
+
+  isCashAccountSelected: boolean = false;
+  paymentMethodOptions: { key: string; value: string }[] = getPaymentMethodEntries(undefined);
+
+  private get selectedAccountObj(): AccountName | undefined {
+    return this.accountNames.find(account => account.objectId === this.selectedAccount);
+  }
+
+  private refreshPaymentMethodOptions(): void {
+    const cashBox = this.selectedAccountObj?.cashBox;
+    this.isCashAccountSelected = !!cashBox;
+    this.paymentMethodOptions = getPaymentMethodEntries(cashBox);
+  }
+
+  onAccountChange() {
+    this.refreshPaymentMethodOptions();
+    if (this.isCashAccountSelected) {
+      this.selectedPaymentMethod = CASH_PAYMENT_METHOD_KEY;
+    } else if ((this.selectedPaymentMethod as unknown as string) === 'CASH') {
+      this.selectedPaymentMethod = undefined as any;
     }
   }
 
@@ -869,6 +891,7 @@ export class CreateExpenseComponent implements OnInit {
     this.disablePaidValue = false;
     this.selectedAccount = undefined as any;
     this.selectedPaymentMethod = undefined as any;
+    this.refreshPaymentMethodOptions();
 
     this.inputs.clear();
 
