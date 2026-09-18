@@ -7,6 +7,13 @@ import { ObjectList } from '../../api/objectList';
 import { ExpenseCreation } from '../../data/model/expenseCreation.model';
 import { Expense } from '../../api/expense';
 
+export interface ExpenseFilters {
+    documentNumber?: string;
+    date?: Date;
+    originId?: number;
+    paymentStatus?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -17,9 +24,22 @@ export class ExpenseService {
 
     constructor(private http: HttpClient) { }
 
-    getExpenses(currentPage: number, pageSize: number) : Observable<ObjectList> {
+    getExpenses(currentPage: number, pageSize: number, filters?: ExpenseFilters) : Observable<ObjectList> {
         let url = this.expensesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+
+        if (filters?.documentNumber) url += "&documentNumber=" + encodeURIComponent(filters.documentNumber);
+        if (filters?.date) url += "&date=" + this.formatDate(filters.date);
+        if (filters?.originId != null) url += "&originId=" + filters.originId;
+        if (filters?.paymentStatus) url += "&paymentStatus=" + filters.paymentStatus;
+
         return this.http.get<ObjectList>(url);
+    }
+
+    private formatDate(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     getExpenseById(expenseId: number) : Observable<Expense> {

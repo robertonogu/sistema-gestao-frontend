@@ -15,7 +15,6 @@ import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
 import { ToolStatus } from 'src/app/demo/data/enum/toolStatus';
 import { Unit } from 'src/app/demo/data/enum/unit';
-import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
 import { CostAllocationCreation } from 'src/app/demo/data/model/costAllocationCreation.model';
 import { EquipmentCreation } from 'src/app/demo/data/model/equipmentCreation.model';
 import { ExpenseCreation } from 'src/app/demo/data/model/expenseCreation.model';
@@ -25,7 +24,6 @@ import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model
 import { ToolCreation } from 'src/app/demo/data/model/toolCreation.model';
 import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from 'src/app/demo/service/company/accountService';
-import { ClientService } from 'src/app/demo/service/company/clientService';
 import { ExternalEntityService } from 'src/app/demo/service/company/externalEntityService';
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
@@ -38,7 +36,29 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 @Component({
   templateUrl: './create-expense.component.html',
   providers: [MessageService],
-  styles: [`:host {
+  styles: [`
+.section-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-color, #495057);
+}
+
+.section-title + div {
+  padding-top: 0.75rem;
+}
+
+:host ::ng-deep .origin-dropdown {
+  min-width: 0;
+}
+
+:host ::ng-deep .origin-dropdown .p-dropdown-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host {
   --bg: #fff;
   --surface-2: #fafbfc;
   --border: #e6e8ec;
@@ -138,6 +158,12 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
     color: inherit !important;
     -webkit-text-fill-color: inherit;
     opacity: 1 !important;
+  }
+
+  input.p-inputtext.ng-invalid.ng-touched,
+  p-inputnumber.ng-invalid.ng-touched input,
+  p-dropdown.ng-invalid.ng-touched > .p-dropdown {
+    border-color: #f44336 !important;
   }
 
   .item-col-num input { text-align: right; font-family: var(--font-mono); }
@@ -268,13 +294,12 @@ export class CreateExpenseComponent implements OnInit {
   equipmentNames: ItemName[] = [];
 
   quickAddOriginOptions: MenuItem[] = [
-    { label: 'Cliente', icon: 'pi pi-user', command: () => this.openQuickAddOrigin('client') },
     { label: 'Fornecedor', icon: 'pi pi-truck', command: () => this.openQuickAddOrigin('supplier') },
     { label: 'Entidade Externa', icon: 'pi pi-building', command: () => this.openQuickAddOrigin('externalEntity') },
   ];
 
   quickAddOriginDialogVisible: boolean = false;
-  quickAddOriginType: 'client' | 'supplier' | 'externalEntity' | null = null;
+  quickAddOriginType: 'supplier' | 'externalEntity' | null = null;
   quickAddOriginSubmitted: boolean = false;
   quickAddOriginName: string | null = null;
   quickAddOriginNif: number | null = null;
@@ -295,7 +320,6 @@ export class CreateExpenseComponent implements OnInit {
     private toolService: ToolService,
     private equipmentService: EquipmentService,
     private expenseService: ExpenseService,
-    private clientService: ClientService,
     private supplierService: SupplierService,
     private externalEntityService: ExternalEntityService,
     private messageService: MessageService,
@@ -331,14 +355,13 @@ export class CreateExpenseComponent implements OnInit {
 
   get quickAddOriginTitle(): string {
     switch (this.quickAddOriginType) {
-      case 'client': return 'Novo Cliente';
       case 'supplier': return 'Novo Fornecedor';
       case 'externalEntity': return 'Nova Entidade Externa';
       default: return '';
     }
   }
 
-  openQuickAddOrigin(type: 'client' | 'supplier' | 'externalEntity'): void {
+  openQuickAddOrigin(type: 'supplier' | 'externalEntity'): void {
     this.quickAddOriginType = type;
     this.quickAddOriginSubmitted = false;
     this.quickAddOriginName = null;
@@ -374,10 +397,7 @@ export class CreateExpenseComponent implements OnInit {
     const name = this.quickAddOriginName;
     const nif = this.quickAddOriginNif as number;
 
-    if (this.quickAddOriginType === 'client') {
-      this.clientService.createClient({ name, nif } as ClientCreation)
-        .subscribe(client => this.afterOriginCreated(client.originId));
-    } else if (this.quickAddOriginType === 'supplier') {
+    if (this.quickAddOriginType === 'supplier') {
       this.supplierService.createSupplier({ name, nif, address: this.quickAddOriginAddress, placeId: this.quickAddOriginPlaceId } as SupplierCreation)
         .subscribe(supplier => this.afterOriginCreated(supplier.originId));
     } else if (this.quickAddOriginType === 'externalEntity') {
@@ -537,7 +557,7 @@ export class CreateExpenseComponent implements OnInit {
       quantity: [null, Validators.required],
       unit: [null, Validators.required],
       value: [null, Validators.required],
-      total: [null],
+      total: [null, Validators.required],
       iva: [0, Validators.required],
       constructionId: [null],
       budgetItemId: [null],
@@ -841,6 +861,12 @@ export class CreateExpenseComponent implements OnInit {
   }
 
   newExpense() {
+    if (this.dynamicItemForm.invalid) {
+      this.dynamicItemForm.markAllAsTouched();
+      this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Preencha todos os campos obrigatórios dos itens.' });
+      return;
+    }
+
     const itemList: ItemCreation[] = [];
     let item: ItemCreation;
 

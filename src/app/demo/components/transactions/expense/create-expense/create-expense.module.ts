@@ -10,13 +10,13 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { CreateExpenseRoutingModule } from './create-expense-routing.module';
 import { SplitButtonModule } from 'primeng/splitbutton';
-import { DividerModule } from 'primeng/divider';
 import { DialogModule } from 'primeng/dialog';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
+import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
 @NgModule({
   declarations: [CreateExpenseComponent],
@@ -28,7 +28,6 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
     CalendarModule,
     DropdownModule,
     CheckboxModule,
-    DividerModule,
     DialogModule,
     TreeSelectModule,
     FormsModule,
@@ -38,7 +37,8 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
     TooltipModule,
 		CreateExpenseRoutingModule,
 		ToastModule,
-		GooglePlaceAutocompleteDirective
+		GooglePlaceAutocompleteDirective,
+		UppercaseDirective
   ]
 })
 

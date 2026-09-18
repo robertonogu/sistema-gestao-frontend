@@ -15,6 +15,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
 import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
+import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
     TableModule,
     TooltipModule,
     CheckboxModule,
-    GooglePlaceAutocompleteDirective
+    GooglePlaceAutocompleteDirective,
+    UppercaseDirective
   ],
   declarations: [EditConstructionComponent]
 })

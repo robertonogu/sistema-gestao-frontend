@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
+import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
 @NgModule({
   imports: [
@@ -25,7 +26,8 @@ import { TooltipModule } from 'primeng/tooltip';
     DropdownModule,
     ToolbarModule,
     ToastModule,
-    TooltipModule
+    TooltipModule,
+    UppercaseDirective
   ],
   declarations: [EditSaleComponent]
 })

@@ -9,6 +9,10 @@ import { PaginatorModule } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { FormsModule } from '@angular/forms';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
+import { InputTextModule } from 'primeng/inputtext';
 
 @NgModule({
   imports: [
@@ -20,7 +24,11 @@ import { ToastModule } from 'primeng/toast';
 		TagModule,
     TooltipModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    FormsModule,
+    DropdownModule,
+    CalendarModule,
+    InputTextModule
   ],
   declarations: [ListExpensesComponent]
 })

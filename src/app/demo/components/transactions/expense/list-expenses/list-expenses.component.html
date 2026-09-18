@@ -21,18 +21,21 @@
                         [text]="true" 
                         severity="primary" 
                     />-->
-                    <button 
+                    <button
                         class="p-button-rounded"
-                        icon="pi pi-download" 
-                        pTooltip="Exportar" 
-                        tooltipPosition="bottom" 
-                        pButton 
-                        type="button" 
+                        icon="pi pi-download"
+                        pTooltip="Exportar"
+                        tooltipPosition="bottom"
+                        pButton
+                        type="button"
+                        [loading]="exporting"
+                        (click)="exportPdf()"
                     ></button>
                 </div>
             </div>
- 
-			<p-table 
+
+			<p-table
+                #dt
                 currentPageReportTemplate="{first} de {last} de {totalRecords} despesas totais"
                 [lazy]="true"
                 [loading]="loading"
@@ -53,13 +56,59 @@
 
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Data</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Data
+                                <p-columnFilter field="date" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-calendar [ngModel]="value" dateFormat="dd/mm/yy" [showIcon]="true" [showButtonBar]="true"
+                                            appendTo="body" (onSelect)="filter($event)" (onClearClick)="filter(null)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Categoria</th>
-                        <th>Estado</th>
-                        <th>Documento</th>
-                        <th>Origem</th>
-                        <th>Valor</th>
-                        <th>IVA</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Estado
+                                <p-columnFilter field="paymentStatus" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="PaymentStatus | keyvalue" optionLabel="value" optionValue="key"
+                                            placeholder="Todos" [showClear]="true" appendTo="body" [style]="{ 'min-width': '12rem' }"
+                                            (onChange)="filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Documento
+                                <p-columnFilter field="documentNumber" matchMode="contains" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Origem
+                                <p-columnFilter field="origin" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="supplierNames" optionLabel="name" optionValue="id"
+                                            placeholder="Todos" [showClear]="true" [filter]="true" filterBy="name" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                            (onChange)="filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
+                        <th>Meio de Pagamento</th>
+                        <th>Valor Total</th>
+                        <th>Valor Pendente</th>
                         <th>Data Limite</th>
                         <th>Ações</th>
                     </tr>
@@ -79,9 +128,10 @@
                         </td>
                         <td><span [class]="'expense-badge status-' + expense.paymentStatus.toLowerCase()">{{ PaymentStatus[expense.paymentStatus] }}</span></td>
                         <td>{{ expense.documentNumber }}</td>
-                        <td>{{ expense.origin.name }}</td>
+                        <td>{{ expense.origin }}</td>
+                        <td>{{ paymentMethodsLabel(expense.paymentMethods) }}</td>
                         <td>{{ expense.totalValue | number: '1.2-2' }} €</td>
-                        <td>{{ expense.iva | number: '1.2-2' }} €</td>
+                        <td>{{ expense.pendingValue | number: '1.2-2' }} €</td>
                         <td>{{ expense.paymentDeadline | date: 'dd/MM/yyyy' }}</td>
                         <td>
                             <p-button 

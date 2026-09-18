@@ -19,7 +19,7 @@ export class ListSalesComponent implements OnInit {
 
   years: number[] = [];
   selectedYear: number | null = null;
-  totalValue: number = 0;
+  netValue: number = 0;
 
   constructor(
     private confirmationService: ConfirmationService,
@@ -43,7 +43,7 @@ export class ListSalesComponent implements OnInit {
     this.saleService.getSales(this.currentPage, this.pageSize, this.selectedYear ?? undefined).subscribe((sales) => {
       this.sales = sales.objectList;
       this.totalRecords = sales.totalElements;
-      this.totalValue = sales.totalValue;
+      this.netValue = sales.netValue;
       this.loading = false;
     });
   }

@@ -16,6 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
+import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
 @NgModule({
   imports: [
@@ -35,7 +36,8 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
     TooltipModule,
     CheckboxModule,
     DialogModule,
-    GooglePlaceAutocompleteDirective
+    GooglePlaceAutocompleteDirective,
+    UppercaseDirective
   ],
   declarations: [CreateConstructionComponent]
 })

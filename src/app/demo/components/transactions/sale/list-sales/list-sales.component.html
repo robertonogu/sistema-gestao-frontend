@@ -39,7 +39,7 @@
                 </div>
                 <div class="sm:ml-auto text-right">
                     <span class="text-500 text-sm block">Total de vendas</span>
-                    <span class="text-900 text-xl font-bold">{{ totalValue | number: '1.2-2' }} €</span>
+                    <span class="text-900 text-xl font-bold">{{ netValue | number: '1.2-2' }} €</span>
                 </div>
             </div>
 
@@ -75,7 +75,7 @@
                         <td>{{ sale.date | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ sale.documentNumber }}</td>
                         <td>{{ sale.client }}</td>
-                        <td>{{ sale.totalValue | number: '1.2-2' }} €</td>
+                        <td>{{ sale.netValue | number: '1.2-2' }} €</td>
                         <td>{{ sale.pendingValue | number: '1.2-2' }} €</td>
                         <td>{{ sale.construction }}</td>
                         <td>

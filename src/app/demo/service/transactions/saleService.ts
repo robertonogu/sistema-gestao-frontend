@@ -18,10 +18,10 @@ export class SaleService {
 
     constructor(private http: HttpClient) { }
 
-    getSales(currentPage: number, pageSize: number, year?: number) : Observable<ObjectList & { totalValue: number }> {
+    getSales(currentPage: number, pageSize: number, year?: number) : Observable<ObjectList & { netValue: number }> {
       let url = this.salesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
       if (year != null) url += "&year=" + year;
-      return this.http.get<ObjectList & { totalValue: number }>(url);
+      return this.http.get<ObjectList & { netValue: number }>(url);
     }
 
     getSaleYears() : Observable<number[]> {

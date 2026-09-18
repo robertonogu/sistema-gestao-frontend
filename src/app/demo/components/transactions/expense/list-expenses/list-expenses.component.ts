@@ -1,10 +1,16 @@
-﻿import { Component } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Expense } from 'src/app/demo/api/expense';
+import { Table } from 'primeng/table';
+import { ExpenseListItem } from 'src/app/demo/api/expenseListItem';
+import { ItemName } from 'src/app/demo/api/itemName';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { PaymentStatus } from 'src/app/demo/data/enum/paymentStatus';
-import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
+import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
+import { ExpenseFilters, ExpenseService } from 'src/app/demo/service/transactions/expense.service';
+import { SupplierService } from 'src/app/demo/service/company/supplierService';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   templateUrl: 'list-expenses.component.html',
@@ -26,17 +32,22 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
   `]
 })
 
-export class ListExpensesComponent {
+export class ListExpensesComponent implements OnInit {
 
   loading: boolean = true;
+  exporting: boolean = false;
   totalRecords: number = 0;
-  expenses!: Expense[];
+  expenses!: ExpenseListItem[];
 
   DocumentType = DocumentType;
   PaymentStatus: any = PaymentStatus;
+  PaymentMethod: any = PaymentMethod;
 
   currentPage: number = 0;
   pageSize: number = 20;
+
+  @ViewChild('dt') table?: Table;
+  supplierNames: ItemName[] = [];
 
   readonly categoryMeta: Record<string, { label: string; color: string }> = {
     BANK:          { label: 'Banco',        color: '#3b82f6' },
@@ -63,28 +74,92 @@ export class ListExpensesComponent {
     return this.categoryLabel(code).charAt(0).toUpperCase();
   }
 
+  paymentMethodsLabel(paymentMethods: string[]): string {
+    if (!paymentMethods || paymentMethods.length === 0) return '-';
+    return paymentMethods.map((method) => this.PaymentMethod[method] ?? method).join(', ');
+  }
+
   constructor(
     private expenseService: ExpenseService,
+    private supplierService: SupplierService,
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}
 
+  ngOnInit(): void {
+    this.supplierService.getSupplierNames().subscribe((suppliers) => {
+      this.supplierNames = suppliers;
+    });
+  }
+
+  private filterValue(filters: any, field: string) {
+    const meta = Array.isArray(filters?.[field]) ? filters[field][0] : filters?.[field];
+    return meta?.value ?? undefined;
+  }
+
+  private buildFilters(filters: any): ExpenseFilters {
+    return {
+      documentNumber: this.filterValue(filters, 'documentNumber'),
+      date: this.filterValue(filters, 'date'),
+      originId: this.filterValue(filters, 'origin'),
+      paymentStatus: this.filterValue(filters, 'paymentStatus')
+    };
+  }
+
   nextPage(event: any) {
     this.loading = true;
-    
+
     this.currentPage = event.first / event.rows;
     this.pageSize = event.rows;
-    
-    this.expenseService.getExpenses(this.currentPage, this.pageSize).subscribe((expenses) => {
+
+    const filters = event.filters ?? this.table?.filters ?? {};
+
+    this.expenseService.getExpenses(this.currentPage, this.pageSize, this.buildFilters(filters)).subscribe((expenses) => {
       this.expenses = expenses.objectList;
       this.totalRecords = expenses.totalElements;
-      console.log(expenses)
       this.loading = false;
     });
   }
 
-  selectedExpense!: Expense;
+  exportPdf() {
+    this.exporting = true;
+
+    const filters = this.table?.filters ?? {};
+
+    this.expenseService.getExpenses(0, 100000, this.buildFilters(filters)).subscribe({
+      next: (result) => {
+        const doc = new jsPDF({ orientation: 'landscape' });
+
+        doc.setFontSize(14);
+        doc.text('Despesas', 14, 15);
+
+        autoTable(doc, {
+          startY: 20,
+          head: [['Data', 'Documento', 'Origem', 'Estado', 'Meio de Pagamento', 'Valor', 'Valor Pendente', 'Data Limite']],
+          body: result.objectList.map((expense: ExpenseListItem) => [
+            expense.date ? new Date(expense.date).toLocaleDateString('pt-PT') : '',
+            expense.documentNumber,
+            expense.origin ?? '',
+            this.PaymentStatus[expense.paymentStatus] ?? expense.paymentStatus,
+            this.paymentMethodsLabel(expense.paymentMethods),
+            `${expense.totalValue.toFixed(2)} €`,
+            `${expense.pendingValue.toFixed(2)} €`,
+            expense.paymentDeadline ? new Date(expense.paymentDeadline).toLocaleDateString('pt-PT') : ''
+          ])
+        });
+
+        doc.save('despesas.pdf');
+        this.exporting = false;
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível exportar as despesas.' });
+        this.exporting = false;
+      }
+    });
+  }
+
+  selectedExpense!: ExpenseListItem;
 
   onRowSelect(event: any) {
     this.router.navigate(["pages/invoice", { expenseId: event.data.expenseId }]);
@@ -94,7 +169,7 @@ export class ListExpensesComponent {
     this.router.navigate(['./transactions/expenses/create-expense']);
   }
 
-  deleteExpense(expense: Expense) {
+  deleteExpense(expense: ExpenseListItem) {
     this.confirmationService.confirm({
       header: `Apagar a despesa ${expense.documentNumber}?`,
       message: 'Confirme para prosseguir.',
