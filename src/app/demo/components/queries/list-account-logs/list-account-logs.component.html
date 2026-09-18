@@ -29,7 +29,8 @@
                 </div>
             </div>
 
-			<p-table 
+			<p-table
+                #dt
                 currentPageReportTemplate="{first} de {last} de {totalRecords} registos de conta"
                 [lazy]="true"
                 [loading]="loading"
@@ -38,7 +39,7 @@
                 [rows]="20"
                 [rowsPerPageOptions]="[5, 10, 20, 50, 100]"
                 [showCurrentPageReport]="true"
-                styleClass="p-datatable-striped" 
+                styleClass="p-datatable-striped"
                 [totalRecords]="totalRecords"
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="accountLogs"
@@ -47,7 +48,20 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Data</th>
-                        <th>Tipo de Movimento</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Tipo de Movimento
+                                <p-columnFilter field="movementType" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="MovementType | keyvalue" optionLabel="value" optionValue="key"
+                                            placeholder="Todos" [showClear]="true" appendTo="body" [style]="{ 'min-width': '12rem' }"
+                                            (onChange)="filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
+                        <th>Origem</th>
                         <th>Número de Documento</th>
                         <th>Crédito</th>
                         <th>Débito</th>
@@ -59,6 +73,7 @@
                     <tr>
                         <td>{{ accountLog.date | date: 'dd/MM/yyyy' }}</td>
                         <td><span [class]="'movement-badge status-' + accountLog.movementType.toLowerCase()">{{ MovementType[accountLog.movementType] }}</span></td>
+                        <td>{{ accountLog.origin }}</td>
                         <td>{{ accountLog.documentNumber }}</td>
                         <td class="text-green-600 font-medium">{{ accountLog.credit !== 0 ? (accountLog.credit | number: '1.2-2') + ' €' : '' }}</td>
                         <td class="text-red-600 font-medium">{{ accountLog.debt !== 0 ? (accountLog.debt | number: '1.2-2') + ' €' : '' }}</td>
@@ -68,7 +83,7 @@
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td class="text-center" colspan="6">Sem registos.</td>
+                        <td class="text-center" colspan="7">Sem registos.</td>
                     </tr>
                   </ng-template>
                 

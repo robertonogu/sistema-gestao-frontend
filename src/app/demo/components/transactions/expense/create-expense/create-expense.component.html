@@ -41,13 +41,14 @@
 <div class="grid">
 	<div class="col-12">
 		<div class="card">
-			<h4 class="section-title">Dados da Fatura</h4>
+			<h4 class="section-title">Dados do Documento</h4>
 
 			<div class="grid p-formgrid p-fluid">
 				<div class="field col-12 md:col-4">
 					<label>Data</label>
 					<p-calendar
 						[(ngModel)]="date"
+						(onSelect)="onDateChange()"
 						dateFormat="dd/mm/yy"
 						[iconDisplay]="'input'"
 						[showIcon]="true"
@@ -138,6 +139,18 @@
 						optionValue="key"
 						placeholder="Selecione uma Condição de Pagamento"
 						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaymentCondition }"
+					/>
+				</div>
+
+				<div class="field col-12 md:col-4">
+					<label>Data Limite Pagamento</label>
+					<p-calendar
+						[(ngModel)]="paymentDeadline"
+						dateFormat="dd/mm/yy"
+						[iconDisplay]="'input'"
+						[showIcon]="true"
+						[disabled]="!isOtherPaymentCondition"
+						[ngClass]="{ 'ng-dirty ng-invalid': isOtherPaymentCondition && !paymentDeadline }"
 					/>
 				</div>
 

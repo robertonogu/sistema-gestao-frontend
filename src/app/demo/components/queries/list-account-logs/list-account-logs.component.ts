@@ -24,6 +24,7 @@ export class ListAccountLogsComponent {
   pageSize: number = 20;
 
   MovementType: any = MovementType;
+  private selectedMovementType: string | undefined;
 
   constructor(
     private accountService: AccountService,
@@ -36,10 +37,16 @@ export class ListAccountLogsComponent {
     });
   }
 
+  private filterValue(filters: any, field: string) {
+    const meta = Array.isArray(filters?.[field]) ? filters[field][0] : filters?.[field];
+    return meta?.value ?? undefined;
+  }
+
   nextPage(event: any) {
     if (this.selectedAccount != null) {
       this.currentPage = event.first / event.rows;
       this.pageSize = event.rows;
+      this.selectedMovementType = this.filterValue(event.filters, 'movementType');
 
       this.loadAccountLogs();
     }
@@ -55,7 +62,7 @@ export class ListAccountLogsComponent {
   private loadAccountLogs() {
     this.loading = true;
 
-    this.accountLogService.getAccountLogs(this.selectedAccount, this.currentPage, this.pageSize).subscribe((accountLogs) => {
+    this.accountLogService.getAccountLogs(this.selectedAccount, this.currentPage, this.pageSize, this.selectedMovementType).subscribe((accountLogs) => {
       this.accountLogs = accountLogs.objectList;
       this.totalRecords = accountLogs.totalElements;
 

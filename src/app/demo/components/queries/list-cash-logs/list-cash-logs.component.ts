@@ -25,17 +25,24 @@ export class ListCashLogsComponent {
     private accountLogService: AccountLogService
   ) {}
 
+  private filterValue(filters: any, field: string) {
+    const meta = Array.isArray(filters?.[field]) ? filters[field][0] : filters?.[field];
+    return meta?.value ?? undefined;
+  }
+
   nextPage(event: any) {
     this.loading = true;
-    
+
     this.currentPage = event.first / event.rows;
     this.pageSize = event.rows;
-    
-    this.accountLogService.getCashAccountLogs(this.currentPage, this.pageSize).subscribe((accountLogs) => {
+
+    const movementType = this.filterValue(event.filters, 'movementType');
+
+    this.accountLogService.getCashAccountLogs(this.currentPage, this.pageSize, movementType).subscribe((accountLogs) => {
       this.accountLogs = accountLogs.objectList;
       this.totalRecords = accountLogs.totalElements;
       // isto só deve ser colocado pela primeira vez
-      this.balance = this.accountLogs[0].balance;
+      this.balance = this.accountLogs[0]?.balance ?? 0;
       this.loading = false;
     });
   }

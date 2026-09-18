@@ -1,6 +1,7 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
 import { AccountName } from 'src/app/demo/api/accountName';
 import { Movement } from 'src/app/demo/api/movement';
 import { MovementType } from 'src/app/demo/data/enum/movementType';
@@ -24,6 +25,8 @@ export class ListMovementsComponent implements OnInit {
   MovementType = MovementType;
 
   accountNames: AccountName[] = [];
+
+  @ViewChild('dt') table?: Table;
 
   movementDialog: boolean = false;
   submitted: boolean = false;
@@ -50,13 +53,27 @@ export class ListMovementsComponent implements OnInit {
     return this.accountNames.find(account => account.cashBox)?.objectId;
   }
 
+  private filterValue(filters: any, field: string) {
+    const meta = Array.isArray(filters?.[field]) ? filters[field][0] : filters?.[field];
+    return meta?.value ?? undefined;
+  }
+
   nextPage(event: any) {
     this.loading = true;
 
     this.currentPage = event.first / event.rows;
     this.pageSize = event.rows;
 
-    this.movementService.getMovements(this.currentPage, this.pageSize).subscribe((movements) => {
+    const filters = event.filters ?? this.table?.filters ?? {};
+    const dateRange = this.filterValue(filters, 'date');
+    let dateFrom: Date | undefined;
+    let dateTo: Date | undefined;
+    if (Array.isArray(dateRange) && dateRange[0]) {
+      dateFrom = dateRange[0];
+      dateTo = dateRange[1] ?? dateRange[0];
+    }
+
+    this.movementService.getMovements(this.currentPage, this.pageSize, dateFrom, dateTo).subscribe((movements) => {
       this.movements = movements.objectList;
       this.totalRecords = movements.totalElements;
       this.loading = false;

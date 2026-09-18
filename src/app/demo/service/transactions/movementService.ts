@@ -16,9 +16,18 @@ export class MovementService {
 
     constructor(private http: HttpClient) { }
 
-    getMovements(currentPage: number, pageSize: number) : Observable<ObjectList> {
+    getMovements(currentPage: number, pageSize: number, dateFrom?: Date, dateTo?: Date) : Observable<ObjectList> {
         let url = this.movementsUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+        if (dateFrom) url += "&dateFrom=" + this.formatDate(dateFrom);
+        if (dateTo) url += "&dateTo=" + this.formatDate(dateTo);
         return this.http.get<ObjectList>(url);
+    }
+
+    private formatDate(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     createMovement(newMovement: MovementCreation) : Observable<Movement> {

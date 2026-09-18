@@ -53,7 +53,7 @@ export class ListExpensesComponent implements OnInit {
     BANK:          { label: 'Banco',        color: '#3b82f6' },
     TAXES:         { label: 'Impostos',     color: '#ef4444' },
     PEOPLE:        { label: 'Pessoal',      color: '#22c55e' },
-    OPERATION:     { label: 'Operação',     color: '#8b5cf6' },
+    OPERATION:     { label: 'Funcionamento',     color: '#8b5cf6' },
     COMMERCIAL:    { label: 'Comercial',    color: '#ec4899' },
     VEHICLES:      { label: 'Veículos',     color: '#f59e0b' },
     EQUIPMENTS:    { label: 'Equipamentos', color: '#14b8a6' },
@@ -99,9 +99,18 @@ export class ListExpensesComponent implements OnInit {
   }
 
   private buildFilters(filters: any): ExpenseFilters {
+    const dateRange = this.filterValue(filters, 'date');
+    let dateFrom: Date | undefined;
+    let dateTo: Date | undefined;
+    if (Array.isArray(dateRange) && dateRange[0]) {
+      dateFrom = dateRange[0];
+      dateTo = dateRange[1] ?? dateRange[0];
+    }
+
     return {
       documentNumber: this.filterValue(filters, 'documentNumber'),
-      date: this.filterValue(filters, 'date'),
+      dateFrom,
+      dateTo,
       originId: this.filterValue(filters, 'origin'),
       paymentStatus: this.filterValue(filters, 'paymentStatus')
     };

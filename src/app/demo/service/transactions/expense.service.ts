@@ -9,7 +9,8 @@ import { Expense } from '../../api/expense';
 
 export interface ExpenseFilters {
     documentNumber?: string;
-    date?: Date;
+    dateFrom?: Date;
+    dateTo?: Date;
     originId?: number;
     paymentStatus?: string;
 }
@@ -28,7 +29,8 @@ export class ExpenseService {
         let url = this.expensesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
 
         if (filters?.documentNumber) url += "&documentNumber=" + encodeURIComponent(filters.documentNumber);
-        if (filters?.date) url += "&date=" + this.formatDate(filters.date);
+        if (filters?.dateFrom) url += "&dateFrom=" + this.formatDate(filters.dateFrom);
+        if (filters?.dateTo) url += "&dateTo=" + this.formatDate(filters.dateTo);
         if (filters?.originId != null) url += "&originId=" + filters.originId;
         if (filters?.paymentStatus) url += "&paymentStatus=" + filters.paymentStatus;
 

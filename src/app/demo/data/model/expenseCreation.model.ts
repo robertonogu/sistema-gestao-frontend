@@ -9,6 +9,7 @@ export interface ExpenseCreation {
     documentType: DocumentType;
     documentNumber: string;
     paymentCondition: PaymentCondition;
+    paymentDeadline?: Date;
     netValue: number;
     iva: number;
     totalValue: number;

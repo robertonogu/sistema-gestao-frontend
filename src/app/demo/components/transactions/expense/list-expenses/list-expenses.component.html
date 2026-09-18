@@ -62,8 +62,8 @@
                                 <p-columnFilter field="date" matchMode="equals" display="menu"
                                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
                                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                        <p-calendar [ngModel]="value" dateFormat="dd/mm/yy" [showIcon]="true" [showButtonBar]="true"
-                                            appendTo="body" (onSelect)="filter($event)" (onClearClick)="filter(null)" />
+                                        <p-calendar [ngModel]="value" selectionMode="range" dateFormat="dd/mm/yy" [showButtonBar]="true"
+                                            appendTo="body" (ngModelChange)="filter($event)" (onClearClick)="filter(null)" />
                                     </ng-template>
                                 </p-columnFilter>
                             </div>

@@ -14,13 +14,15 @@ export class AccountLogService {
 
     constructor(private http: HttpClient) { }
 
-    getAccountLogs(accountId: number, currentPage: number, pageSize: number) : Observable<ObjectList> {
+    getAccountLogs(accountId: number, currentPage: number, pageSize: number, movementType?: string) : Observable<ObjectList> {
         let url = this.accountLogsUrl + accountId + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        if (movementType) url += "&movementType=" + movementType;
         return this.http.get<ObjectList>(url);
     }
 
-    getCashAccountLogs(currentPage: number, pageSize: number) : Observable<ObjectList> {
+    getCashAccountLogs(currentPage: number, pageSize: number, movementType?: string) : Observable<ObjectList> {
         let url = this.cashAccountLogsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        if (movementType) url += "&movementType=" + movementType;
         return this.http.get<ObjectList>(url);
     }
 

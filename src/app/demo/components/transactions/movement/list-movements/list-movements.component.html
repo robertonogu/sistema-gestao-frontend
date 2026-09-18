@@ -25,6 +25,7 @@
             </div>
 
 			<p-table
+                #dt
                 currentPageReportTemplate="{first} de {last} de {totalRecords} movimentos totais"
                 [lazy]="true"
                 [loading]="loading"
@@ -41,7 +42,18 @@
 
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Data</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Data
+                                <p-columnFilter field="date" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-calendar [ngModel]="value" selectionMode="range" dateFormat="dd/mm/yy" [showButtonBar]="true"
+                                            appendTo="body" (ngModelChange)="filter($event)" (onClearClick)="filter(null)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>De</th>
                         <th>Para</th>
                         <th>Valor</th>

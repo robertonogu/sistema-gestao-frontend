@@ -10,7 +10,7 @@ import { Origin } from 'src/app/demo/api/origin';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
 import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { EquipmentStatus } from 'src/app/demo/data/enum/equipmentStatus';
-import { PaymentCondition } from 'src/app/demo/data/enum/paymentCondition';
+import { PaymentCondition, PAYMENT_CONDITION_DAYS } from 'src/app/demo/data/enum/paymentCondition';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { SubCategoryType } from 'src/app/demo/data/enum/subCategoryType';
 import { ToolStatus } from 'src/app/demo/data/enum/toolStatus';
@@ -267,6 +267,7 @@ export class CreateExpenseComponent implements OnInit {
   selectedDocumentType!: DocumentType;
   documentNumber!: string;
   selectedPaymentCondition!: PaymentCondition;
+  paymentDeadline!: Date;
   isIntegralPayment: boolean = false;
   private _paymentValue: number = 0;
   selectedAccount!: number;
@@ -504,6 +505,32 @@ export class CreateExpenseComponent implements OnInit {
       this.disablePaidValue = false;
       this.paymentValue = 0;
     }
+    this.recalculatePaymentDeadline();
+  }
+
+  get isOtherPaymentCondition(): boolean {
+    return (this.selectedPaymentCondition as unknown as string) === 'OTHER';
+  }
+
+  onDateChange() {
+    this.recalculatePaymentDeadline();
+  }
+
+  private recalculatePaymentDeadline(): void {
+    if (this.isOtherPaymentCondition) {
+      this.paymentDeadline = undefined as any;
+      return;
+    }
+
+    const conditionKey = this.selectedPaymentCondition as unknown as string;
+    if (!this.date || !conditionKey || !(conditionKey in PAYMENT_CONDITION_DAYS)) {
+      this.paymentDeadline = undefined as any;
+      return;
+    }
+
+    const deadline = new Date(this.date);
+    deadline.setDate(deadline.getDate() + PAYMENT_CONDITION_DAYS[conditionKey]);
+    this.paymentDeadline = deadline;
   }
 
   originalOrder = (): number => 0;
@@ -894,7 +921,7 @@ export class CreateExpenseComponent implements OnInit {
 
     this.expenseCreation = {
       date: this.date, originId: this.selectedOrigin, documentType: this.selectedDocumentType, documentNumber: this.documentNumber,
-      paymentCondition: this.selectedPaymentCondition, netValue: this.netValue, iva: this.iva, totalValue: this.totalValue, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
+      paymentCondition: this.selectedPaymentCondition, paymentDeadline: this.paymentDeadline, netValue: this.netValue, iva: this.iva, totalValue: this.totalValue, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
       accountId: this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList
     } as ExpenseCreation;
 
@@ -912,6 +939,7 @@ export class CreateExpenseComponent implements OnInit {
     this.selectedDocumentType = undefined as any;
     this.documentNumber = undefined as any;
     this.selectedPaymentCondition = undefined as any;
+    this.paymentDeadline = undefined as any;
     this.isIntegralPayment = false;
     this.paymentValue = 0;
     this.disablePaidValue = false;
