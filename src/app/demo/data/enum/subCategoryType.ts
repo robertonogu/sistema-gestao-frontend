@@ -91,22 +91,31 @@ export enum SubCategoryType {
 
     // TOOLS
 
-    TOOLS_PURCHASE = 'Compra de Ferramentas',
-    TOOLS_MAINTENANCE = 'Manutenção de Ferramentas',
+    TOOLS_PURCHASE = 'Aquisição ferramentas manuais',
+    ELECTRIC_TOOLS_PURCHASE = 'Aquisição de ferramentas elétricas',
+    MANUAL_TOOLS_CONSUMABLES = 'Consumíveis para ferramentas manuais',
+    ELECTRIC_TOOLS_CONSUMABLES = 'Consumíveis para ferramentas elétricas',
+    TOOLS_MAINTENANCE = 'Manutenção de ferramentas elétricas',
 
     // INVENTORY
 
-    CONSTRUCTION = 'Construção',
-    PLUMBING = 'Pichelaria',
-    ELECTRICAL_MATERIALS = 'Instalações Elétricas',
-    HARDWARE = 'Ferragens',
-    GLASS_MIRRORS = 'Vidros e Espelhos',
-    METALS = 'Metais',
-    PAINTS_GLUES_VARNISHES = 'Tintas / Colas / Vernizes',
     WOOD = 'Madeiras',
+    CONSTRUCTION = 'Materiais de construção',
+    METALS = 'Metais',
+    HARDWARE = 'Ferragens',
+    FASTENING_SYSTEMS = 'Sistemas de fixação',
+    ADHESIVES_SEALANTS = 'Colas, selantes e outros produtos químicos',
+    PAINTS_GLUES_VARNISHES = 'Tintas, Vernizes e outros produtos de acabamento',
+    WATERPROOFING_INSULATION = 'Impermeabilização e isolamento',
+    PLUMBING = 'Pichelaria',
+    ELECTRICAL_MATERIALS = 'Eletricidade',
+    SITE_CONSUMABLES = 'Consumíveis de obra',
+    GLASS_MIRRORS = 'Vidros e espelhos',
+    CLADDING = 'Revestimentos',
+    OTHER_MATERIALS = 'Outros materiais',
     REAL_ESTATE = 'Imóveis',
-    INVENTORY_EXPENSES = 'Despesas com Inventário',
-    INVENTORY_INVESTMENT = 'Investimento com Inventário',
+    INVENTORY_EXPENSES = 'Despesas com inventário',
+    INVENTORY_INVESTMENT = 'Investimento com inventário',
 
     // CONSTRUCTION
 

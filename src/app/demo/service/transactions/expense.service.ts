@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment';
 import { ObjectList } from '../../api/objectList';
 import { ExpenseCreation } from '../../data/model/expenseCreation.model';
 import { Expense } from '../../api/expense';
+import { ExpenseEdit } from '../../api/expenseEdit';
 
 export interface ExpenseFilters {
     documentNumber?: string;
@@ -62,6 +63,16 @@ export class ExpenseService {
 
     createExpense(expense: ExpenseCreation) : Observable<Expense> {
         return this.http.post<Expense>(this.expensesUrl, expense, environment.httpOptions);
+    }
+
+    updateExpense(expenseId: number, expense: ExpenseCreation) : Observable<Expense> {
+        let url = this.expensesUrl + "/" + expenseId;
+        return this.http.put<Expense>(url, expense, environment.httpOptions);
+    }
+
+    getExpenseForEdit(expenseId: number) : Observable<ExpenseEdit> {
+        let url = this.expensesUrl + "/" + expenseId + "/edit";
+        return this.http.get<ExpenseEdit>(url);
     }
 
     deleteExpense(expenseId: number) : Observable<void> {

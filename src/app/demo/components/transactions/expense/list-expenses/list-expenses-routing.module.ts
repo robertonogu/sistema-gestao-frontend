@@ -6,6 +6,7 @@ import { ListExpensesComponent } from './list-expenses.component';
 	imports: [RouterModule.forChild([
 		{ path: '', component: ListExpensesComponent },
 		{ path: 'create-expense', data: { breadcrumb: 'Nova Despesa' }, loadChildren: () => import('../create-expense/create-expense.module').then(m => m.CreateExpenseModule) },
+		{ path: 'edit-expense/:expenseId', data: { breadcrumb: 'Editar Despesa' }, loadChildren: () => import('../create-expense/create-expense.module').then(m => m.CreateExpenseModule) },
 	])],
 	exports: [RouterModule]
 })

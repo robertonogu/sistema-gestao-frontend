@@ -1,10 +1,12 @@
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuItem, MessageService, TreeNode } from 'primeng/api';
 import { AccountName } from 'src/app/demo/api/accountName';
 import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
+import { ExpenseEdit, ExpenseItemEdit } from 'src/app/demo/api/expenseEdit';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { Origin } from 'src/app/demo/api/origin';
 import { CategoryType } from 'src/app/demo/data/enum/categoryType';
@@ -211,17 +213,17 @@ export class CreateExpenseComponent implements OnInit {
 
   categoriesAndSubCategories = {
     [CategoryType.BANK]: [
-      SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.IMMEDIATE_TRANSFERS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS,
-      SubCategoryType.CREDIT, SubCategoryType.CARD_COMMISSIONS, SubCategoryType.OTHER_BANK_COMMISSIONS, SubCategoryType.LOAN_INTEREST,
-      SubCategoryType.OTHER_INTEREST, SubCategoryType.BANK_GUARANTEES, SubCategoryType.FINANCING_CHARGES, SubCategoryType.BANK_OPERATING_COSTS
+      SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS,
+      SubCategoryType.CREDIT, SubCategoryType.CARD_COMMISSIONS, SubCategoryType.LOAN_INTEREST,
+      SubCategoryType.OTHER_INTEREST, SubCategoryType.BANK_GUARANTEES, SubCategoryType.FINANCING_CHARGES
     ],
     [CategoryType.TAXES]: [
       SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.IES, SubCategoryType.FONT_RETENTION,
       SubCategoryType.IMI, SubCategoryType.FINES_PENALTIES, SubCategoryType.OTHER_TAXES
     ],
     [CategoryType.PEOPLE]: [
-      SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS, SubCategoryType.COMPENSATION_FUNDS,
-      SubCategoryType.INSURANCE_PEOPLE, SubCategoryType.SAFETY, SubCategoryType.MEALS, SubCategoryType.WORK_ACCIDENT_INSURANCE,
+      SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS,
+      SubCategoryType.SAFETY, SubCategoryType.MEALS, SubCategoryType.WORK_ACCIDENT_INSURANCE,
       SubCategoryType.OTHER_INSURANCES, SubCategoryType.PROFESSIONAL_TRAINING, SubCategoryType.PERSONAL_PROTECTIVE_EQUIPMENT,
       SubCategoryType.OCCUPATIONAL_HEALTH, SubCategoryType.EMPLOYEE_TRAVEL, SubCategoryType.OTHER_PEOPLE_EXPENSES
     ],
@@ -244,10 +246,16 @@ export class CreateExpenseComponent implements OnInit {
       SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.EQUIPMENTS_MAINTENANCE, SubCategoryType.EQUIPMENT_CONSUMABLES,
       SubCategoryType.EQUIPMENT_RENTAL, SubCategoryType.EQUIPMENT_FUEL
     ],
-    [CategoryType.TOOLS]: [SubCategoryType.TOOLS_PURCHASE, SubCategoryType.TOOLS_MAINTENANCE],
+    [CategoryType.TOOLS]: [
+      SubCategoryType.TOOLS_PURCHASE, SubCategoryType.ELECTRIC_TOOLS_PURCHASE,
+      SubCategoryType.MANUAL_TOOLS_CONSUMABLES, SubCategoryType.ELECTRIC_TOOLS_CONSUMABLES,
+      SubCategoryType.TOOLS_MAINTENANCE
+    ],
     [CategoryType.INVENTORY]: [
-      SubCategoryType.CONSTRUCTION, SubCategoryType.PLUMBING, SubCategoryType.ELECTRICAL_MATERIALS, SubCategoryType.HARDWARE,
-      SubCategoryType.GLASS_MIRRORS, SubCategoryType.METALS, SubCategoryType.PAINTS_GLUES_VARNISHES, SubCategoryType.WOOD,
+      SubCategoryType.WOOD, SubCategoryType.CONSTRUCTION, SubCategoryType.METALS, SubCategoryType.HARDWARE,
+      SubCategoryType.FASTENING_SYSTEMS, SubCategoryType.ADHESIVES_SEALANTS, SubCategoryType.PAINTS_GLUES_VARNISHES,
+      SubCategoryType.WATERPROOFING_INSULATION, SubCategoryType.PLUMBING, SubCategoryType.ELECTRICAL_MATERIALS,
+      SubCategoryType.SITE_CONSUMABLES, SubCategoryType.GLASS_MIRRORS, SubCategoryType.CLADDING, SubCategoryType.OTHER_MATERIALS,
       SubCategoryType.REAL_ESTATE, SubCategoryType.INVENTORY_EXPENSES, SubCategoryType.INVENTORY_INVESTMENT
     ],
     [CategoryType.CONSTRUCTIONS]: [SubCategoryType.EXTERNAL_SERVICES],
@@ -313,6 +321,9 @@ export class CreateExpenseComponent implements OnInit {
   quickAddToolEquipmentName: string | null = null;
   quickAddToolEquipmentCode: string | null = null;
 
+  editingExpenseId?: number;
+  loadingEdit: boolean = false;
+
   constructor(
     private originService: OriginService,
     private accountService: AccountService,
@@ -325,7 +336,9 @@ export class CreateExpenseComponent implements OnInit {
     private externalEntityService: ExternalEntityService,
     private messageService: MessageService,
     private fb: FormBuilder,
-    private _location: Location
+    private _location: Location,
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.originService.getOriginsGrouped().subscribe((origins) => {
       this.origins = origins;
@@ -348,6 +361,59 @@ export class CreateExpenseComponent implements OnInit {
 
   ngOnInit() {
     this.categories = this.transformCategoriesAndSubCategories(this.categoriesAndSubCategories);
+
+    const expenseId = Number(this.route.snapshot.params['expenseId']);
+    if (expenseId) {
+      this.editingExpenseId = expenseId;
+      this.loadingEdit = true;
+      this.expenseService.getExpenseForEdit(expenseId).subscribe({
+        next: (expenseEdit) => {
+          this.populateFormForEdit(expenseEdit);
+          this.loadingEdit = false;
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível carregar a despesa.' });
+          this.loadingEdit = false;
+        }
+      });
+    }
+  }
+
+  private populateFormForEdit(expenseEdit: ExpenseEdit): void {
+    this.date = new Date(expenseEdit.date);
+    this.selectedDocumentType = expenseEdit.documentType;
+    this.documentNumber = expenseEdit.documentNumber;
+    this.selectedOrigin = expenseEdit.originId as any;
+    this.selectedPaymentCondition = expenseEdit.paymentCondition;
+    this.paymentDeadline = expenseEdit.paymentDeadline ? new Date(expenseEdit.paymentDeadline) : undefined as any;
+
+    this.itemInputs.clear();
+    for (const item of expenseEdit.itemList) {
+      this.itemInputs.push(this.buildItemInputFromEdit(item));
+    }
+    if (this.itemInputs.length === 0) {
+      this.itemInputs.push(this.buildItemInput());
+    }
+  }
+
+  private buildItemInputFromEdit(item: ExpenseItemEdit): FormGroup {
+    const costAllocation = item.costAllocations?.[0];
+
+    return this.fb.group({
+      subCategoryType: [(SubCategoryType as any)[item.subCategoryType] ?? null, Validators.required],
+      name: [item.name, Validators.required],
+      quantity: [item.quantity, Validators.required],
+      unit: [item.unit, Validators.required],
+      value: [item.netValue, Validators.required],
+      total: [item.totalValue, Validators.required],
+      iva: [item.iva, Validators.required],
+      constructionId: [item.constructionId ?? null],
+      budgetItemId: [costAllocation?.budgetItemId ?? null],
+      allocationQuantity: [costAllocation?.quantity ?? null],
+      vehicleId: [item.vehicleId ?? null],
+      toolId: [item.toolId ?? null],
+      equipmentId: [item.equipmentId ?? null],
+    });
   }
 
   back() {
@@ -925,7 +991,13 @@ export class CreateExpenseComponent implements OnInit {
       accountId: this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList
     } as ExpenseCreation;
 
-    console.log(this.expenseCreation)
+    if (this.editingExpenseId) {
+      this.expenseService.updateExpense(this.editingExpenseId, this.expenseCreation).subscribe(() => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa atualizada com sucesso.' });
+        this.router.navigate(['/transactions/expenses']);
+      });
+      return;
+    }
 
     this.expenseService.createExpense(this.expenseCreation).subscribe(newExpense => {
       this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa adicionada com sucesso.' });

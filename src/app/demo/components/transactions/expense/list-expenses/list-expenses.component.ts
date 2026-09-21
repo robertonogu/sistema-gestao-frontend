@@ -8,7 +8,7 @@ import { DocumentType } from 'src/app/demo/data/enum/documentType';
 import { PaymentStatus } from 'src/app/demo/data/enum/paymentStatus';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { ExpenseFilters, ExpenseService } from 'src/app/demo/service/transactions/expense.service';
-import { SupplierService } from 'src/app/demo/service/company/supplierService';
+import { OriginService } from 'src/app/demo/service/company/originService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -47,7 +47,7 @@ export class ListExpensesComponent implements OnInit {
   pageSize: number = 20;
 
   @ViewChild('dt') table?: Table;
-  supplierNames: ItemName[] = [];
+  originNames: ItemName[] = [];
 
   readonly categoryMeta: Record<string, { label: string; color: string }> = {
     BANK:          { label: 'Banco',        color: '#3b82f6' },
@@ -81,15 +81,15 @@ export class ListExpensesComponent implements OnInit {
 
   constructor(
     private expenseService: ExpenseService,
-    private supplierService: SupplierService,
+    private originService: OriginService,
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
-    this.supplierService.getSupplierNames().subscribe((suppliers) => {
-      this.supplierNames = suppliers;
+    this.originService.getOriginNames().subscribe((origins) => {
+      this.originNames = origins;
     });
   }
 
@@ -176,6 +176,10 @@ export class ListExpensesComponent implements OnInit {
 
   newExpense() {
     this.router.navigate(['./transactions/expenses/create-expense']);
+  }
+
+  editExpense(expense: ExpenseListItem) {
+    this.router.navigate(['./transactions/expenses/edit-expense', expense.expenseId]);
   }
 
   deleteExpense(expense: ExpenseListItem) {
