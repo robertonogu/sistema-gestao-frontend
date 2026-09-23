@@ -7,6 +7,7 @@ import { ToastModule } from 'primeng/toast';
 import { CalendarModule } from 'primeng/calendar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
+import { TreeSelectModule } from 'primeng/treeselect';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { DividerModule } from 'primeng/divider';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,6 +25,7 @@ import { IssueArticleRoutingModule } from './issue-article-routing.module';
     InputTextModule,
     CalendarModule,
     DropdownModule,
+    TreeSelectModule,
     CheckboxModule,
     DividerModule,
     FormsModule,

@@ -210,10 +210,21 @@
 <div class="grid">
 	<div class="col-12">
 		<form [formGroup]="dynamicItemForm" class="card">
-			<h4 class="section-title">Itens</h4>
+			<div class="flex align-items-center justify-content-between">
+				<h4 class="section-title">Itens</h4>
+				<button
+					pButton
+					type="button"
+					icon="pi pi-link"
+					label="Associar"
+					class="p-button-outlined p-button-sm"
+					(click)="openBulkAssociateDialog()"
+				></button>
+			</div>
 
 			<div class="item-tbl" formArrayName="itemInputs">
 				<div class="item-head">
+					<div></div>
 					<div>Nome</div>
 					<div>Categoria</div>
 					<div>Quantidade</div>
@@ -226,6 +237,9 @@
 
 				<ng-container *ngFor="let itemInput of itemInputs.controls; let j = index" [formGroupName]="j">
 					<div class="item-row">
+						<div>
+							<p-checkbox formControlName="selected" [binary]="true" [disabled]="!isInventoryItem(j)"></p-checkbox>
+						</div>
 						<div>
 							<p-autoComplete
 								formControlName="name"
@@ -356,7 +370,7 @@
 	[(visible)]="linkDialogVisible"
 	[modal]="true"
 	[dismissableMask]="true"
-	[style]="{ width: '28rem' }"
+	[style]="{ width: '36rem' }"
 	(onHide)="closeLinkDialog()"
 >
 	<form *ngIf="linkRowGroup as grp" [formGroup]="grp" class="p-fluid flex flex-column gap-3">
@@ -488,6 +502,65 @@
 			pButton
 			type="button"
 			(click)="saveLinkDialog()"
+		></button>
+	</ng-template>
+</p-dialog>
+
+<p-dialog
+	header="Associar Itens"
+	[(visible)]="bulkAssociateDialogVisible"
+	[modal]="true"
+	[dismissableMask]="true"
+	[style]="{ width: '36rem' }"
+	(onHide)="closeBulkAssociateDialog()"
+>
+	<div class="p-fluid flex flex-column gap-3">
+		<div class="field">
+			<label>Obra</label>
+			<p-dropdown
+				[(ngModel)]="bulkAssociateConstructionId"
+				[ngModelOptions]="{ standalone: true }"
+				[options]="constructionNames"
+				optionLabel="name"
+				optionValue="constructionId"
+				placeholder="Selecione uma Obra"
+				(onChange)="onBulkAssociateConstructionChange($event.value)"
+				appendTo="body"
+				[ngClass]="{ 'ng-dirty ng-invalid': bulkAssociateValidationAttempted && !bulkAssociateConstructionId }"
+			/>
+		</div>
+
+		<div class="field">
+			<label>Item</label>
+			<p-treeSelect
+				[(ngModel)]="selectedBulkAssociateBudgetNode"
+				[ngModelOptions]="{ standalone: true }"
+				[options]="bulkAssociateBudgetTree"
+				containerStyleClass="w-full"
+				placeholder="Selecione um Item"
+				appendTo="body"
+				[ngClass]="{ 'ng-dirty ng-invalid': bulkAssociateValidationAttempted && !selectedBulkAssociateBudgetNode }"
+			/>
+			<small class="p-error" *ngIf="bulkAssociateValidationAttempted && !selectedBulkAssociateBudgetNode">O Item é obrigatório.</small>
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			class="p-button-rounded p-button-outlined p-button-secondary"
+			icon="pi pi-times"
+			label="Cancelar"
+			pButton
+			type="button"
+			(click)="closeBulkAssociateDialog()"
+		></button>
+		<button
+			class="p-button-rounded"
+			icon="pi pi-check"
+			label="Guardar"
+			pButton
+			type="button"
+			(click)="saveBulkAssociateDialog()"
 		></button>
 	</ng-template>
 </p-dialog>

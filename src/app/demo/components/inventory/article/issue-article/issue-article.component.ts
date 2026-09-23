@@ -1,10 +1,10 @@
 import { DatePipe, Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { MessageService, TreeNode } from 'primeng/api';
 import { Article } from 'src/app/demo/api/article';
+import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
-import { ItemName } from 'src/app/demo/api/itemName';
 import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
@@ -28,11 +28,11 @@ import { PaymentService } from 'src/app/demo/service/transactions/paymentService
 export class IssueArticleComponent {
 
   constructionNames!: ConstructionNames[];
-  subItems!: ItemName[];
+  budgetTree: TreeNode[] = [];
+  selectedBudgetNode?: TreeNode;
 
   date!: Date;
   selectedConstruction!: number;
-  selectedSubItem!: number;
   articles!: Article[];
 
   articlesSelected: Article[] = [];
@@ -72,9 +72,19 @@ export class IssueArticleComponent {
   }
 
   getSubItems() {
-    this.constructionService.getBudgetSubItemsForConstruction(this.selectedConstruction).subscribe((subItems) => {
-      this.subItems = subItems;
+    this.selectedBudgetNode = undefined;
+    this.constructionService.getBudgetItemsForConstruction(this.selectedConstruction).subscribe((budgetItems) => {
+      this.budgetTree = this.mapBudgetItemsToTreeNodes(budgetItems);
     });
+  }
+
+  private mapBudgetItemsToTreeNodes(budgetItems: BudgetItem[]): TreeNode[] {
+    return budgetItems.map((budgetItem) => ({
+      key: budgetItem.id.toString(),
+      label: budgetItem.name,
+      data: budgetItem.id,
+      children: budgetItem.children?.length ? this.mapBudgetItemsToTreeNodes(budgetItem.children) : undefined
+    }));
   }
 
   newIssueArticle() {
@@ -86,7 +96,7 @@ export class IssueArticleComponent {
       }
     }
 
-    const issuedArticles = { date: this.date, constructionId: this.selectedConstruction, budgetSubItemId: this.selectedSubItem, issuedArticlesList: issuedArticlesList } as ListIssuedArticlesCreation;
+    const issuedArticles = { date: this.date, constructionId: this.selectedConstruction, budgetSubItemId: this.selectedBudgetNode?.data, issuedArticlesList: issuedArticlesList } as ListIssuedArticlesCreation;
     if (issuedArticles != null) {
       this.issuedArticleService.issueArticles(issuedArticles).subscribe(newIssuedArticles => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pagamento(s) registado(s) com sucesso.' });

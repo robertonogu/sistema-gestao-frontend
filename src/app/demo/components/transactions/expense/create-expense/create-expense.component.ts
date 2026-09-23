@@ -85,7 +85,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 380px 90px 130px 130px 130px 130px 84px;
+  grid-template-columns: 36px minmax(220px, 1fr) 380px 90px 130px 130px 130px 130px 84px;
   align-items: center;
   column-gap: 8px;
   min-width: fit-content;
@@ -299,6 +299,13 @@ export class CreateExpenseComponent implements OnInit {
   linkDialogIndex: number | null = null;
   linkBudgetTree: TreeNode[] = [];
   selectedLinkBudgetNode?: TreeNode;
+
+  bulkAssociateDialogVisible: boolean = false;
+  bulkAssociateConstructionId: number | null = null;
+  bulkAssociateBudgetTree: TreeNode[] = [];
+  selectedBulkAssociateBudgetNode?: TreeNode;
+  bulkAssociateValidationAttempted: boolean = false;
+
   vehicleNames: ItemName[] = [];
   toolNames: ItemName[] = [];
   equipmentNames: ItemName[] = [];
@@ -421,6 +428,7 @@ export class CreateExpenseComponent implements OnInit {
       vehicleId: [item.vehicleId ?? null],
       toolId: [item.toolId ?? null],
       equipmentId: [item.equipmentId ?? null],
+      selected: [false],
     });
   }
 
@@ -666,6 +674,7 @@ export class CreateExpenseComponent implements OnInit {
       vehicleId: [null],
       toolId: [null],
       equipmentId: [null],
+      selected: [false],
     });
   }
 
@@ -924,6 +933,60 @@ export class CreateExpenseComponent implements OnInit {
         ? undefined
         : this.findBudgetTreeNode(this.linkBudgetTree, row?.budgetItemId);
     });
+  }
+
+  isInventoryItem(index: number): boolean {
+    const subCategoryType = this.itemInputs.at(index).value.subCategoryType;
+    return this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
+  }
+
+  get hasSelectedInventoryItems(): boolean {
+    return this.itemInputs.controls.some((control, index) => control.value.selected && this.isInventoryItem(index));
+  }
+
+  openBulkAssociateDialog() {
+    if (!this.hasSelectedInventoryItems) {
+      this.messageService.add({ severity: 'warn', summary: 'Nenhum item selecionado', detail: 'Selecione pelo menos um item de Inventário para associar.' });
+      return;
+    }
+    this.bulkAssociateValidationAttempted = false;
+    this.bulkAssociateConstructionId = null;
+    this.bulkAssociateBudgetTree = [];
+    this.selectedBulkAssociateBudgetNode = undefined;
+    this.bulkAssociateDialogVisible = true;
+  }
+
+  closeBulkAssociateDialog() {
+    this.bulkAssociateDialogVisible = false;
+  }
+
+  onBulkAssociateConstructionChange(constructionId: number) {
+    this.selectedBulkAssociateBudgetNode = undefined;
+    this.constructionService.getBudgetItemsForConstruction(constructionId).subscribe(budgetItems => {
+      this.bulkAssociateBudgetTree = this.mapBudgetItemsToTreeNodes(budgetItems);
+    });
+  }
+
+  saveBulkAssociateDialog() {
+    if (!this.bulkAssociateConstructionId || !this.selectedBulkAssociateBudgetNode) {
+      this.bulkAssociateValidationAttempted = true;
+      this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Selecione a Obra e o Item antes de guardar.' });
+      return;
+    }
+
+    const budgetItemId = this.selectedBulkAssociateBudgetNode.data;
+    this.itemInputs.controls.forEach((control, index) => {
+      if (control.value.selected && this.isInventoryItem(index)) {
+        control.patchValue({
+          constructionId: this.bulkAssociateConstructionId,
+          budgetItemId: budgetItemId,
+          allocationQuantity: control.value.quantity,
+          selected: false
+        });
+      }
+    });
+
+    this.closeBulkAssociateDialog();
   }
 
   itemNetValue(index: number): number {
