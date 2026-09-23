@@ -413,9 +413,11 @@ export class CreateExpenseComponent implements OnInit {
 
   private buildItemInputFromEdit(item: ExpenseItemEdit): FormGroup {
     const costAllocation = item.costAllocations?.[0];
+    const subCategoryType = (SubCategoryType as any)[item.subCategoryType] ?? null;
+    const isInventory = this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
 
-    return this.fb.group({
-      subCategoryType: [(SubCategoryType as any)[item.subCategoryType] ?? null, Validators.required],
+    const group = this.fb.group({
+      subCategoryType: [subCategoryType, Validators.required],
       name: [item.name, Validators.required],
       quantity: [item.quantity, Validators.required],
       unit: [item.unit, Validators.required],
@@ -428,8 +430,10 @@ export class CreateExpenseComponent implements OnInit {
       vehicleId: [item.vehicleId ?? null],
       toolId: [item.toolId ?? null],
       equipmentId: [item.equipmentId ?? null],
-      selected: [false],
+      selected: [{ value: false, disabled: !isInventory }],
     });
+    this.wireSelectedDisabling(group);
+    return group;
   }
 
   back() {
@@ -660,7 +664,7 @@ export class CreateExpenseComponent implements OnInit {
   }
 
   private buildItemInput(): FormGroup {
-    return this.fb.group({
+    const group = this.fb.group({
       subCategoryType: [null, Validators.required],
       name: [null, Validators.required],
       quantity: [null, Validators.required],
@@ -674,7 +678,23 @@ export class CreateExpenseComponent implements OnInit {
       vehicleId: [null],
       toolId: [null],
       equipmentId: [null],
-      selected: [false],
+      selected: [{ value: false, disabled: true }],
+    });
+    this.wireSelectedDisabling(group);
+    return group;
+  }
+
+  // Controla o disabled do checkbox "selected" via FormControl.disable()/enable() em vez de um
+  // binding [disabled] no template, que não é fiável quando combinado com formControlName no Angular.
+  private wireSelectedDisabling(group: FormGroup): void {
+    group.get('subCategoryType')?.valueChanges.subscribe((value) => {
+      const selectedControl = group.get('selected');
+      if (this.categoryOf(value) === CategoryType.INVENTORY) {
+        selectedControl?.enable({ emitEvent: false });
+      } else {
+        selectedControl?.disable({ emitEvent: false });
+        selectedControl?.setValue(false, { emitEvent: false });
+      }
     });
   }
 
@@ -953,6 +973,7 @@ export class CreateExpenseComponent implements OnInit {
     this.bulkAssociateConstructionId = null;
     this.bulkAssociateBudgetTree = [];
     this.selectedBulkAssociateBudgetNode = undefined;
+    this.getConstructionNames();
     this.bulkAssociateDialogVisible = true;
   }
 

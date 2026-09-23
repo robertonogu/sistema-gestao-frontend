@@ -238,7 +238,7 @@
 				<ng-container *ngFor="let itemInput of itemInputs.controls; let j = index" [formGroupName]="j">
 					<div class="item-row">
 						<div>
-							<p-checkbox formControlName="selected" [binary]="true" [disabled]="!isInventoryItem(j)"></p-checkbox>
+							<p-checkbox formControlName="selected" [binary]="true"></p-checkbox>
 						</div>
 						<div>
 							<p-autoComplete
