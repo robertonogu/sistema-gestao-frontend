@@ -85,7 +85,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 300px 90px 130px 130px 130px 130px 84px;
+  grid-template-columns: minmax(220px, 1fr) 380px 90px 130px 130px 130px 130px 84px;
   align-items: center;
   column-gap: 8px;
   min-width: fit-content;

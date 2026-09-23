@@ -37,6 +37,10 @@ export class ListArticlesComponent {
     this.router.navigate(['./inventory/articles/issue-article']);
   }
 
+  editExpense(expenseId: number) {
+    this.router.navigate(['/transactions/expenses/edit-expense', expenseId]);
+  }
+
   getStockEntries() {
     this.stockMovementService.getStockEntries(this.currentPage, this.pageSize).subscribe((stockEntries) => {
       this.stockEntries = stockEntries.objectList;

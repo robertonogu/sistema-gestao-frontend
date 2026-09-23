@@ -35,6 +35,7 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Código</th>
+                                <th>Número de Documento</th>
                                 <th>Nome</th>
                                 <th>Quantidade</th>
                                 <th>Unidade</th>
@@ -47,6 +48,7 @@
                             <tr>
                                 <td>{{ article.date | date: 'dd/MM/yyyy' }}</td>
                                 <td>{{ article.articleCode }}</td>
+                                <td>{{ article.documentNumber }}</td>
                                 <td>{{ article.articleName }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
@@ -55,7 +57,7 @@
 
                             </tr>
                         </ng-template>
-                        
+
                     </p-table>
 
                 </p-tabPanel>
@@ -85,12 +87,14 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Código</th>
+                                <th>Número de Documento</th>
                                 <th>Nome</th>
                                 <th>Quantidade</th>
                                 <th>Unidade</th>
                                 <th>Valor Unitário</th>
                                 <th>Valor Total</th>
                                 <th>Obra</th>
+                                <th></th>
                             </tr>
                         </ng-template>
 
@@ -98,12 +102,25 @@
                             <tr>
                                 <td>{{ article.date | date: 'dd/MM/yyyy' }}</td>
                                 <td>{{ article.articleCode }}</td>
+                                <td>{{ article.documentNumber }}</td>
                                 <td>{{ article.articleName }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
                                 <td>{{ article.unitValue | number: '1.2-2' }} €</td>
                                 <td>{{ article.totalValue | number: '1.2-2' }} €</td>
                                 <td>{{ article.constructionName }}</td>
+                                <td>
+                                    <button
+                                        *ngIf="article.expenseId"
+                                        pButton
+                                        type="button"
+                                        icon="pi pi-pencil"
+                                        class="p-button-rounded p-button-text"
+                                        pTooltip="Editar fatura"
+                                        tooltipPosition="bottom"
+                                        (click)="editExpense(article.expenseId)"
+                                    ></button>
+                                </td>
                             </tr>
                         </ng-template>
                         

@@ -68,7 +68,19 @@
                                 </p-columnFilter>
                             </div>
                         </th>
-                        <th>Categoria</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Categoria
+                                <p-columnFilter field="category" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="categoryOptions" optionLabel="label" optionValue="key"
+                                            placeholder="Todas" [showClear]="true" appendTo="body" [style]="{ 'min-width': '12rem' }"
+                                            (onChange)="filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>
                             <div class="flex align-items-center">
                                 Estado

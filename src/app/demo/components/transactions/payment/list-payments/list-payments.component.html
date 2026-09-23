@@ -42,9 +42,44 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Data</th>
-                        <th>Número de Documento</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Origem
+                                <p-columnFilter field="origin" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="originNames" optionLabel="name" optionValue="id"
+                                            placeholder="Todas" [showClear]="true" [filter]="true" filterBy="name" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                            (onChange)="filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Número de Documento
+                                <p-columnFilter field="documentNumber" matchMode="contains" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Valor Pago</th>
-                        <th>Método de Pagamento</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Método de Pagamento
+                                <p-columnFilter field="paymentMethod" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [ngModel]="value" [options]="PaymentMethod | keyvalue" optionLabel="value" optionValue="key"
+                                            placeholder="Todos" [showClear]="true" appendTo="body" [style]="{ 'min-width': '12rem' }"
+                                            (onChange)="filter($event.value)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Conta</th>
                         <th>Ações</th>
                     </tr>
@@ -53,6 +88,7 @@
                 <ng-template pTemplate="body" let-payment>
                     <tr>
                         <td>{{ payment.date | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ payment.origin }}</td>
                         <td>{{ payment.documentNumber }}</td>
                         <td class="text-red-500 font-semibold">- {{ payment.value | number: '1.2-2' }} €</td>
                         <td><span [class]="'payment-badge status-' + payment.paymentMethod.toLowerCase()">{{ PaymentMethod[payment.paymentMethod] }}</span></td>

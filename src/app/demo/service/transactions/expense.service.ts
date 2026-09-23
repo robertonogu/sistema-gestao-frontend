@@ -14,6 +14,7 @@ export interface ExpenseFilters {
     dateTo?: Date;
     originId?: number;
     paymentStatus?: string;
+    category?: string;
 }
 
 @Injectable({
@@ -34,6 +35,7 @@ export class ExpenseService {
         if (filters?.dateTo) url += "&dateTo=" + this.formatDate(filters.dateTo);
         if (filters?.originId != null) url += "&originId=" + filters.originId;
         if (filters?.paymentStatus) url += "&paymentStatus=" + filters.paymentStatus;
+        if (filters?.category) url += "&category=" + filters.category;
 
         return this.http.get<ObjectList>(url);
     }

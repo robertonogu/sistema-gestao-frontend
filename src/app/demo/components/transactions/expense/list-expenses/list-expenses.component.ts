@@ -62,6 +62,8 @@ export class ListExpensesComponent implements OnInit {
     CONSTRUCTIONS: { label: 'Obras',        color: '#64748b' },
   };
 
+  readonly categoryOptions = Object.entries(this.categoryMeta).map(([key, meta]) => ({ key, label: meta.label }));
+
   categoryLabel(code: string): string {
     return this.categoryMeta[code]?.label ?? code;
   }
@@ -118,7 +120,8 @@ export class ListExpensesComponent implements OnInit {
       dateFrom,
       dateTo,
       originId: this.filterValue(filters, 'origin'),
-      paymentStatus: this.filterValue(filters, 'paymentStatus')
+      paymentStatus: this.filterValue(filters, 'paymentStatus'),
+      category: this.filterValue(filters, 'category')
     };
   }
 

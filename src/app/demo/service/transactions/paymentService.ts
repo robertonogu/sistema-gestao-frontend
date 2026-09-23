@@ -6,6 +6,12 @@ import { environment } from 'src/environments/environment';
 import { ListPaymentCreation } from '../../data/model/listPaymentCreation.model';
 import { Payment } from '../../api/payment';
 
+export interface PaymentFilters {
+    documentNumber?: string;
+    originId?: number;
+    paymentMethod?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -15,8 +21,13 @@ export class PaymentService {
 
     constructor(private http: HttpClient) { }
 
-    getPayments(currentPage: number, pageSize: number) : Observable<PaymentList> {
+    getPayments(currentPage: number, pageSize: number, filters?: PaymentFilters) : Observable<PaymentList> {
         let url = this.paymentUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
+
+        if (filters?.documentNumber) url += "&documentNumber=" + encodeURIComponent(filters.documentNumber);
+        if (filters?.originId != null) url += "&originId=" + filters.originId;
+        if (filters?.paymentMethod) url += "&paymentMethod=" + filters.paymentMethod;
+
         return this.http.get<PaymentList>(url);
     }
 

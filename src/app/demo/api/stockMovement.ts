@@ -9,4 +9,6 @@ export interface StockMovement {
     unitValue: number;
     totalValue: number;
     constructionName: string | null;
+    documentNumber: string | null;
+    expenseId: number | null;
 }
