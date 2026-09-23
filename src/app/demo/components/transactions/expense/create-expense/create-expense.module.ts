@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CreateExpenseComponent } from './create-expense.component';
 import { InputNumberModule } from "primeng/inputnumber";
 import { InputTextModule } from "primeng/inputtext";
+import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { CalendarModule } from 'primeng/calendar';
@@ -25,6 +26,7 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
     ButtonModule,
 		InputNumberModule,
 		InputTextModule,
+		AutoCompleteModule,
     CalendarModule,
     DropdownModule,
     CheckboxModule,

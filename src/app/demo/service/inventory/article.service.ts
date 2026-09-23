@@ -10,11 +10,16 @@ import { ObjectList } from '../../api/objectList';
 export class ArticleService {
 
     private stockArticlesUrl = `${environment.apiUrl}/articles/stock`;
+    private articleNamesUrl = `${environment.apiUrl}/articles/names`;
 
     constructor(private http: HttpClient) { }
 
     findStockToday() : Observable<ObjectList> {
         return this.http.get<ObjectList>(this.stockArticlesUrl);
+    }
+
+    getArticleNames(): Observable<string[]> {
+        return this.http.get<string[]>(this.articleNamesUrl);
     }
 
 }

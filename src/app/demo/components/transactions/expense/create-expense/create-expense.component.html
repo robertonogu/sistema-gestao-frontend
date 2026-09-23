@@ -227,7 +227,14 @@
 				<ng-container *ngFor="let itemInput of itemInputs.controls; let j = index" [formGroupName]="j">
 					<div class="item-row">
 						<div>
-							<input type="text" pInputText formControlName="name" placeholder="Nome do item..." appUppercase />
+							<p-autoComplete
+								formControlName="name"
+								[suggestions]="filteredArticleNames"
+								(completeMethod)="filterArticleNames($event)"
+								[dropdown]="false"
+								placeholder="Nome do item..."
+								appUppercase
+							/>
 						</div>
 
 						<div>

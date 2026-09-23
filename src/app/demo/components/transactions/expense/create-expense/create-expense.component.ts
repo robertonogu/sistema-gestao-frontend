@@ -30,6 +30,7 @@ import { ExternalEntityService } from 'src/app/demo/service/company/externalEnti
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
+import { ArticleService } from 'src/app/demo/service/inventory/article.service';
 import { EquipmentService } from 'src/app/demo/service/inventory/equipment.service';
 import { ToolService } from 'src/app/demo/service/inventory/tool.service';
 import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
@@ -301,6 +302,8 @@ export class CreateExpenseComponent implements OnInit {
   vehicleNames: ItemName[] = [];
   toolNames: ItemName[] = [];
   equipmentNames: ItemName[] = [];
+  articleNames: string[] = [];
+  filteredArticleNames: string[] = [];
 
   quickAddOriginOptions: MenuItem[] = [
     { label: 'Fornecedor', icon: 'pi pi-truck', command: () => this.openQuickAddOrigin('supplier') },
@@ -331,6 +334,7 @@ export class CreateExpenseComponent implements OnInit {
     private vehicleService: VehicleService,
     private toolService: ToolService,
     private equipmentService: EquipmentService,
+    private articleService: ArticleService,
     private expenseService: ExpenseService,
     private supplierService: SupplierService,
     private externalEntityService: ExternalEntityService,
@@ -346,6 +350,10 @@ export class CreateExpenseComponent implements OnInit {
 
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
+    });
+
+    this.articleService.getArticleNames().subscribe((names) => {
+      this.articleNames = names;
     });
 
     this.validIvaRates = [0, 6, 13, 23];
@@ -726,6 +734,11 @@ export class CreateExpenseComponent implements OnInit {
     return entry ? entry[0] as CategoryType : undefined;
   }
 
+  filterArticleNames(event: { query: string }) {
+    const query = (event.query ?? '').toUpperCase();
+    this.filteredArticleNames = this.articleNames.filter((name) => name.toUpperCase().includes(query));
+  }
+
   showConstructionLink(subCategoryType: SubCategoryType | null): boolean {
     return subCategoryType === SubCategoryType.EXTERNAL_SERVICES || subCategoryType === SubCategoryType.MEALS || this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
   }
@@ -993,8 +1006,7 @@ export class CreateExpenseComponent implements OnInit {
 
     if (this.editingExpenseId) {
       this.expenseService.updateExpense(this.editingExpenseId, this.expenseCreation).subscribe(() => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa atualizada com sucesso.' });
-        this.router.navigate(['/transactions/expenses']);
+        this.router.navigate(['/transactions/expenses'], { state: { expenseUpdated: true } });
       });
       return;
     }

@@ -91,6 +91,12 @@ export class ListExpensesComponent implements OnInit {
     this.originService.getOriginNames().subscribe((origins) => {
       this.originNames = origins;
     });
+
+    const state = history.state;
+    if (state?.expenseUpdated) {
+      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa atualizada com sucesso.' });
+      history.replaceState({ ...state, expenseUpdated: false }, '');
+    }
   }
 
   private filterValue(filters: any, field: string) {
