@@ -6,4 +6,7 @@ export interface ArticleStock {
     quantity: number;
     unitValue: number;
     totalValue: number;
+    documentNumber: string | null;
+    originId: number | null;
+    origin: string | null;
 }

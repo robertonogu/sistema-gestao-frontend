@@ -37,8 +37,41 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Código</th>
-                                <th>Número de Documento</th>
-                                <th>Nome</th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Número de Documento
+                                        <p-columnFilter field="documentNumber" matchMode="contains" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Origem
+                                        <p-columnFilter field="origin" matchMode="equals" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <p-dropdown [ngModel]="value" [options]="originNames" optionLabel="name" optionValue="id"
+                                                    placeholder="Todas" [showClear]="true" [filter]="true" filterBy="name" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                                    (onChange)="filter($event.value)" />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Nome
+                                        <p-columnFilter field="itemName" matchMode="contains" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
                                 <th>Quantidade</th>
                                 <th>Unidade</th>
                                 <th>Valor Unitário</th>
@@ -51,6 +84,7 @@
                                 <td>{{ article.date | date: 'dd/MM/yyyy' }}</td>
                                 <td>{{ article.articleCode }}</td>
                                 <td>{{ article.documentNumber }}</td>
+                                <td>{{ article.origin }}</td>
                                 <td>{{ article.articleName }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
@@ -91,8 +125,41 @@
                             <tr>
                                 <th>Data</th>
                                 <th>Código</th>
-                                <th>Número de Documento</th>
-                                <th>Nome</th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Número de Documento
+                                        <p-columnFilter field="documentNumber" matchMode="contains" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Origem
+                                        <p-columnFilter field="origin" matchMode="equals" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <p-dropdown [ngModel]="value" [options]="originNames" optionLabel="name" optionValue="id"
+                                                    placeholder="Todas" [showClear]="true" [filter]="true" filterBy="name" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                                    (onChange)="filter($event.value)" />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Nome
+                                        <p-columnFilter field="itemName" matchMode="contains" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
                                 <th>Quantidade</th>
                                 <th>Unidade</th>
                                 <th>Valor Unitário</th>
@@ -107,6 +174,7 @@
                                 <td>{{ article.date | date: 'dd/MM/yyyy' }}</td>
                                 <td>{{ article.articleCode }}</td>
                                 <td>{{ article.documentNumber }}</td>
+                                <td>{{ article.origin }}</td>
                                 <td>{{ article.articleName }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
@@ -131,7 +199,7 @@
                     </p-table>
                 </p-tabPanel>
 
-                <p-tabPanel header="Atual">
+                <p-tabPanel header="Stock">
 
                     <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
                         <div class="text-900 text-xl font-semibold">Stock</div>
@@ -149,6 +217,8 @@
                     </div>
 
                     <p-table
+                        [lazy]="true"
+                        (onLazyLoad)="onStockLazyLoad($event)"
                         [paginator]="true"
                         [rows]="20"
                         [showCurrentPageReport]="true"
@@ -163,7 +233,41 @@
                         <ng-template pTemplate="header">
                             <tr>
                                 <th>Código</th>
-                                <th>Nome</th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Número de Documento
+                                        <p-columnFilter field="documentNumber" matchMode="contains" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Origem
+                                        <p-columnFilter field="origin" matchMode="equals" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <p-dropdown [ngModel]="value" [options]="originNames" optionLabel="name" optionValue="id"
+                                                    placeholder="Todas" [showClear]="true" [filter]="true" filterBy="name" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                                    (onChange)="filter($event.value)" />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="flex align-items-center">
+                                        Nome
+                                        <p-columnFilter field="itemName" matchMode="contains" display="menu"
+                                            [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                                <input type="text" pInputText [ngModel]="value" (ngModelChange)="filter($event)" placeholder="Pesquisar..." />
+                                            </ng-template>
+                                        </p-columnFilter>
+                                    </div>
+                                </th>
                                 <th>Quantidade em Stock</th>
                                 <th>Unidade</th>
                                 <th>Valor Unitário</th>
@@ -174,6 +278,8 @@
                         <ng-template pTemplate="body" let-article>
                             <tr>
                                 <td>{{ article.code }}</td>
+                                <td>{{ article.documentNumber }}</td>
+                                <td>{{ article.origin }}</td>
                                 <td>{{ article.name }}</td>
                                 <td>{{ article.quantity }}</td>
                                 <td>{{ article.unit }}</td>
@@ -181,7 +287,7 @@
                                 <td>{{ article.totalValue | number: '1.2-2' }} €</td>
                             </tr>
                         </ng-template>
-                        
+
                     </p-table>
                 </p-tabPanel>
 

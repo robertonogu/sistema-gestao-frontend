@@ -11,4 +11,5 @@ export interface StockMovement {
     constructionName: string | null;
     documentNumber: string | null;
     expenseId: number | null;
+    origin: string | null;
 }

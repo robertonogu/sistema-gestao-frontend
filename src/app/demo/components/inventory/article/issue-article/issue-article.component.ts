@@ -16,8 +16,8 @@ import { RevenueCreation } from 'src/app/demo/data/model/revenueCreation.model';
 import { AccountService } from 'src/app/demo/service/company/accountService';
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
-import { ArticleService } from 'src/app/demo/service/inventory/article.service';
 import { IssuedArticleService } from 'src/app/demo/service/inventory/issuedArticle.service';
+import { StockMovementService } from 'src/app/demo/service/inventory/stockMovement.service';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 import { PaymentService } from 'src/app/demo/service/transactions/paymentService';
 
@@ -34,7 +34,7 @@ export class IssueArticleComponent {
   selectedConstruction!: number;
   selectedSubItem!: number;
   articles!: Article[];
-  
+
   articlesSelected: Article[] = [];
   articleQuantities: number[] = [];
 
@@ -46,7 +46,7 @@ export class IssueArticleComponent {
 
   constructor(
     private messageService: MessageService,
-    private articleService: ArticleService,
+    private stockMovementService: StockMovementService,
     private constructionService: ConstructionService,
     private issuedArticleService: IssuedArticleService,
     private _location: Location,
@@ -57,10 +57,14 @@ export class IssueArticleComponent {
     this.constructionService.getConstructionNames().subscribe((constructionNames) => {
       this.constructionNames = constructionNames;
     });
-    this.articleService.findStockToday().subscribe((articles) => {
-      this.articles = articles.objectList;
-      this.articleQuantities = this.articles.map(() => 0); 
-    });
+
+    const today = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
+    if (today != null) {
+      this.stockMovementService.getStockAsOfDate(today, 0, 1000).subscribe((articles) => {
+        this.articles = articles.objectList;
+        this.articleQuantities = this.articles.map(() => 0);
+      });
+    }
   }
 
   back() {
