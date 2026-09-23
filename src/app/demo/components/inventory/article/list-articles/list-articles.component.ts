@@ -55,6 +55,18 @@ export class ListArticlesComponent {
     });
   }
 
+  onEntriesLazyLoad(event: any) {
+    this.currentPage = event.first / event.rows;
+    this.pageSize = event.rows;
+    this.getStockEntries();
+  }
+
+  onExitsLazyLoad(event: any) {
+    this.currentPage = event.first / event.rows;
+    this.pageSize = event.rows;
+    this.getStockExits();
+  }
+
   getStockAsOfDate() {
     let dt = this.datePipe.transform(this.date, 'yyyy-MM-dd');
     if (dt != null) {
@@ -66,6 +78,7 @@ export class ListArticlesComponent {
 
   handleChange(e: any) {
     var index = e.index;
+    this.currentPage = 0;
     if (index == 1) {
       this.getStockExits();
     }

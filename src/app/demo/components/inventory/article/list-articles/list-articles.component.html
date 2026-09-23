@@ -20,6 +20,8 @@
                     </div>
 
                     <p-table
+                        [lazy]="true"
+                        (onLazyLoad)="onEntriesLazyLoad($event)"
                         [paginator]="true"
                         [rows]="20"
                         [showCurrentPageReport]="true"
@@ -72,6 +74,8 @@
                     </div>
 
                     <p-table
+                        [lazy]="true"
+                        (onLazyLoad)="onExitsLazyLoad($event)"
                         [paginator]="true"
                         [rows]="20"
                         [showCurrentPageReport]="true"

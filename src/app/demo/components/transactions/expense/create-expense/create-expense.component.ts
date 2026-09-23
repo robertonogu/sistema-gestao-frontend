@@ -1005,16 +1005,26 @@ export class CreateExpenseComponent implements OnInit {
     } as ExpenseCreation;
 
     if (this.editingExpenseId) {
-      this.expenseService.updateExpense(this.editingExpenseId, this.expenseCreation).subscribe(() => {
-        this.router.navigate(['/transactions/expenses'], { state: { expenseUpdated: true } });
+      this.expenseService.updateExpense(this.editingExpenseId, this.expenseCreation).subscribe({
+        next: () => {
+          this.router.navigate(['/transactions/expenses'], { state: { expenseUpdated: true } });
+        },
+        error: (err) => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível atualizar a despesa.' });
+        }
       });
       return;
     }
 
-    this.expenseService.createExpense(this.expenseCreation).subscribe(newExpense => {
-      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa adicionada com sucesso.' });
-      this.resetForm();
-    })
+    this.expenseService.createExpense(this.expenseCreation).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Despesa adicionada com sucesso.' });
+        this.resetForm();
+      },
+      error: (err) => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível adicionar a despesa.' });
+      }
+    });
   }
 
   private resetForm(): void {
