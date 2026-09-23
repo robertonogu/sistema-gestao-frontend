@@ -8,7 +8,7 @@ export enum ArticleFamily {
     PAINTS_GLUES_VARNISHES = 'Tintas, Vernizes e outros produtos de acabamento',
     WATERPROOFING_INSULATION = 'Impermeabilização e isolamento',
     PLUMBING = 'Pichelaria',
-    ELECTRICAL_MATERIALS = 'Eletricidade',
+    ELECTRICAL_MATERIALS = 'Material Elétrico',
     SITE_CONSUMABLES = 'Consumíveis de obra',
     GLASS_MIRRORS = 'Vidros e espelhos',
     CLADDING = 'Revestimentos',
