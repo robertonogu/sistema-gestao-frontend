@@ -29,7 +29,7 @@ export class ListPaymentsComponent {
   ) {}
 
   ngOnInit(): void {
-    this.originService.getOriginNames().subscribe((origins) => {
+    this.originService.getOriginNamesWithPayments().subscribe((origins) => {
       this.originNames = origins;
     });
   }

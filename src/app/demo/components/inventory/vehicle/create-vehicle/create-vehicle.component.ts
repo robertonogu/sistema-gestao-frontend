@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Vehicle } from 'src/app/demo/api/vehicle';
 import { InsurancePeriodicity } from 'src/app/demo/data/enum/insurancePeriodicity';
@@ -26,12 +27,32 @@ export class CreateVehicleComponent {
 
   vehicle!: VehicleCreation;
 
+  editingVehicleId: number | null = null;
+
   constructor(
     private _location: Location,
+    private route: ActivatedRoute,
     private messageService: MessageService,
     private vehicleService: VehicleService) { }
 
   ngOnInit(): void {
+    const vehicleId = Number(this.route.snapshot.params['vehicleId']);
+    if (vehicleId) {
+      this.editingVehicleId = vehicleId;
+      this.vehicleService.getVehicle(vehicleId).subscribe(vehicle => {
+        this.selectedVehicleType = vehicle.vehicleType;
+        this.registration = vehicle.registration;
+        this.registrationDate = this.toDate(vehicle.registrationDate);
+        this.inspectionDate = this.toDate(vehicle.inspectionDate);
+        this.insuranceDate = this.toDate(vehicle.insuranceDate);
+        this.selectedInsurancePeriodicity = vehicle.insurancePeriodicity;
+        this.valueKilometer = vehicle.valueKilometer;
+      });
+    }
+  }
+
+  private toDate(value: any): Date {
+    return value ? new Date(value) : undefined as any;
   }
 
   back() {
@@ -39,8 +60,14 @@ export class CreateVehicleComponent {
   }
 
   newVehicle() {
-    console.log(this.selectedInsurancePeriodicity)
     this.vehicle = { vehicleType: this.selectedVehicleType, registration: this.registration, registrationDate: this.registrationDate, inspectionDate: this.inspectionDate, insuranceDate: this.insuranceDate, insurancePeriodicity: this.selectedInsurancePeriodicity, valueKilometer: this.valueKilometer } as VehicleCreation;
+
+    if (this.editingVehicleId) {
+      this.vehicleService.updateVehicle(this.editingVehicleId, this.vehicle).subscribe(() => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Viatura atualizada com sucesso.' });
+      });
+      return;
+    }
 
     if (this.vehicle != null) {
       this.vehicleService.createVehicle(this.vehicle).subscribe(newVehicleCost => {

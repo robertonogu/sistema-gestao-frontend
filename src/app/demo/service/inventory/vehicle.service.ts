@@ -31,6 +31,14 @@ export class VehicleService {
         return this.http.post<Vehicle>(this.vehiclesUrl, vehicle, environment.httpOptions);
     }
 
+    getVehicle(vehicleId: number) : Observable<any> {
+        return this.http.get<any>(this.vehiclesUrl + "/" + vehicleId);
+    }
+
+    updateVehicle(vehicleId: number, vehicle: VehicleCreation) : Observable<Vehicle> {
+        return this.http.put<Vehicle>(this.vehiclesUrl + "/" + vehicleId, vehicle, environment.httpOptions);
+    }
+
     updateVehicleStatus(vehicleId: number, isActive: boolean) : Observable<Vehicle> {
         const params = new HttpParams().set('isActive', isActive.toString());
         console.log(params)

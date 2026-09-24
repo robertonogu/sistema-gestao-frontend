@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -41,7 +42,7 @@ import { ConstructionService } from 'src/app/demo/service/construction/construct
 // Grid columns shared by every row
 .orc-head, .orc-row {
   display: grid;
-  grid-template-columns: 32px 1fr 125px 125px 132px 125px 120px 60px 44px;
+  grid-template-columns: 20px 32px 1fr 125px 125px 132px 125px 120px 60px 44px;
   align-items: center;
 }
 
@@ -85,6 +86,31 @@ import { ConstructionService } from 'src/app/demo/service/construction/construct
 .col-num.strong { font-weight: 600; }
 .col-num.small { font-size: 11px; }
 .col-actions { display: flex; gap: 4px; justify-content: center; }
+
+// Drag handle (grip) at the start of each row
+.col-grip { padding-left: 6px !important; padding-right: 0 !important; display: flex; align-items: center; }
+.grip {
+  display: flex; align-items: center; justify-content: center;
+  width: 16px; height: 24px;
+  color: var(--text-3);
+  cursor: grab;
+  border-radius: 4px;
+  svg { fill: currentColor; }
+  &:hover { color: var(--text); background: rgba(0,0,0,0.05); }
+  &:active { cursor: grabbing; }
+}
+
+// Drag & drop feedback
+.drag-block.cdk-drag-preview {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  background: var(--bg);
+  opacity: 0.95;
+}
+.drag-block.cdk-drag-placeholder { opacity: 0.3; }
+.drag-block.cdk-drag-animating,
+.cdk-drop-list-dragging .drag-block:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
 .col-extra { display: flex; justify-content: center; }
 
 .col-desc.indent { padding-left: 32px; position: relative; }
@@ -430,6 +456,27 @@ export class EditConstructionComponent implements OnInit {
       this.setSubItemCostLock(rowIndex, subIndex, false);
     }
     this.cdr.markForCheck();
+  }
+
+  // ===== drag & drop reorder (only among siblings of the same parent) =====
+  private moveControl(arr: FormArray, from: number, to: number): void {
+    if (from === to) return;
+    const ctrl = arr.at(from);
+    arr.removeAt(from);
+    arr.insert(to, ctrl);
+    this.cdr.markForCheck();
+  }
+
+  dropInput(event: CdkDragDrop<unknown>): void {
+    this.moveControl(this.inputs, event.previousIndex, event.currentIndex);
+  }
+
+  dropSubInput(rowIndex: number, event: CdkDragDrop<unknown>): void {
+    this.moveControl(this.getSubInputs(rowIndex), event.previousIndex, event.currentIndex);
+  }
+
+  dropSubSubInput(rowIndex: number, subIndex: number, event: CdkDragDrop<unknown>): void {
+    this.moveControl(this.getSubSubInputs(rowIndex, subIndex), event.previousIndex, event.currentIndex);
   }
 
   toggleExpanded(rowIndex: number): void {

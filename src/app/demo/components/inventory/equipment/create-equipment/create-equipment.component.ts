@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { EquipmentStatus } from 'src/app/demo/data/enum/equipmentStatus';
 import { EquipmentCreation } from 'src/app/demo/data/model/equipmentCreation.model';
@@ -27,10 +28,37 @@ export class CreateEquipmentComponent {
 
   equipment!: EquipmentCreation;
 
+  editingEquipmentId: number | null = null;
+
   constructor(
     private _location: Location,
+    private route: ActivatedRoute,
     private messageService: MessageService,
     private equipmentService: EquipmentService) { }
+
+  ngOnInit(): void {
+    const equipmentId = Number(this.route.snapshot.params['equipmentId']);
+    if (equipmentId) {
+      this.editingEquipmentId = equipmentId;
+      this.equipmentService.getEquipment(equipmentId).subscribe(equipment => {
+        this.code = equipment.code;
+        this.name = equipment.name;
+        this.brand = equipment.brand;
+        this.model = equipment.model;
+        this.serialNumber = equipment.serialNumber;
+        this.purchaseDate = this.toDate(equipment.purchaseDate);
+        this.purchaseValue = equipment.purchaseValue;
+        this.warrantyStart = this.toDate(equipment.warrantyStart);
+        this.warrantyEnd = this.toDate(equipment.warrantyEnd);
+        this.power = equipment.power;
+        this.selectedStatus = equipment.status;
+      });
+    }
+  }
+
+  private toDate(value: any): Date {
+    return value ? new Date(value) : undefined as any;
+  }
 
   back() {
     this._location.back();
@@ -50,6 +78,13 @@ export class CreateEquipmentComponent {
       power: this.power,
       status: this.selectedStatus
     } as EquipmentCreation;
+
+    if (this.editingEquipmentId) {
+      this.equipmentService.updateEquipment(this.editingEquipmentId, this.equipment).subscribe(() => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Equipamento atualizado com sucesso.' });
+      });
+      return;
+    }
 
     if (this.equipment != null) {
       this.equipmentService.createEquipment(this.equipment).subscribe(() => {

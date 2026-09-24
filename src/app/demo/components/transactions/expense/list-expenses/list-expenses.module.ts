@@ -11,6 +11,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
 
@@ -27,6 +28,7 @@ import { InputTextModule } from 'primeng/inputtext';
     ToastModule,
     FormsModule,
     DropdownModule,
+    MultiSelectModule,
     CalendarModule,
     InputTextModule
   ],

@@ -6,6 +6,7 @@ import { ListVehiclesComponent } from './list-vehicles.component';
 	imports: [RouterModule.forChild([
 		{ path: '', component: ListVehiclesComponent },
 		{ path: 'create-vehicle', data: { breadcrumb: 'Nova Viatura' }, loadChildren: () => import('../create-vehicle/create-vehicle.module').then(m => m.CreateVehicleModule) },
+		{ path: 'edit-vehicle/:vehicleId', data: { breadcrumb: 'Editar Viatura' }, loadChildren: () => import('../create-vehicle/create-vehicle.module').then(m => m.CreateVehicleModule) },
 	])],
 	exports: [RouterModule]
 })

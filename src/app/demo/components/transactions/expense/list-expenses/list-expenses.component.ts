@@ -90,7 +90,7 @@ export class ListExpensesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.originService.getOriginNames().subscribe((origins) => {
+    this.originService.getOriginNamesWithExpenses().subscribe((origins) => {
       this.originNames = origins;
     });
 
@@ -119,7 +119,7 @@ export class ListExpensesComponent implements OnInit {
       documentNumber: this.filterValue(filters, 'documentNumber'),
       dateFrom,
       dateTo,
-      originId: this.filterValue(filters, 'origin'),
+      originIds: this.filterValue(filters, 'origin'),
       paymentStatus: this.filterValue(filters, 'paymentStatus'),
       category: this.filterValue(filters, 'category')
     };

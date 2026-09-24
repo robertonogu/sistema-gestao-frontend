@@ -800,7 +800,19 @@ export class CreateExpenseComponent implements OnInit {
     return subCategoryType === SubCategoryType.EQUIPMENTS_PURCHASE;
   }
 
+  // Purchases of equipment/tools cannot be associated with anything
+  private readonly nonAssociableSubCategories: SubCategoryType[] = [
+    SubCategoryType.EQUIPMENTS_PURCHASE,
+    SubCategoryType.TOOLS_PURCHASE,
+    SubCategoryType.ELECTRIC_TOOLS_PURCHASE,
+  ];
+
+  isNonAssociable(subCategoryType: SubCategoryType | null): boolean {
+    return subCategoryType !== null && this.nonAssociableSubCategories.includes(subCategoryType);
+  }
+
   canOpenLinkDialog(subCategoryType: SubCategoryType | null): boolean {
+    if (this.isNonAssociable(subCategoryType)) return false;
     return this.showConstructionLink(subCategoryType) || this.showVehicleLink(subCategoryType) || this.showToolEquipmentLink(subCategoryType);
   }
 
@@ -1061,7 +1073,8 @@ export class CreateExpenseComponent implements OnInit {
     let item: ItemCreation;
 
     this.itemInputs.controls.forEach((control, index) => {
-      const costAllocations: CostAllocationCreation[] = control.value.budgetItemId
+      const associable = !this.isNonAssociable(control.value.subCategoryType);
+      const costAllocations: CostAllocationCreation[] = associable && control.value.budgetItemId
         ? [{ budgetItemId: control.value.budgetItemId, quantity: control.value.allocationQuantity }]
         : [];
 
@@ -1075,9 +1088,9 @@ export class CreateExpenseComponent implements OnInit {
         totalValue: this.itemTotal(index),
         costAllocations: costAllocations,
         constructionId: control.value.budgetItemId ? undefined : (control.value.constructionId ?? undefined),
-        vehicleId: control.value.vehicleId,
-        toolId: control.value.toolId,
-        equipmentId: control.value.equipmentId
+        vehicleId: associable ? control.value.vehicleId : undefined,
+        toolId: associable ? control.value.toolId : undefined,
+        equipmentId: associable ? control.value.equipmentId : undefined
       } as ItemCreation;
       itemList.push(item);
     });

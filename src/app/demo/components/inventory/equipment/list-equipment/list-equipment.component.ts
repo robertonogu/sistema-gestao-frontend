@@ -44,6 +44,10 @@ export class ListEquipmentComponent {
     this.router.navigate(['./inventory/equipments/create-equipment']);
   }
 
+  editEquipment(equipment: Equipment) {
+    this.router.navigate(['./inventory/equipments/edit-equipment', equipment.equipmentId]);
+  }
+
   deleteEquipment(equipment: Equipment) {
     this.confirmationService.confirm({
       header: 'Tem a certeza?',

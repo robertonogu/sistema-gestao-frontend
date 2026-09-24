@@ -77,7 +77,7 @@
 
         <div class="orcamento">
           <div class="orc-head">
-            <div class="col-toggle"></div>
+            <div class="col-grip"></div><div class="col-toggle"></div>
             <div class="col-desc">Descrição</div>
             <div class="col-num">Mão de Obra</div>
             <div class="col-num">Materiais</div>
@@ -88,10 +88,11 @@
             <div class="col-actions"></div>
           </div>
 
-          <ng-container formArrayName="inputs">
-            <ng-container *ngFor="let inputGroup of inputs.controls; let rowIndex = index">
+          <div formArrayName="inputs" cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="dropInput($event)">
+            <div class="drag-block" *ngFor="let inputGroup of inputs.controls; let rowIndex = index" cdkDrag cdkDragPreviewContainer="parent">
               <ng-container [formGroup]="asFormGroup(inputGroup)">
               <div class="orc-row parent">
+                <div class="col-grip"><span class="grip" cdkDragHandle pTooltip="Arrastar para reordenar" tooltipPosition="top"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><circle cx="2.5" cy="3" r="1.5"/><circle cx="7.5" cy="3" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13" r="1.5"/><circle cx="7.5" cy="13" r="1.5"/></svg></span></div>
                 <div class="col-toggle">
                   <button type="button" class="toggle" (click)="toggleExpanded(rowIndex)"
                     [class.expanded]="inputGroup.value.expanded">
@@ -145,10 +146,12 @@
               </div>
 
               <ng-container *ngIf="inputGroup.value.expanded" formArrayName="subInputs">
-                <ng-container *ngFor="let subGroup of getSubInputs(rowIndex).controls; let subIndex = index">
+              <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="dropSubInput(rowIndex, $event)">
+                <div class="drag-block" *ngFor="let subGroup of getSubInputs(rowIndex).controls; let subIndex = index" cdkDrag cdkDragPreviewContainer="parent">
                   <ng-container [formGroup]="asFormGroup(subGroup)">
 
                     <div class="orc-row sub">
+                      <div class="col-grip"><span class="grip" cdkDragHandle pTooltip="Arrastar para reordenar" tooltipPosition="top"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><circle cx="2.5" cy="3" r="1.5"/><circle cx="7.5" cy="3" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13" r="1.5"/><circle cx="7.5" cy="13" r="1.5"/></svg></span></div>
                       <div class="col-toggle">
                         <button type="button" class="toggle" (click)="toggleSubExpanded(rowIndex, subIndex)"
                           [class.expanded]="subGroup.value.expanded">
@@ -203,10 +206,12 @@
                     </div>
 
                     <ng-container *ngIf="subGroup.value.expanded" formArrayName="subSubInputs">
-                      <div class="orc-row sub-sub"
+                      <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="dropSubSubInput(rowIndex, subIndex, $event)">
+                      <div class="orc-row sub-sub drag-block" cdkDrag cdkDragPreviewContainer="parent"
                         *ngFor="let subSubGroup of getSubSubInputs(rowIndex, subIndex).controls; let subSubIndex = index"
                         [formGroup]="asFormGroup(subSubGroup)">
 
+                        <div class="col-grip"><span class="grip" cdkDragHandle pTooltip="Arrastar para reordenar" tooltipPosition="top"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><circle cx="2.5" cy="3" r="1.5"/><circle cx="7.5" cy="3" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13" r="1.5"/><circle cx="7.5" cy="13" r="1.5"/></svg></span></div>
                         <div class="col-toggle"></div>
 
                         <div class="col-desc indent-2">
@@ -244,7 +249,9 @@
                         </div>
                       </div>
 
+                      </div>
                       <div class="orc-row add-row">
+                        <div class="col-grip"></div>
                         <div class="col-toggle"></div>
                         <div class="col-desc indent-2">
                           <button type="button" class="btn-dashed" (click)="addSubSubInput(rowIndex, subIndex)">
@@ -255,9 +262,11 @@
                     </ng-container>
 
                   </ng-container>
-                </ng-container>
+                </div>
+                </div>
 
                 <div class="orc-row add-row">
+                  <div class="col-grip"></div>
                   <div class="col-toggle"></div>
                   <div class="col-desc indent">
                     <button type="button" class="btn-dashed" (click)="addSubInput(rowIndex)">
@@ -267,8 +276,8 @@
                 </div>
               </ng-container>
               </ng-container>
-            </ng-container>
-          </ng-container>
+            </div>
+          </div>
 
           <div class="orc-foot">
             <button type="button" class="btn-dashed" (click)="addInput()">

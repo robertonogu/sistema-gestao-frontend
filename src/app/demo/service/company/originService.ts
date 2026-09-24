@@ -22,4 +22,12 @@ export class OriginService {
     getOriginNames() : Observable<ItemName[]> {
         return this.http.get<ItemName[]>(this.originNamesUrl);
     }
+
+    getOriginNamesWithExpenses() : Observable<ItemName[]> {
+        return this.http.get<ItemName[]>(this.originNamesUrl + "/withExpenses");
+    }
+
+    getOriginNamesWithPayments() : Observable<ItemName[]> {
+        return this.http.get<ItemName[]>(this.originNamesUrl + "/withPayments");
+    }
 }

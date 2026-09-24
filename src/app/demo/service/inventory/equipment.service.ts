@@ -30,6 +30,14 @@ export class EquipmentService {
         return this.http.post<Equipment>(this.equipmentsUrl, equipment, environment.httpOptions);
     }
 
+    getEquipment(equipmentId: number): Observable<any> {
+        return this.http.get<any>(this.equipmentsUrl + "/" + equipmentId);
+    }
+
+    updateEquipment(equipmentId: number, equipment: EquipmentCreation): Observable<Equipment> {
+        return this.http.put<Equipment>(this.equipmentsUrl + "/" + equipmentId, equipment, environment.httpOptions);
+    }
+
     deleteEquipment(equipmentId: number) {
         let url = this.equipmentsUrl + "/" + equipmentId;
         return this.http.delete(url);

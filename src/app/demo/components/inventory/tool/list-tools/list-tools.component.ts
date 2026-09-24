@@ -44,6 +44,10 @@ export class ListToolsComponent {
     this.router.navigate(['./inventory/tools/create-tool']);
   }
 
+  editTool(tool: Tool) {
+    this.router.navigate(['./inventory/tools/edit-tool', tool.toolId]);
+  }
+
   deleteTool(tool: Tool) {
     this.confirmationService.confirm({
       header: 'Tem a certeza?',

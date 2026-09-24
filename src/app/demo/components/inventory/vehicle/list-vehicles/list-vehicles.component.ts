@@ -43,6 +43,10 @@ export class ListVehiclesComponent {
     this.router.navigate(['./inventory/vehicles/create-vehicle']);
   }
 
+  editVehicle(vehicle: Vehicle) {
+    this.router.navigate(['./inventory/vehicles/edit-vehicle', vehicle.vehicleId]);
+  }
+
   updateStatus(vehicle: Vehicle) {
     this.vehicleService.updateVehicleStatus(vehicle.vehicleId, !vehicle.active).subscribe((updatedVehicle) => {
       if (updatedVehicle != null) {

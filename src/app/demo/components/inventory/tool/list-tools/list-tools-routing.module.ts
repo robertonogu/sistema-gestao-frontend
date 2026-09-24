@@ -6,6 +6,7 @@ import { ListToolsComponent } from './list-tools.component';
 	imports: [RouterModule.forChild([
 		{ path: '', component: ListToolsComponent },
 		{ path: 'create-tool', data: { breadcrumb: 'Nova Ferramenta' }, loadChildren: () => import('../create-tool/create-tool.module').then(m => m.CreateToolModule) },
+		{ path: 'edit-tool/:toolId', data: { breadcrumb: 'Editar Ferramenta' }, loadChildren: () => import('../create-tool/create-tool.module').then(m => m.CreateToolModule) },
 	])],
 	exports: [RouterModule]
 })

@@ -30,6 +30,14 @@ export class ToolService {
         return this.http.post<Tool>(this.toolsUrl, tool, environment.httpOptions);
     }
 
+    getTool(toolId: number): Observable<any> {
+        return this.http.get<any>(this.toolsUrl + "/" + toolId);
+    }
+
+    updateTool(toolId: number, tool: ToolCreation): Observable<Tool> {
+        return this.http.put<Tool>(this.toolsUrl + "/" + toolId, tool, environment.httpOptions);
+    }
+
     deleteTool(toolId: number) {
         let url = this.toolsUrl + "/" + toolId;
         return this.http.delete(url);

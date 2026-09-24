@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
@@ -20,6 +21,7 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
 @NgModule({
   imports: [
     ButtonModule,
+    DragDropModule,
     CommonModule,
     EditConstructionRoutingModule,
     InputTextModule,

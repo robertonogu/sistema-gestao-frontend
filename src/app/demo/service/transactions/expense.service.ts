@@ -12,7 +12,7 @@ export interface ExpenseFilters {
     documentNumber?: string;
     dateFrom?: Date;
     dateTo?: Date;
-    originId?: number;
+    originIds?: number[];
     paymentStatus?: string;
     category?: string;
 }
@@ -33,7 +33,7 @@ export class ExpenseService {
         if (filters?.documentNumber) url += "&documentNumber=" + encodeURIComponent(filters.documentNumber);
         if (filters?.dateFrom) url += "&dateFrom=" + this.formatDate(filters.dateFrom);
         if (filters?.dateTo) url += "&dateTo=" + this.formatDate(filters.dateTo);
-        if (filters?.originId != null) url += "&originId=" + filters.originId;
+        if (filters?.originIds?.length) url += "&originIds=" + filters.originIds.join(",");
         if (filters?.paymentStatus) url += "&paymentStatus=" + filters.paymentStatus;
         if (filters?.category) url += "&category=" + filters.category;
 
