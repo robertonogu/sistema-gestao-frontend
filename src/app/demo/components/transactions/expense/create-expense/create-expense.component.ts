@@ -329,7 +329,6 @@ export class CreateExpenseComponent implements OnInit {
   quickAddToolEquipmentType: 'tool' | 'equipment' | null = null;
   quickAddToolEquipmentSubmitted: boolean = false;
   quickAddToolEquipmentName: string | null = null;
-  quickAddToolEquipmentCode: string | null = null;
 
   editingExpenseId?: number;
   loadingEdit: boolean = false;
@@ -433,6 +432,7 @@ export class CreateExpenseComponent implements OnInit {
       selected: [{ value: false, disabled: !isInventory }],
     });
     this.wireSelectedDisabling(group);
+    this.wirePurchaseLinkReset(group);
     return group;
   }
 
@@ -505,7 +505,6 @@ export class CreateExpenseComponent implements OnInit {
     this.quickAddToolEquipmentType = type;
     this.quickAddToolEquipmentSubmitted = false;
     this.quickAddToolEquipmentName = null;
-    this.quickAddToolEquipmentCode = null;
     this.quickAddToolEquipmentDialogVisible = true;
   }
 
@@ -519,10 +518,9 @@ export class CreateExpenseComponent implements OnInit {
     if (!this.quickAddToolEquipmentName?.trim()) return;
 
     const name = this.quickAddToolEquipmentName;
-    const code = this.quickAddToolEquipmentCode as string;
 
     if (this.quickAddToolEquipmentType === 'tool') {
-      this.toolService.createTool({ name, code, status: ToolStatus.AVAILABLE } as ToolCreation)
+      this.toolService.createTool({ name, status: ToolStatus.AVAILABLE } as ToolCreation)
         .subscribe(tool => {
           this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Ferramenta criada com sucesso.' });
           this.quickAddToolEquipmentDialogVisible = false;
@@ -530,7 +528,7 @@ export class CreateExpenseComponent implements OnInit {
           this.linkRowGroup?.patchValue({ toolId: tool.toolId });
         });
     } else if (this.quickAddToolEquipmentType === 'equipment') {
-      this.equipmentService.createEquipment({ name, code, status: EquipmentStatus.ACTIVE } as EquipmentCreation)
+      this.equipmentService.createEquipment({ name, status: EquipmentStatus.ACTIVE } as EquipmentCreation)
         .subscribe(equipment => {
           this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Equipamento criado com sucesso.' });
           this.quickAddToolEquipmentDialogVisible = false;
@@ -681,6 +679,7 @@ export class CreateExpenseComponent implements OnInit {
       selected: [{ value: false, disabled: true }],
     });
     this.wireSelectedDisabling(group);
+    this.wirePurchaseLinkReset(group);
     return group;
   }
 
@@ -695,6 +694,26 @@ export class CreateExpenseComponent implements OnInit {
         selectedControl?.disable({ emitEvent: false });
         selectedControl?.setValue(false, { emitEvent: false });
       }
+    });
+  }
+
+  // Moving a line into or out of a purchase subcategory drops its links: a purchase gets a new tool/equipment
+  // created by the backend, and a line that stops being a purchase no longer owns the one it had created
+  // (the backend deletes it when saving).
+  private wirePurchaseLinkReset(group: FormGroup): void {
+    let previous = group.get('subCategoryType')?.value ?? null;
+    group.get('subCategoryType')?.valueChanges.subscribe((value) => {
+      const touchesPurchase = this.isNonAssociable(value) || this.isNonAssociable(previous);
+      previous = value;
+      if (!touchesPurchase) return;
+      group.patchValue({
+        constructionId: null,
+        budgetItemId: null,
+        allocationQuantity: null,
+        vehicleId: null,
+        toolId: null,
+        equipmentId: null,
+      }, { emitEvent: false });
     });
   }
 
@@ -800,7 +819,7 @@ export class CreateExpenseComponent implements OnInit {
     return subCategoryType === SubCategoryType.EQUIPMENTS_PURCHASE;
   }
 
-  // Purchases of equipment/tools cannot be associated with anything
+  // Purchases of equipment/tools cannot be associated manually: the backend creates the tool/equipment and links it
   private readonly nonAssociableSubCategories: SubCategoryType[] = [
     SubCategoryType.EQUIPMENTS_PURCHASE,
     SubCategoryType.TOOLS_PURCHASE,
@@ -809,6 +828,16 @@ export class CreateExpenseComponent implements OnInit {
 
   isNonAssociable(subCategoryType: SubCategoryType | null): boolean {
     return subCategoryType !== null && this.nonAssociableSubCategories.includes(subCategoryType);
+  }
+
+  autoPurchaseTooltip(index: number): string {
+    const row = this.itemInputs.at(index).value;
+    const isEquipment = row.subCategoryType === SubCategoryType.EQUIPMENTS_PURCHASE;
+    const alreadyCreated = isEquipment ? !!row.equipmentId : !!row.toolId;
+    if (isEquipment) {
+      return alreadyCreated ? 'Associado ao equipamento criado com esta despesa' : 'Será criado um equipamento ao guardar';
+    }
+    return alreadyCreated ? 'Associado à ferramenta criada com esta despesa' : 'Será criada uma ferramenta ao guardar';
   }
 
   canOpenLinkDialog(subCategoryType: SubCategoryType | null): boolean {
@@ -1073,8 +1102,7 @@ export class CreateExpenseComponent implements OnInit {
     let item: ItemCreation;
 
     this.itemInputs.controls.forEach((control, index) => {
-      const associable = !this.isNonAssociable(control.value.subCategoryType);
-      const costAllocations: CostAllocationCreation[] = associable && control.value.budgetItemId
+      const costAllocations: CostAllocationCreation[] = control.value.budgetItemId
         ? [{ budgetItemId: control.value.budgetItemId, quantity: control.value.allocationQuantity }]
         : [];
 
@@ -1088,9 +1116,9 @@ export class CreateExpenseComponent implements OnInit {
         totalValue: this.itemTotal(index),
         costAllocations: costAllocations,
         constructionId: control.value.budgetItemId ? undefined : (control.value.constructionId ?? undefined),
-        vehicleId: associable ? control.value.vehicleId : undefined,
-        toolId: associable ? control.value.toolId : undefined,
-        equipmentId: associable ? control.value.equipmentId : undefined
+        vehicleId: control.value.vehicleId,
+        toolId: control.value.toolId,
+        equipmentId: control.value.equipmentId
       } as ItemCreation;
       itemList.push(item);
     });

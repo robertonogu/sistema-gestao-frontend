@@ -1,7 +1,7 @@
 import { ToolStatus } from "../enum/toolStatus";
 
 export interface ToolCreation {
-    code: string;
+    code?: string;
     name: string;
     brand: string;
     model: string;

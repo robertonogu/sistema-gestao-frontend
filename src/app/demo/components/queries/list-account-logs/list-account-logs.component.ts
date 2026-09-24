@@ -1,13 +1,15 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { AccountLog } from 'src/app/demo/api/accountLogs';
 import { ObjectName } from 'src/app/demo/api/objectName';
 import { MovementType } from 'src/app/demo/data/enum/movementType';
-import { AccountLogService } from 'src/app/demo/service/queries/accountLogService';
+import { AccountLogFilters, AccountLogService } from 'src/app/demo/service/queries/accountLogService';
 import { AccountService } from 'src/app/demo/service/company/accountService';
-import { LazyLoadEvent } from 'primeng/api';
+import { exportAccountLogsExcel, exportAccountLogsPdf } from 'src/app/demo/service/queries/accountLogExport';
 
 @Component({
   templateUrl: './list-account-logs.component.html',
+  providers: [MessageService]
 })
 export class ListAccountLogsComponent {
 
@@ -15,8 +17,10 @@ export class ListAccountLogsComponent {
 
   accountNames!: ObjectName[];
   selectedAccount!: number;
+  private selectedAccountName: string = '';
 
   loading: boolean = false;
+  exporting: boolean = false;
   totalRecords: number = 0;
   accountLogs: AccountLog[] = [];
 
@@ -24,11 +28,12 @@ export class ListAccountLogsComponent {
   pageSize: number = 20;
 
   MovementType: any = MovementType;
-  private selectedMovementType: string | undefined;
+  private filters: AccountLogFilters = {};
 
   constructor(
     private accountService: AccountService,
-    private accountLogService: AccountLogService
+    private accountLogService: AccountLogService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -42,18 +47,32 @@ export class ListAccountLogsComponent {
     return meta?.value ?? undefined;
   }
 
-  nextPage(event: any) {
-    if (this.selectedAccount != null) {
-      this.currentPage = event.first / event.rows;
-      this.pageSize = event.rows;
-      this.selectedMovementType = this.filterValue(event.filters, 'movementType');
+  private buildFilters(filters: any): AccountLogFilters {
+    // The date filter is a range calendar: one picked day filters that day, two days filter the period
+    const dateRange = this.filterValue(filters, 'date');
+    let dateFrom: Date | undefined;
+    let dateTo: Date | undefined;
+    if (Array.isArray(dateRange) && dateRange[0]) {
+      dateFrom = dateRange[0];
+      dateTo = dateRange[1] ?? dateRange[0];
+    }
 
+    return { movementType: this.filterValue(filters, 'movementType'), dateFrom, dateTo };
+  }
+
+  nextPage(event: any) {
+    this.currentPage = event.first / event.rows;
+    this.pageSize = event.rows;
+    this.filters = this.buildFilters(event.filters);
+
+    if (this.selectedAccount != null) {
       this.loadAccountLogs();
     }
   }
 
   changeValue(event: any) {
     this.selectedAccount = event.value.objectId;
+    this.selectedAccountName = event.value.name;
     this.currentPage = 0;
 
     this.loadAccountLogs();
@@ -62,16 +81,43 @@ export class ListAccountLogsComponent {
   private loadAccountLogs() {
     this.loading = true;
 
-    this.accountLogService.getAccountLogs(this.selectedAccount, this.currentPage, this.pageSize, this.selectedMovementType).subscribe((accountLogs) => {
+    this.accountLogService.getAccountLogs(this.selectedAccount, this.currentPage, this.pageSize, this.filters).subscribe((accountLogs) => {
       this.accountLogs = accountLogs.objectList;
       this.totalRecords = accountLogs.totalElements;
 
-      // The list comes newest-first, so the first row on page 0 holds the account's current balance.
+      // The list comes newest-first, so the first row on page 0 holds the balance at the end of the filtered period.
       if (this.currentPage === 0) {
         this.balance = this.accountLogs.length > 0 ? this.accountLogs[0].balance : 0;
       }
 
       this.loading = false;
+    });
+  }
+
+  export(format: 'pdf' | 'excel') {
+    if (this.selectedAccount == null) {
+      this.messageService.add({ severity: 'warn', summary: 'Conta', detail: 'Selecione uma conta para exportar.' });
+      return;
+    }
+
+    this.exporting = true;
+    this.accountLogService.exportAccountLogs(this.selectedAccount, this.filters).subscribe({
+      next: async (result) => {
+        const data = {
+          title: `Mapa Banco - ${this.selectedAccountName}`,
+          fileName: `mapa-banco-${this.selectedAccountName}`.replace(/\s+/g, '-').toLowerCase(),
+          dateFrom: this.filters.dateFrom,
+          dateTo: this.filters.dateTo,
+          logs: result,
+        };
+        if (format === 'pdf') exportAccountLogsPdf(data);
+        else await exportAccountLogsExcel(data);
+        this.exporting = false;
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível exportar o mapa banco.' });
+        this.exporting = false;
+      }
     });
   }
 

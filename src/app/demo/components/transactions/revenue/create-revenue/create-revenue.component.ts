@@ -126,9 +126,14 @@ export class CreateRevenueComponent {
     this.revenue = new RevenueCreation(this.date, this.selectedRevenueType, this.documentNumber, this.selectedOrigin, this.selectedAccount, this.selectedPaymentMethod, this.totalValue, this.iva, this.selectedSale);
     console.log(this.revenue);
     if (this.revenue != null) {
-      this.revenueService.createRevenue(this.revenue).subscribe(newRevenue => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Receita adicionada com sucesso.' });
-        this.resetForm();
+      this.revenueService.createRevenue(this.revenue).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Receita adicionada com sucesso.' });
+          this.resetForm();
+        },
+        error: (err) => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível adicionar a receita.' });
+        }
       })
     }
     else {

@@ -90,7 +90,7 @@ export class EditSaleComponent implements OnInit {
           this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Venda atualizada com sucesso.' });
         },
         error: (err) => {
-          const detail = typeof err === 'string' ? err : 'Existem campos por preencher.';
+          const detail = err?.error?.message ?? (typeof err === 'string' ? err : 'Existem campos por preencher.');
           this.messageService.add({ severity: 'error', summary: 'Erro', detail });
         }
       });

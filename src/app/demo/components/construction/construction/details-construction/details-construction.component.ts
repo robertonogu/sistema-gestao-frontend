@@ -9,6 +9,7 @@ import { ConstructionCalendarEvent } from 'src/app/demo/api/constructionCalendar
 import { ConstructionDetails } from 'src/app/demo/api/constructionDetails';
 import { ItemCost } from 'src/app/demo/api/itemCost';
 import { MessageService } from 'primeng/api';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 
 interface CostBucket { budgeted: number; actual: number; }
@@ -335,6 +336,8 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 
 // ===== Charts =====
 .chart-host { height: 240px; padding: 8px 16px 16px; }
+// Fixed-size (non-responsive) chart: a responsive canvas here gets stuck in a resize loop and freezes the page
+.cost-pie-host { display: flex; justify-content: center; }
 .chart-host.sm { height: 180px; }
   `]
 })
@@ -405,7 +408,7 @@ export class DetailsConstructionComponent implements OnInit {
     this.constructionId = Number(this.route.snapshot.params['constructionId']);
     this.constructionService.getConstructionDetails(this.constructionId).subscribe((data) => {
       this.constructionDetails = data;
-          console.log(data)
+      this.buildCostCategoryChart();
     });
     console.log(this.constructionDetails)
   }
@@ -598,6 +601,72 @@ export class DetailsConstructionComponent implements OnInit {
 
   totalActual(key: SourceKey): number {
     return this.itemsSplit.reduce((s, it) => s + it[key].actual, 0);
+  }
+
+  // ===== Gráfico circular: custos por categoria (mesmo estilo do "Despesas por Categoria" do dashboard) =====
+  costCategoryData: any;
+  costCategoryOptions: any;
+  // Registered only on this chart (not globally), so other charts don't start showing values
+  costCategoryPlugins = [ChartDataLabels];
+
+  private buildCostCategoryChart(): void {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const totals = this.costBreakdownTotals;
+    const categories = [
+      { label: 'Materiais', value: totals.materials },
+      { label: 'Mão de Obra', value: totals.labor },
+      { label: 'Serviços Externos', value: totals.externalServices },
+      { label: 'Custos Indiretos', value: totals.indirect },
+    ];
+    const total = categories.reduce((sum, c) => sum + c.value, 0);
+    const pct = (value: number) => total ? Math.round((value / total) * 1000) / 10 : 0;
+    const eur = (value: number) => new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(value);
+
+    this.costCategoryData = total === 0 ? null : {
+      labels: categories.map(c => c.label),
+      datasets: [{
+        data: categories.map(c => c.value),
+        backgroundColor: ['--primary-700', '--primary-500', '--primary-300', '--primary-100'].map(v => documentStyle.getPropertyValue(v)),
+        hoverBackgroundColor: ['--primary-600', '--primary-400', '--primary-200', '--primary-50'].map(v => documentStyle.getPropertyValue(v)),
+      }],
+    };
+
+    const textColor = documentStyle.getPropertyValue('--text-color');
+
+    this.costCategoryOptions = {
+      animation: { duration: 0 },
+      // Room around the pie for the outside value labels
+      layout: { padding: { top: 28, bottom: 8, left: 100, right: 100 } },
+      plugins: {
+        // Value in euros just outside each slice (slices with 0 € are left unlabelled)
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          offset: 6,
+          color: textColor,
+          font: { weight: 600, size: 12 },
+          display: (context: any) => context.dataset.data[context.dataIndex] > 0,
+          formatter: (value: number) => eur(value),
+        },
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: textColor,
+            usePointStyle: true,
+            font: { weight: 700 },
+            padding: 15,
+          },
+        },
+        tooltip: {
+          callbacks: {
+            label: (context: any) => {
+              const category = categories[context.dataIndex];
+              return `${category.label}: ${eur(category.value)} (${pct(category.value)}%)`;
+            },
+          },
+        },
+      },
+    };
   }
 
   get costBreakdownRows() {

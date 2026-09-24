@@ -134,6 +134,18 @@
     </p-card>
   </section>-->
 
+  <!-- ========== Distribuição de custos por categoria ========== -->
+  <h3 class="section-title">Distribuição de custos</h3>
+
+  <p-card>
+    <div *ngIf="costCategoryData; else noCostCategory" class="cost-pie-host">
+      <p-chart type="pie" [data]="costCategoryData" [options]="costCategoryOptions" [plugins]="costCategoryPlugins" [responsive]="false" width="560px" height="380px"></p-chart>
+    </div>
+    <ng-template #noCostCategory>
+      <div class="text-center muted">Sem custos lançados.</div>
+    </ng-template>
+  </p-card>
+
   <!-- ========== Custos por budget item (com indiretos rateados) ========== -->
   <h3 class="section-title">Custos por budget item</h3>
 

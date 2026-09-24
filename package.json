@@ -26,6 +26,7 @@
         "@fullcalendar/interaction": "^6.0.3",
         "@fullcalendar/timegrid": "^6.0.3",
         "chart.js": "^3.3.2",
+        "chartjs-plugin-datalabels": "^2.2.0",
         "exceljs": "^4.4.0",
         "jspdf": "^4.2.1",
         "jspdf-autotable": "^5.0.8",

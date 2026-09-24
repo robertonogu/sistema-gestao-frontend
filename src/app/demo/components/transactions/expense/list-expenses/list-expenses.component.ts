@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -145,7 +145,7 @@ export class ListExpensesComponent implements OnInit {
 
     const filters = this.table?.filters ?? {};
 
-    this.expenseService.getExpenses(0, 100000, this.buildFilters(filters)).subscribe({
+    this.expenseService.exportExpenses(this.buildFilters(filters)).subscribe({
       next: (result) => {
         const doc = new jsPDF({ orientation: 'landscape' });
 
@@ -155,7 +155,7 @@ export class ListExpensesComponent implements OnInit {
         autoTable(doc, {
           startY: 20,
           head: [['Data', 'Documento', 'Origem', 'Estado', 'Meio de Pagamento', 'Valor', 'Valor Pendente', 'Data Limite']],
-          body: result.objectList.map((expense: ExpenseListItem) => [
+          body: result.map((expense: ExpenseListItem) => [
             expense.date ? new Date(expense.date).toLocaleDateString('pt-PT') : '',
             expense.documentNumber,
             expense.origin ?? '',

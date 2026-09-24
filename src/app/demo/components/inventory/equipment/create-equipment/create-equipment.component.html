@@ -36,9 +36,9 @@
 
 			<div class="p-fluid p-formgrid grid">
 
-                <div class="field col-12 md:col-4">
+                <div class="field col-12 md:col-4" *ngIf="editingEquipmentId">
                     <label>Código</label>
-                    <input [(ngModel)]="code" type="text" pInputText />
+                    <input [ngModel]="code" type="text" pInputText [disabled]="true" />
                 </div>
 
                 <div class="field col-12 md:col-4">

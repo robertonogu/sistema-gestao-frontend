@@ -1,7 +1,7 @@
 import { EquipmentStatus } from "../enum/equipmentStatus";
 
 export interface EquipmentCreation {
-    code: string;
+    code?: string;
     name: string;
     brand: string;
     model: string;

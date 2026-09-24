@@ -334,6 +334,10 @@
 							   [ngClass]="rowHasAssociation(j) ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"
 							   [pTooltip]="rowHasAssociation(j) ? 'Associado' : 'Sem associação'"
 							   tooltipPosition="top"></i>
+							<i *ngIf="isNonAssociable(itemInput.value.subCategoryType)"
+							   class="pi pi-bolt assoc-icon text-primary"
+							   [pTooltip]="autoPurchaseTooltip(j)"
+							   tooltipPosition="top"></i>
 							<p-button [text]="true" icon="pi pi-link" title="Associar" [disabled]="!canOpenLinkDialog(itemInput.value.subCategoryType)" (click)="openLinkDialog(j)"></p-button>
 							<p-button severity="danger" [text]="true" icon="pi pi-trash" (click)="removeItemInput(j)"></p-button>
 						</div>
@@ -588,17 +592,6 @@
 				[ngClass]="{ 'ng-invalid ng-dirty': quickAddToolEquipmentSubmitted && !quickAddToolEquipmentName }"
 			/>
 			<small class="p-error" *ngIf="quickAddToolEquipmentSubmitted && !quickAddToolEquipmentName">Nome é obrigatório.</small>
-		</div>
-
-		<div class="field">
-			<label for="quickAddToolEquipmentCode" class="block font-bold mb-4">Código</label>
-			<input
-				type="text"
-				pInputText
-				id="quickAddToolEquipmentCode"
-				[(ngModel)]="quickAddToolEquipmentCode"
-				[ngModelOptions]="{ standalone: true }"
-			/>
 		</div>
 	</ng-template>
 

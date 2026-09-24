@@ -7,6 +7,7 @@ import { ObjectList } from '../../api/objectList';
 import { ExpenseCreation } from '../../data/model/expenseCreation.model';
 import { Expense } from '../../api/expense';
 import { ExpenseEdit } from '../../api/expenseEdit';
+import { ExpenseListItem } from '../../api/expenseListItem';
 
 export interface ExpenseFilters {
     documentNumber?: string;
@@ -28,16 +29,25 @@ export class ExpenseService {
     constructor(private http: HttpClient) { }
 
     getExpenses(currentPage: number, pageSize: number, filters?: ExpenseFilters) : Observable<ObjectList> {
-        let url = this.expensesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
-
-        if (filters?.documentNumber) url += "&documentNumber=" + encodeURIComponent(filters.documentNumber);
-        if (filters?.dateFrom) url += "&dateFrom=" + this.formatDate(filters.dateFrom);
-        if (filters?.dateTo) url += "&dateTo=" + this.formatDate(filters.dateTo);
-        if (filters?.originIds?.length) url += "&originIds=" + filters.originIds.join(",");
-        if (filters?.paymentStatus) url += "&paymentStatus=" + filters.paymentStatus;
-        if (filters?.category) url += "&category=" + filters.category;
-
+        const url = this.expensesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize + this.filterParams(filters);
         return this.http.get<ObjectList>(url);
+    }
+
+    // Every expense matching the filters, without pagination (PDF/Excel export)
+    exportExpenses(filters?: ExpenseFilters) : Observable<ExpenseListItem[]> {
+        const url = this.expensesUrl + "/export?" + this.filterParams(filters).substring(1);
+        return this.http.get<ExpenseListItem[]>(url);
+    }
+
+    private filterParams(filters?: ExpenseFilters): string {
+        let params = "";
+        if (filters?.documentNumber) params += "&documentNumber=" + encodeURIComponent(filters.documentNumber);
+        if (filters?.dateFrom) params += "&dateFrom=" + this.formatDate(filters.dateFrom);
+        if (filters?.dateTo) params += "&dateTo=" + this.formatDate(filters.dateTo);
+        if (filters?.originIds?.length) params += "&originIds=" + filters.originIds.join(",");
+        if (filters?.paymentStatus) params += "&paymentStatus=" + filters.paymentStatus;
+        if (filters?.category) params += "&category=" + filters.category;
+        return params;
     }
 
     private formatDate(date: Date): string {

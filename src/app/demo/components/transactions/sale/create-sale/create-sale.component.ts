@@ -96,9 +96,14 @@ export class CreateSaleComponent {
     this.sale = { date: this.date, clientId: this.selectedClient, documentNumber: this.documentNumber, constructionId: this.selectedConstruction, netValue: this.netValue, iva: this.iva } as SaleCreation;
 
     if (this.sale != null) {
-      this.saleService.createSale(this.sale).subscribe(newSale => {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Venda adicionada com sucesso.' });
-        this.resetForm();
+      this.saleService.createSale(this.sale).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Venda adicionada com sucesso.' });
+          this.resetForm();
+        },
+        error: (err) => {
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível adicionar a venda.' });
+        }
       })
     }
     else {

@@ -8,6 +8,8 @@ import { TagModule } from 'primeng/tag';
 import { ListCashAccountLogsRoutingModule } from './list-cash-logs-routing.module';
 import { ListCashLogsComponent } from './list-cash-logs.component';
 import { TooltipModule } from 'primeng/tooltip';
+import { CalendarModule } from 'primeng/calendar';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   	imports: [
@@ -18,7 +20,9 @@ import { TooltipModule } from 'primeng/tooltip';
 		DropdownModule,
 		ListCashAccountLogsRoutingModule,
 		TagModule,
-		TooltipModule
+		TooltipModule,
+		CalendarModule,
+		ToastModule
   ],
   declarations: [ListCashLogsComponent]
 })
