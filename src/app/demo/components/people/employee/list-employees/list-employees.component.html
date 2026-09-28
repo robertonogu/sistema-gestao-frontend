@@ -162,6 +162,12 @@
         </div>
 
         <div class="field">
+            <label for="initialBalance" class="block font-bold mb-4">Saldo Inicial</label>
+            <p-inputNumber id="initialBalance" [(ngModel)]="employee.initialBalance" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
+                suffix=" €" locale="pt-PT" [useGrouping]="false" placeholder="0,00 €"></p-inputNumber>
+        </div>
+
+        <div class="field">
             <label for="baseSalary" class="block font-bold mb-4">Vencimento Base</label>
             <p-inputNumber
                 id="baseSalary"

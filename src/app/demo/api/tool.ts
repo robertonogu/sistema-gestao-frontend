@@ -10,4 +10,8 @@ export interface Tool {
     purchaseValue: number;
     location: string;
     status: ToolStatus;
+    documentNumber?: string;
+    originId?: number;
+    originName?: string;
+    fromExpense: boolean;
 }

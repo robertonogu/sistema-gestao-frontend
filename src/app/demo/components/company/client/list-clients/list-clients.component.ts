@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Client } from 'src/app/demo/api/client';
 import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
@@ -64,7 +64,7 @@ export class ListClientsComponent {
     this.submitted = true;
 
     if (this.client.name?.trim()) {
-      const clientCreation = { name: this.client.name, nif: this.client.nif } as ClientCreation;
+      const clientCreation = { name: this.client.name, nif: this.client.nif, initialBalance: this.client.initialBalance ?? null } as ClientCreation;
 
       if (this.client.originId) {
         this.clientService.updateClient(this.client.originId, clientCreation).subscribe(() => {

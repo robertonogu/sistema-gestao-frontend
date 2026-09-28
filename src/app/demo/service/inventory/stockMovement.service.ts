@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ObjectList } from '../../api/objectList';
+import { StockExitCreation } from '../../data/model/stockExitCreation.model';
 
 export interface StockMovementFilters {
     documentNumber?: string;
@@ -35,6 +36,10 @@ export class StockMovementService {
     getStockExits(currentPage: number, pageSize: number, filters?: StockMovementFilters) : Observable<ObjectList> {
         let url = this.stockMovementsUrl + "/out?pageNo=" + currentPage + "&pageSize=" + pageSize + this.filtersQuery(filters);
         return this.http.get<ObjectList>(url);
+    }
+
+    createStockExits(stockExit: StockExitCreation) : Observable<any> {
+        return this.http.post<any>(this.stockMovementsUrl + "/out", stockExit);
     }
 
     getStockAsOfDate(date: string, currentPage: number, pageSize: number, filters?: StockMovementFilters) : Observable<ObjectList> {

@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { ObjectList } from '../../api/objectList';
 import { VehicleCostCreation } from '../../data/model/vehicleCostCreation';
 import { VehicleCost } from '../../api/vehicleCost';
+import { DestinationLocation } from '../../api/destinationLocation';
 
 @Injectable({
     providedIn: 'root'
@@ -13,12 +14,17 @@ export class VehicleCostService {
 
     private vehicleCostsUrl = `${environment.apiUrl}/vehicleCosts`;
     private deleteVehicleCostUrl = `${environment.apiUrl}/vehicleCosts/`;
+    private destinationLocationsUrl = `${environment.apiUrl}/locations/destinations`;
 
     constructor(private http: HttpClient) { }
 
     getVehicleCosts(currentPage: number, pageSize: number) : Observable<ObjectList> {
         let url = this.vehicleCostsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
         return this.http.get<ObjectList>(url);
+    }
+
+    getDestinationLocations() : Observable<DestinationLocation[]> {
+        return this.http.get<DestinationLocation[]>(this.destinationLocationsUrl);
     }
 
     createVehicleCost(vehicleCost: VehicleCostCreation) : Observable<VehicleCost> {

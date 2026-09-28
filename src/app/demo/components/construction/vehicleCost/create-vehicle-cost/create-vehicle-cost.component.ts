@@ -4,6 +4,7 @@ import { MessageService } from 'primeng/api';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { Destination } from 'src/app/demo/data/model/destination.model';
+import { DestinationLocation } from 'src/app/demo/api/destinationLocation';
 import { VehicleCostCreation } from 'src/app/demo/data/model/vehicleCostCreation';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
@@ -86,6 +87,8 @@ export class CreateVehicleCostComponent implements OnInit {
   selectedConstruction!: number;
 
   destinations: Destination[] = [];
+  // Every supplier/construction location; a stop is picked by owner and location name
+  destinationLocations: DestinationLocation[] = [];
   destinationToAdd: Destination | null = null;
   destinationOptions: DestinationOption[] = [];
 
@@ -100,8 +103,8 @@ export class CreateVehicleCostComponent implements OnInit {
     private vehicleCostService: VehicleCostService) { }
 
   ngOnInit(): void {
-    this.supplierService.getSupplierNames().subscribe((supplierNames) => {
-      this.supplierNames = supplierNames;
+    this.vehicleCostService.getDestinationLocations().subscribe((destinationLocations) => {
+      this.destinationLocations = destinationLocations;
       this.refreshDestinationOptions();
     });
     this.constructionService.getConstructionNames().subscribe((constructionNames) => {
@@ -121,28 +124,24 @@ export class CreateVehicleCostComponent implements OnInit {
     this.refreshDestinationOptions();
   }
 
+  // One option per supplier location (all suppliers) and per location of the selected construction.
+  // The location name is only shown when the supplier/construction has more than one.
   private refreshDestinationOptions(): void {
-    const options: DestinationOption[] = (this.supplierNames ?? []).map((s) => ({
-      label: s.name,
-      value: { type: 'SUPPLIER', id: s.id },
-    }));
+    const all = this.destinationLocations ?? [];
+    const countByOwner = new Map<string, number>();
+    all.forEach(d => countByOwner.set(d.type + d.ownerId, (countByOwner.get(d.type + d.ownerId) ?? 0) + 1));
 
-    const construction = this.constructionNames?.find((c) => c.constructionId === this.selectedConstruction);
-    if (construction) {
-      options.push({
-        label: 'Obra: ' + construction.name,
-        value: { type: 'CONSTRUCTION', id: construction.constructionId },
+    this.destinationOptions = all
+      .filter(d => d.type === 'SUPPLIER' || d.ownerId === this.selectedConstruction)
+      .map(d => {
+        const withLocation = (countByOwner.get(d.type + d.ownerId) ?? 0) > 1 ? `${d.ownerName} — ${d.locationName}` : d.ownerName;
+        const label = d.type === 'CONSTRUCTION' ? 'Obra: ' + withLocation : withLocation;
+        return { label, value: { type: d.type, id: d.ownerId, locationId: d.locationId, label } };
       });
-    }
-
-    this.destinationOptions = options;
   }
 
   destinationLabel(destination: Destination): string {
-    if (destination.type === 'CONSTRUCTION') {
-      return 'Obra: ' + (this.constructionNames?.find((c) => c.constructionId === destination.id)?.name ?? destination.id);
-    }
-    return this.supplierNames?.find((s) => s.id === destination.id)?.name ?? String(destination.id);
+    return destination.label ?? String(destination.id);
   }
 
   addDestination(): void {

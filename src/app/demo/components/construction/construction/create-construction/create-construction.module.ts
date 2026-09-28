@@ -17,7 +17,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
-import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
+import { LocationsEditorComponent } from 'src/app/demo/components/shared/locations-editor/locations-editor.component';
 
 @NgModule({
   imports: [
@@ -39,7 +39,7 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
     CheckboxModule,
     DialogModule,
     GooglePlaceAutocompleteDirective,
-    UppercaseDirective
+    LocationsEditorComponent
   ],
   declarations: [CreateConstructionComponent]
 })

@@ -9,4 +9,6 @@ export interface ToolCreation {
     purchaseValue: number;
     location: string;
     status: ToolStatus;
+    documentNumber?: string;
+    originId?: number;
 }

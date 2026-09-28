@@ -20,13 +20,28 @@
                 styleClass="p-datatable-striped" 
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="expensesInDebt"
+                (onFilter)="onFilter($event)"
             >
 
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Data Limite</th>
                         <th>Documento</th>
-                        <th>Origem</th>
+                        <th>Data do Documento</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Origem
+                                <p-columnFilter field="origin" matchMode="in" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-multiSelect [ngModel]="value" [options]="originOptions" placeholder="Todas"
+                                            [showClear]="true" [filter]="true" appendTo="body" [style]="{ 'min-width': '14rem' }"
+                                            display="chip" selectedItemsLabel="{0} origens selecionadas" [maxSelectedLabels]="2"
+                                            (onChange)="filter($event.value?.length ? $event.value : null)" (onClear)="filter(null)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Valor</th>
                         <th>Débito</th>
                     </tr>
@@ -49,6 +64,7 @@
                             </ng-template>
                         </td>
                         <td>{{ expenseInDebt.documentNumber }}</td>
+                        <td>{{ expenseInDebt.date | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ expenseInDebt.origin }}</td>
                         <td>{{ expenseInDebt.totalValue | number: '1.2-2' }} €</td>
                         <td class="text-red-600 font-semibold">{{ expenseInDebt.debtValue | number: '1.2-2' }} €</td>
@@ -57,7 +73,7 @@
 
                 <ng-template pTemplate="footer">
                     <tr>
-                        <td colspan="4">Valor total em débito</td>
+                        <td colspan="5">Valor total em débito</td>
                         <td>{{ totalInDebt | number: '1.2-2' }} €</td>
                     </tr>
                 </ng-template>

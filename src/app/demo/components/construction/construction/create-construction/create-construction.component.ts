@@ -8,6 +8,7 @@ import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { Unit } from 'src/app/demo/data/enum/unit';
 import { Construction } from 'src/app/demo/data/model/construction.model';
+import { Location as PlaceLocation } from 'src/app/demo/api/location';
 import { BudgetItem } from 'src/app/demo/data/model/budgetItem.model';
 import { ClientCreation } from 'src/app/demo/data/model/clientCreation.model';
 import { VehicleCostCreation } from 'src/app/demo/data/model/vehicleCostCreation';
@@ -228,8 +229,8 @@ export class CreateConstructionComponent {
   dynamicForm!: FormGroup; // Your main form group
 
   name!: string;
-  address!: string;
-  placeId!: string;
+  // Named locations of the construction; the first one is the main location
+  locations: PlaceLocation[] = [{ name: '', address: '', placeId: '' }];
   selectedClient!: number;
   adjudicationDate!: Date;
   initialDate!: Date;
@@ -284,10 +285,6 @@ export class CreateConstructionComponent {
     this._location.back();
   }
 
-  onAddressPlaceSelected(place: PlaceSelection): void {
-    this.address = place.address;
-    this.placeId = place.placeId;
-  }
 
   onImageSelect(event: any): void {
     this.selectedImageFile = event.files?.[0];
@@ -585,8 +582,7 @@ export class CreateConstructionComponent {
 
     this.construction = {
       name: this.name,
-      address: this.address,
-      placeId: this.placeId,
+      locations: this.locations,
       clientId: this.selectedClient,
       adjudicationDate: this.adjudicationDate,
       initialDate: this.initialDate,
@@ -609,8 +605,7 @@ export class CreateConstructionComponent {
 
   private resetForm(): void {
     this.name = undefined as any;
-    this.address = undefined as any;
-    this.placeId = undefined as any;
+    this.locations = [{ name: '', address: '', placeId: '' }];
     this.selectedClient = undefined as any;
     this.adjudicationDate = undefined as any;
     this.initialDate = undefined as any;

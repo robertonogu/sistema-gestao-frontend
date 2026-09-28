@@ -5,7 +5,7 @@ import { ListArticlesComponent } from './list-articles.component';
 @NgModule({
 	imports: [RouterModule.forChild([
 		{ path: '', component: ListArticlesComponent },
-		{ path: 'issue-article', data: { breadcrumb: 'Emitir Artigo' }, loadChildren: () => import('../issue-article/issue-article.module').then(m => m.IssueArticleModule) },
+		{ path: 'article-exit', data: { breadcrumb: 'Nova Saída de Artigos' }, loadChildren: () => import('../article-exit/article-exit.module').then(m => m.ArticleExitModule) },
 	])],
 	exports: [RouterModule]
 })

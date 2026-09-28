@@ -14,6 +14,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { RippleModule } from 'primeng/ripple';
 import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
+import { LocationsEditorComponent } from 'src/app/demo/components/shared/locations-editor/locations-editor.component';
 
 @NgModule({
   imports: [
@@ -30,7 +31,8 @@ import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google
     InputNumberModule,
     FormsModule,
     RippleModule,
-    GooglePlaceAutocompleteDirective
+    GooglePlaceAutocompleteDirective,
+    LocationsEditorComponent
   ],
   declarations: [ListSuppliersComponent]
 })

@@ -635,28 +635,22 @@ export class DetailsConstructionComponent implements OnInit {
 
     this.costCategoryOptions = {
       animation: { duration: 0 },
-      // Room around the pie for the outside value labels
-      layout: { padding: { top: 28, bottom: 8, left: 100, right: 100 } },
+      // Room around the pie for the outside labels
+      layout: { padding: { top: 40, bottom: 40, left: 130, right: 130 } },
       plugins: {
-        // Value in euros just outside each slice (slices with 0 € are left unlabelled)
+        // Category name and percentage just outside each slice (slices with 0 € are left unlabelled)
         datalabels: {
           anchor: 'end',
           align: 'end',
           offset: 6,
           color: textColor,
+          textAlign: 'center',
           font: { weight: 600, size: 12 },
           display: (context: any) => context.dataset.data[context.dataIndex] > 0,
-          formatter: (value: number) => eur(value),
+          formatter: (value: number, context: any) => `${categories[context.dataIndex].label}\n${pct(value)}%`,
         },
-        legend: {
-          position: 'bottom',
-          labels: {
-            color: textColor,
-            usePointStyle: true,
-            font: { weight: 700 },
-            padding: 15,
-          },
-        },
+        // The labels around the pie already name each slice
+        legend: { display: false },
         tooltip: {
           callbacks: {
             label: (context: any) => {

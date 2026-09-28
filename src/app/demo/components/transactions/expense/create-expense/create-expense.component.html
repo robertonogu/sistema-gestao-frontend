@@ -224,7 +224,17 @@
 
 			<div class="item-tbl" formArrayName="itemInputs">
 				<div class="item-head">
-					<div></div>
+					<div>
+						<p-checkbox
+							[binary]="true"
+							[ngModel]="allSelectableItemsSelected"
+							[ngModelOptions]="{ standalone: true }"
+							[disabled]="!hasSelectableItems"
+							(onChange)="toggleSelectAllItems($event.checked)"
+							pTooltip="Selecionar todos"
+							tooltipPosition="top"
+						></p-checkbox>
+					</div>
 					<div>Nome</div>
 					<div>Categoria</div>
 					<div>Quantidade</div>
@@ -243,8 +253,9 @@
 						<div>
 							<p-autoComplete
 								formControlName="name"
-								[suggestions]="filteredArticleNames"
-								(completeMethod)="filterArticleNames($event)"
+								[suggestions]="filteredItemNames"
+								(completeMethod)="filterItemNames($event)"
+								(onSelect)="onItemNameSelect(j, $event)"
 								[dropdown]="false"
 								appendTo="body"
 								placeholder="Nome do item..."

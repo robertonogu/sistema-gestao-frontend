@@ -9,5 +9,6 @@ export interface Employee {
     foodAllowance: number,
     healthInsurance: number,
     internal: boolean,
-    statusEmployee: EmployeeStatus
+    statusEmployee: EmployeeStatus,
+    initialBalance?: number | null
 }

@@ -6,5 +6,7 @@ export enum Unit {
     UN = "un",
     LT = "lt",
     BALSEIRO = "balseiro",
-    ML = "m.l."
+    ML = "m.l.",
+    VG = "vg",
+    CT = "ct"
 }

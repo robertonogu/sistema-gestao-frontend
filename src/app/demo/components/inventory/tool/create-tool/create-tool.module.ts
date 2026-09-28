@@ -10,6 +10,7 @@ import { ToastModule } from 'primeng/toast';
 import { CreateToolComponent } from './create-tool.component';
 import { CreateToolRoutingModule } from './create-tool-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { TooltipModule } from 'primeng/tooltip';
     DropdownModule,
     FormsModule,
     ToastModule,
-    TooltipModule
+    TooltipModule,
+    UppercaseDirective
   ],
   declarations: [CreateToolComponent]
 })

@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { IssueArticleComponent } from './issue-article.component';
+import { ArticleExitComponent } from './article-exit.component';
 
 @NgModule({
 	imports: [RouterModule.forChild([
-		{ path: '', component: IssueArticleComponent }
+		{ path: '', component: ArticleExitComponent }
 	])],
 	exports: [RouterModule]
 })
 
-export class IssueArticleRoutingModule { }
+export class ArticleExitRoutingModule { }

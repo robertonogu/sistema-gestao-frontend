@@ -4,5 +4,6 @@ export enum DocumentType {
     INVOICE_RECEIPT = "Fatura Recibo",
     SIMPLIFIED_INVOICE = "Fatura Simplificada",
     PAYMENT_GUIDE = "Guia de Pagamento",
-    SINGLE_COLLECTION_DOCUMENT = "Documento Único de Cobrança"
+    SINGLE_COLLECTION_DOCUMENT = "Documento Único de Cobrança",
+    SALARY_RECEIPT = "Recibo de Vencimento"
 }

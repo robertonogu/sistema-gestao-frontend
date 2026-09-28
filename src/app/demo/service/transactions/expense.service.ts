@@ -8,6 +8,7 @@ import { ExpenseCreation } from '../../data/model/expenseCreation.model';
 import { Expense } from '../../api/expense';
 import { ExpenseEdit } from '../../api/expenseEdit';
 import { ExpenseListItem } from '../../api/expenseListItem';
+import { ExpenseItemName } from '../../api/expenseItemName';
 
 export interface ExpenseFilters {
     documentNumber?: string;
@@ -25,6 +26,7 @@ export class ExpenseService {
 
     private expensesUrl = `${environment.apiUrl}/expenses`;
     private expensesInDebtUrl = `${environment.apiUrl}/expensesInDebt`;
+    private usedItemNamesUrl = `${environment.apiUrl}/expenseItems/names`;
 
     constructor(private http: HttpClient) { }
 
@@ -61,6 +63,10 @@ export class ExpenseService {
         let url = this.expensesUrl + "/" + expenseId;
         console.log(this.http.get<Expense>(url));
         return this.http.get<Expense>(url);
+    }
+
+    getUsedItemNames() : Observable<ExpenseItemName[]> {
+        return this.http.get<ExpenseItemName[]>(this.usedItemNamesUrl);
     }
 
     getExpensesInDebt(currentPage: number, pageSize: number) : Observable<ExpenseInDebt[]> {

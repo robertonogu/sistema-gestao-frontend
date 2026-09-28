@@ -94,6 +94,7 @@ export class ListEmployeesComponent {
         foodAllowance: this.employee.foodAllowance,
         healthInsurance: this.employee.healthInsurance,
         internal: this.employee.internal ?? false,
+        initialBalance: this.employee.initialBalance ?? null,
         statusEmployee: this.employee.originId ? this.employee.statusEmployee : EmployeeStatus.ACTIVE,
       } as Employee;
 

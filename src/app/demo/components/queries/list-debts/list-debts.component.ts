@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TableFilterEvent } from 'primeng/table';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 
@@ -18,11 +19,24 @@ export class ListDebtsComponent {
 
   constructor(private expenseService: ExpenseService) {}
 
+  // Origins that currently have debts (options of the origin filter)
+  originOptions: string[] = [];
+
   ngOnInit(): void {
     this.expenseService.getExpensesInDebt(this.currentPage, this.pageSize).subscribe((expensesInDebt) => {
       this.expensesInDebt = expensesInDebt;
-      this.totalInDebt = this.expensesInDebt.reduce((exp, expense) => exp + expense.debtValue, 0);
+      this.originOptions = [...new Set(expensesInDebt.map(expense => expense.origin).filter(Boolean))].sort();
+      this.updateTotal(this.expensesInDebt);
     });
+  }
+
+  // Total in debt of the rows shown: every row when there is no filter, only the filtered ones otherwise
+  onFilter(event: TableFilterEvent) {
+    this.updateTotal((event.filteredValue as ExpenseInDebt[]) ?? this.expensesInDebt);
+  }
+
+  private updateTotal(rows: ExpenseInDebt[]) {
+    this.totalInDebt = rows.reduce((sum, expense) => sum + expense.debtValue, 0);
   }
 
   formatDate(date: string | null): string | undefined {
@@ -51,8 +65,6 @@ export class ListDebtsComponent {
   }
 
   isNumber(value: any): boolean {
-    console.log(value);
-    console.log(!isNaN(value));
     return !isNaN(value);
   }
 

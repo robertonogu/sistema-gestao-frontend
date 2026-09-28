@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/api';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { BudgetItem } from 'src/app/demo/data/model/budgetItem.model';
 import { Construction } from 'src/app/demo/data/model/construction.model';
+import { Location as PlaceLocation } from 'src/app/demo/api/location';
 import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { ClientService } from 'src/app/demo/service/company/clientService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
@@ -223,8 +224,8 @@ export class EditConstructionComponent implements OnInit {
   constructionId!: number;
 
   name!: string;
-  address!: string;
-  placeId!: string;
+  // Named locations of the construction; the first one is the main location
+  locations: PlaceLocation[] = [{ name: '', address: '', placeId: '' }];
   selectedClient!: number;
   adjudicationDate!: Date;
   initialDate!: Date;
@@ -255,8 +256,9 @@ export class EditConstructionComponent implements OnInit {
     this.constructionService.getConstructionForEdit(this.constructionId).subscribe({
       next: (construction) => {
         this.name = construction.name;
-        this.address = construction.address;
-        this.placeId = construction.placeId;
+        this.locations = construction.locations?.length
+          ? construction.locations.map((location: PlaceLocation) => ({ ...location }))
+          : [{ name: '', address: construction.address ?? '', placeId: construction.placeId ?? '' }];
         this.selectedClient = construction.clientId;
         this.adjudicationDate = construction.adjudicationDate ? new Date(construction.adjudicationDate) : null as any;
         this.initialDate = construction.initialDate ? new Date(construction.initialDate) : null as any;
@@ -285,10 +287,6 @@ export class EditConstructionComponent implements OnInit {
     this._location.back();
   }
 
-  onAddressPlaceSelected(place: PlaceSelection): void {
-    this.address = place.address;
-    this.placeId = place.placeId;
-  }
 
   onImageSelect(event: any): void {
     this.selectedImageFile = event.files?.[0];
@@ -585,8 +583,7 @@ export class EditConstructionComponent implements OnInit {
     this.construction = {
       id: this.constructionId,
       name: this.name,
-      address: this.address,
-      placeId: this.placeId,
+      locations: this.locations,
       clientId: this.selectedClient,
       adjudicationDate: this.adjudicationDate,
       initialDate: this.initialDate,

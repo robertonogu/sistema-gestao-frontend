@@ -1,18 +1,14 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { MessageService } from 'primeng/api';
+import { AccountName } from 'src/app/demo/api/accountName';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
-import { ItemName } from 'src/app/demo/api/itemName';
-import { ObjectName } from 'src/app/demo/api/objectName';
 import { Origin } from 'src/app/demo/api/origin';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { ListPaymentCreation } from 'src/app/demo/data/model/listPaymentCreation.model';
 import { PaymentCreation } from 'src/app/demo/data/model/paymentCreation.model';
-import { RevenueCreation } from 'src/app/demo/data/model/revenueCreation.model';
-import { AccountService } from 'src/app/demo/service/company/accountService';
-import { ClientService } from 'src/app/demo/service/company/clientService';
+import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from 'src/app/demo/service/company/accountService';
 import { OriginService } from 'src/app/demo/service/company/originService';
-import { SupplierService } from 'src/app/demo/service/company/supplierService';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 import { PaymentService } from 'src/app/demo/service/transactions/paymentService';
 
@@ -28,30 +24,29 @@ import { PaymentService } from 'src/app/demo/service/transactions/paymentService
 export class CreatePaymentComponent {
 
   origins!: Origin[];
-  accountNames!: ObjectName[];
-  paymentMethods = PaymentMethod;
+  accountNames: AccountName[] = [];
 
   date!: Date;
   documentNumber!: string
   selectedAccount!: number;
   selectedPaymentMethod!: PaymentMethod;
   selectedOrigin!: number;
-  expenses!: ExpenseInDebt[];
 
-  selectedExpenses: ExpenseInDebt[] = [];
-  
+  isCashAccountSelected: boolean = false;
+  paymentMethodOptions: { key: string; value: string }[] = getPaymentMethodEntries(undefined);
+
+  // Faturas em débito da origem, da mais antiga para a mais recente
+  expenses: ExpenseInDebt[] = [];
   expensesSelected: ExpenseInDebt[] = [];
   expenseValues: number[] = [];
 
-  revenue!: RevenueCreation;
-
-  payments!: ListPaymentCreation;
   sumTotalValues: number = 0;
-  paymentCreationDTOList: PaymentCreation[] = [];
+  totalToPay: number | null = null;
+  saving: boolean = false;
 
   constructor(
-    private originService: OriginService, 
-    private accountService: AccountService, 
+    private originService: OriginService,
+    private accountService: AccountService,
     private expenseService: ExpenseService,
     private messageService: MessageService,
     private paymentService: PaymentService,
@@ -63,7 +58,7 @@ export class CreatePaymentComponent {
       this.origins = origins;
     });
 
-    this.accountService.getAccountNames().subscribe((accountNames) => {
+    this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
     });
   }
@@ -72,26 +67,57 @@ export class CreatePaymentComponent {
     this._location.back();
   }
 
+  onAccountChange() {
+    const cashBox = this.accountNames.find(account => account.objectId === this.selectedAccount)?.cashBox;
+    this.isCashAccountSelected = !!cashBox;
+    this.paymentMethodOptions = getPaymentMethodEntries(cashBox);
+
+    if (this.isCashAccountSelected) {
+      this.selectedPaymentMethod = CASH_PAYMENT_METHOD_KEY;
+    } else if ((this.selectedPaymentMethod as unknown as string) === 'CASH') {
+      this.selectedPaymentMethod = undefined as any;
+    }
+  }
+
   getExpenses() {
     this.expenseService.getExpensesFromOrigin(this.selectedOrigin).subscribe((expenses) => {
-      this.expenses = expenses;
-      this.selectedExpenses = expenses;
-      this.expenseValues = this.selectedExpenses.map(() => 0);
+      this.expenses = [...expenses].sort((a, b) => this.expenseTime(a) - this.expenseTime(b) || a.id - b.id);
+      this.expensesSelected = [];
+      this.expenseValues = this.expenses.map(() => 0);
+      this.sumTotalValues = 0;
+      this.totalToPay = null;
     });
   }
 
+  private expenseTime(expense: ExpenseInDebt): number {
+    const date = expense.date ?? expense.paymentDeadline;
+    return date ? new Date(date).getTime() : 0;
+  }
+
+  get totalDebt(): number {
+    return this.round(this.expenses.reduce((acc, expense) => acc + expense.debtValue, 0));
+  }
+
+  // Reparte o valor total pelas faturas em débito, da mais antiga para a mais recente
+  distributeTotal(input: number | string | null) {
+    const value = input == null || input === '' ? null : Number(input);
+    this.totalToPay = value;
+    let remaining = Math.min(value ?? 0, this.totalDebt);
+
+    this.expenseValues = this.expenses.map((expense) => {
+      const amount = this.round(Math.max(0, Math.min(remaining, expense.debtValue)));
+      remaining = this.round(remaining - amount);
+      return amount;
+    });
+
+    this.expensesSelected = this.expenses.filter((_, i) => this.expenseValues[i] > 0);
+    this.updateSum(false);
+
+  }
+
   selectAll(event: any) {
-    if (event.checked) {
-      this.sumTotalValues = 0;
-      this.selectedExpenses.forEach((expense, index) => {
-        this.expenseValues[index] = expense.debtValue;
-        this.sumTotalValues += expense.debtValue;
-      });
-    }
-    else {
-      this.expenseValues = this.selectedExpenses.map(() => 0);
-      this.sumTotalValues = 0;
-    }
+    this.expenseValues = this.expenses.map((expense) => event.checked ? expense.debtValue : 0);
+    this.updateSum();
   }
 
   isSelected(expense: ExpenseInDebt): boolean {
@@ -99,40 +125,70 @@ export class CreatePaymentComponent {
   }
 
   onCheckboxChange(event: any) {
-    const selectedIndex = this.selectedExpenses.indexOf(event.data);
-    this.sumTotalValues += this.selectedExpenses[selectedIndex].debtValue;
-    this.expenseValues[selectedIndex] = this.selectedExpenses[selectedIndex].debtValue;
+    const index = this.expenses.indexOf(event.data);
+    this.expenseValues[index] = this.expenses[index].debtValue;
+    this.updateSum();
   }
 
   onCheckboxUnchange(event: any) {
-    const selectedIndex = this.selectedExpenses.indexOf(event.data);
-    this.sumTotalValues -= this.expenseValues[selectedIndex];
-    this.expenseValues[selectedIndex] = 0;
+    const index = this.expenses.indexOf(event.data);
+    this.expenseValues[index] = 0;
+    this.updateSum();
   }
 
   changeValue() {
-    this.sumTotalValues = this.expenseValues.reduce((acc, value) => acc + value, 0);
+    this.updateSum();
   }
 
-  newPayment() {;
-    for (let i = 0; i < this.expenseValues.length; i++) {
-      if (this.expenseValues[i] != 0) {
-        const paymentCreation = { value: this.expenseValues[i], expenseId: this.selectedExpenses[i].id } as PaymentCreation;
-        this.paymentCreationDTOList.push(paymentCreation);
+  private updateSum(syncTotal: boolean = true) {
+    this.sumTotalValues = this.round(this.expenseValues.reduce((acc, value) => acc + (value ?? 0), 0));
+    if (syncTotal) this.totalToPay = this.sumTotalValues;
+  }
+
+  private round(value: number): number {
+    return Math.round(value * 100) / 100;
+  }
+
+  newPayment() {
+    if (!this.date || !this.selectedAccount || !this.selectedPaymentMethod || !this.selectedOrigin) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
+      return;
+    }
+
+    const paymentCreationDTOList: PaymentCreation[] = [];
+    for (let i = 0; i < this.expenses.length; i++) {
+      const value = this.expenseValues[i] ?? 0;
+      if (value > this.expenses[i].debtValue + 0.005) {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O valor a pagar da fatura ' + this.expenses[i].documentNumber + ' excede o valor em débito.' });
+        return;
+      }
+      if (value > 0) {
+        paymentCreationDTOList.push({ value: value, expenseId: this.expenses[i].id });
       }
     }
 
-    const listPayments = { documentNumber: this.documentNumber, date: this.date, paymentMethod: this.selectedPaymentMethod, accountId: this.selectedAccount, paymentCreationDTOList: this.paymentCreationDTOList } as ListPaymentCreation;
+    if (paymentCreationDTOList.length === 0) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Indique o valor a pagar de pelo menos uma fatura.' });
+      return;
+    }
 
-    if (this.paymentCreationDTOList != null) {
-      this.paymentService.createPayment(listPayments).subscribe(newPayment => {
+    const listPayments: ListPaymentCreation = {
+      documentNumber: this.documentNumber, date: this.date, paymentMethod: this.selectedPaymentMethod,
+      accountId: this.selectedAccount, paymentCreationDTOList: paymentCreationDTOList
+    };
+
+    this.saving = true;
+    this.paymentService.createPayment(listPayments).subscribe({
+      next: () => {
+        this.saving = false;
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pagamento(s) registado(s) com sucesso.' });
         this.resetForm();
-      })
-    }
-    else {
-      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
-    }
+      },
+      error: (err) => {
+        this.saving = false;
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível registar o pagamento.' });
+      }
+    });
   }
 
   private resetForm(): void {
@@ -141,11 +197,12 @@ export class CreatePaymentComponent {
     this.selectedAccount = undefined as any;
     this.selectedPaymentMethod = undefined as any;
     this.selectedOrigin = undefined as any;
-    this.expenses = undefined as any;
-    this.selectedExpenses = [];
+    this.isCashAccountSelected = false;
+    this.paymentMethodOptions = getPaymentMethodEntries(undefined);
+    this.expenses = [];
     this.expensesSelected = [];
     this.expenseValues = [];
     this.sumTotalValues = 0;
-    this.paymentCreationDTOList = [];
+    this.totalToPay = null;
   }
 }

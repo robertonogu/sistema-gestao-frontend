@@ -73,6 +73,42 @@
                 </div>
 
                 <div class="field col-12 md:col-4">
+                    <label>Número de Documento</label>
+                    <input
+                        [(ngModel)]="documentNumber"
+                        type="text"
+                        pInputText
+                        appUppercase
+                        [disabled]="fromExpense"
+                        [pTooltip]="fromExpense ? 'Definido pela despesa de compra' : ''"
+                        tooltipPosition="top"
+                    />
+                </div>
+
+                <div class="field col-12 md:col-4">
+                    <label>Fornecedor</label>
+                    <p-dropdown
+                        [(ngModel)]="selectedOrigin"
+                        [options]="origins"
+                        placeholder="Selecione um fornecedor"
+                        [group]="true"
+                        [filter]="true"
+                        filterBy="label"
+                        optionLabel="label"
+                        optionValue="value"
+                        [showClear]="!fromExpense"
+                        [disabled]="fromExpense"
+                        appendTo="body"
+                    >
+                        <ng-template let-group pTemplate="group">
+                            <div class="flex align-items-center">
+                                <span>{{ group.label }}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+
+                <div class="field col-12 md:col-4">
 					<label>Data de Compra</label>
 					<p-calendar
                         [(ngModel)]="purchaseDate"

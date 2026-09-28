@@ -1,4 +1,4 @@
-﻿<div class="grid">
+<div class="grid">
 	<div class="col-12">
 		<div class="card">
 
@@ -105,6 +105,12 @@
         <div class="field">
             <label for="nif" class="block font-bold mb-4">NIF</label>
             <p-inputNumber id="nif" [(ngModel)]="externalEntity.nif" [useGrouping]="false"></p-inputNumber>
+        </div>
+
+        <div class="field">
+            <label for="initialBalance" class="block font-bold mb-4">Saldo Inicial</label>
+            <p-inputNumber id="initialBalance" [(ngModel)]="externalEntity.initialBalance" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
+                suffix=" €" locale="pt-PT" [useGrouping]="false" placeholder="0,00 €"></p-inputNumber>
         </div>
     </ng-template>
 

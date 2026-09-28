@@ -1,4 +1,4 @@
-﻿<div class="grid">
+<div class="grid">
 	<div class="col-12">
 		<div class="card">
 
@@ -84,7 +84,7 @@
 <p-dialog
     [header]="supplier.originId ? 'Editar Fornecedor' : 'Novo Fornecedor'"
     [(visible)]="supplierDialog"
-    [style]="{ width: '450px' }"
+    [style]="{ width: '680px' }"
     [modal]="true"
     class="p-fluid"
     (onHide)="hideDialog()"
@@ -110,16 +110,14 @@
         </div>
 
         <div class="field">
-            <label for="address" class="block font-bold mb-4">Endereço</label>
-            <input
-                type="text"
-                pInputText
-                id="address"
-                autocomplete="off"
-                [(ngModel)]="supplier.address"
-                appGooglePlaceAutocomplete
-                (placeSelected)="onAddressPlaceSelected($event)"
-            />
+            <label for="initialBalance" class="block font-bold mb-4">Saldo Inicial</label>
+            <p-inputNumber id="initialBalance" [(ngModel)]="supplier.initialBalance" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
+                suffix=" €" locale="pt-PT" [useGrouping]="false" placeholder="0,00 €"></p-inputNumber>
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-4">Localizações</label>
+            <app-locations-editor [(locations)]="supplier.locations!"></app-locations-editor>
         </div>
     </ng-template>
 

@@ -5,19 +5,16 @@ import { InputTextModule } from "primeng/inputtext";
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { CalendarModule } from 'primeng/calendar';
-import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { TreeSelectModule } from 'primeng/treeselect';
-import { SplitButtonModule } from 'primeng/splitbutton';
-import { DividerModule } from 'primeng/divider';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MultiSelectModule } from 'primeng/multiselect';
+import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { IssueArticleComponent } from './issue-article.component';
-import { IssueArticleRoutingModule } from './issue-article-routing.module';
+import { TooltipModule } from 'primeng/tooltip';
+import { ArticleExitComponent } from './article-exit.component';
+import { ArticleExitRoutingModule } from './article-exit-routing.module';
 
 @NgModule({
-  declarations: [IssueArticleComponent],
+  declarations: [ArticleExitComponent],
   imports: [
     CommonModule,
     ButtonModule,
@@ -26,17 +23,12 @@ import { IssueArticleRoutingModule } from './issue-article-routing.module';
     CalendarModule,
     DropdownModule,
     TreeSelectModule,
-    CheckboxModule,
-    DividerModule,
     FormsModule,
-    ReactiveFormsModule,
-    SplitButtonModule,
-    IssueArticleRoutingModule,
+    ArticleExitRoutingModule,
     ToastModule,
-    MultiSelectModule,
-    FormsModule,
-    TableModule
+    TableModule,
+    TooltipModule
   ]
 })
 
-export class IssueArticleModule { }
+export class ArticleExitModule { }

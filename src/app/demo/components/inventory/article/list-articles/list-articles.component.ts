@@ -44,8 +44,8 @@ export class ListArticlesComponent {
     this.getStockEntries();
   }
 
-  issueArticle() {
-    this.router.navigate(['./inventory/articles/issue-article']);
+  newArticleExit() {
+    this.router.navigate(['./inventory/articles/article-exit']);
   }
 
   editExpense(expenseId: number) {

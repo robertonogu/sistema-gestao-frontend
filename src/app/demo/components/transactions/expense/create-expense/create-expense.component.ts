@@ -30,7 +30,6 @@ import { ExternalEntityService } from 'src/app/demo/service/company/externalEnti
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
-import { ArticleService } from 'src/app/demo/service/inventory/article.service';
 import { EquipmentService } from 'src/app/demo/service/inventory/equipment.service';
 import { ToolService } from 'src/app/demo/service/inventory/tool.service';
 import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
@@ -85,7 +84,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  grid-template-columns: 36px minmax(220px, 1fr) 380px 90px 130px 130px 130px 130px 84px;
+  grid-template-columns: 36px minmax(420px, 2fr) 320px 90px 130px 130px 130px 130px 84px;
   align-items: center;
   column-gap: 8px;
   min-width: fit-content;
@@ -129,6 +128,13 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
   height: 1.75rem;
 
   .p-button-icon { font-size: 12px; }
+}
+
+// Item name autocomplete fills its whole column (PrimeNG's wrapper otherwise shrinks to its content)
+:host ::ng-deep .item-row p-autocomplete,
+:host ::ng-deep .item-row .p-autocomplete {
+  display: flex;
+  width: 100%;
 }
 
 :host ::ng-deep .item-row {
@@ -309,8 +315,10 @@ export class CreateExpenseComponent implements OnInit {
   vehicleNames: ItemName[] = [];
   toolNames: ItemName[] = [];
   equipmentNames: ItemName[] = [];
-  articleNames: string[] = [];
-  filteredArticleNames: string[] = [];
+  // Names of items already used in expenses, and the subcategory (enum key) last used for each
+  itemNames: string[] = [];
+  filteredItemNames: string[] = [];
+  private lastSubCategoryByItemName = new Map<string, string>();
 
   quickAddOriginOptions: MenuItem[] = [
     { label: 'Fornecedor', icon: 'pi pi-truck', command: () => this.openQuickAddOrigin('supplier') },
@@ -340,7 +348,6 @@ export class CreateExpenseComponent implements OnInit {
     private vehicleService: VehicleService,
     private toolService: ToolService,
     private equipmentService: EquipmentService,
-    private articleService: ArticleService,
     private expenseService: ExpenseService,
     private supplierService: SupplierService,
     private externalEntityService: ExternalEntityService,
@@ -358,8 +365,9 @@ export class CreateExpenseComponent implements OnInit {
       this.accountNames = accountNames;
     });
 
-    this.articleService.getArticleNames().subscribe((names) => {
-      this.articleNames = names;
+    this.expenseService.getUsedItemNames().subscribe((items) => {
+      this.itemNames = items.map(item => item.name);
+      this.lastSubCategoryByItemName = new Map(items.map(item => [item.name.toUpperCase(), item.subCategoryType]));
     });
 
     this.validIvaRates = [0, 6, 13, 23];
@@ -486,7 +494,10 @@ export class CreateExpenseComponent implements OnInit {
 
     if (this.quickAddOriginType === 'supplier') {
       this.supplierService.createSupplier({ name, nif, address: this.quickAddOriginAddress, placeId: this.quickAddOriginPlaceId } as SupplierCreation)
-        .subscribe(supplier => this.afterOriginCreated(supplier.originId));
+        .subscribe({
+          next: supplier => this.afterOriginCreated(supplier.originId),
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível criar o fornecedor.' })
+        });
     } else if (this.quickAddOriginType === 'externalEntity') {
       this.externalEntityService.createExternalEntity({ name, nif } as ExternalEntityCreation)
         .subscribe(externalEntity => this.afterOriginCreated(externalEntity.originId));
@@ -717,6 +728,26 @@ export class CreateExpenseComponent implements OnInit {
     });
   }
 
+  // ===== "select all" checkbox in the items header (only rows whose checkbox is enabled, i.e. inventory items) =====
+  private get selectableItemControls() {
+    return this.itemInputs.controls
+      .map(control => control.get('selected'))
+      .filter(control => !!control && control.enabled);
+  }
+
+  get hasSelectableItems(): boolean {
+    return this.selectableItemControls.length > 0;
+  }
+
+  get allSelectableItemsSelected(): boolean {
+    const selectable = this.selectableItemControls;
+    return selectable.length > 0 && selectable.every(control => control!.value === true);
+  }
+
+  toggleSelectAllItems(checked: boolean) {
+    this.selectableItemControls.forEach(control => control!.setValue(checked));
+  }
+
   addItemInput() {
     this.itemInputs.push(this.buildItemInput());
   }
@@ -782,9 +813,18 @@ export class CreateExpenseComponent implements OnInit {
     return entry ? entry[0] as CategoryType : undefined;
   }
 
-  filterArticleNames(event: { query: string }) {
+  filterItemNames(event: { query: string }) {
     const query = (event.query ?? '').toUpperCase();
-    this.filteredArticleNames = this.articleNames.filter((name) => name.toUpperCase().includes(query));
+    this.filteredItemNames = this.itemNames.filter((name) => name.toUpperCase().includes(query));
+  }
+
+  // Picking an item already used fills in the subcategory it had the last time
+  onItemNameSelect(index: number, event: { value: string }) {
+    const key = this.lastSubCategoryByItemName.get((event.value ?? '').toUpperCase());
+    const subCategoryType = key ? (SubCategoryType as any)[key] : null;
+    if (subCategoryType) {
+      this.itemInputs.at(index).get('subCategoryType')?.setValue(subCategoryType);
+    }
   }
 
   showConstructionLink(subCategoryType: SubCategoryType | null): boolean {

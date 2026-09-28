@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Supplier } from 'src/app/demo/api/supplier';
 import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
@@ -42,13 +42,13 @@ export class ListSuppliersComponent {
   }
 
   openNew() {
-    this.supplier = {};
+    this.supplier = { locations: [{ name: '', address: '', placeId: '' }] };
     this.submitted = false;
     this.supplierDialog = true;
   }
 
   editSupplier(supplier: Supplier) {
-    this.supplier = { ...supplier };
+    this.supplier = { ...supplier, locations: (supplier.locations ?? []).map(location => ({ ...location })) };
     this.supplierDialog = true;
   }
 
@@ -57,30 +57,32 @@ export class ListSuppliersComponent {
     this.submitted = false;
   }
 
-  onAddressPlaceSelected(place: PlaceSelection): void {
-    this.supplier.address = place.address;
-    this.supplier.placeId = place.placeId;
-  }
 
   saveSupplier() {
     this.submitted = true;
 
     if (this.supplier.name?.trim()) {
-      const supplierCreation = { name: this.supplier.name, nif: this.supplier.nif, address: this.supplier.address, placeId: this.supplier.placeId } as SupplierCreation;
+      const supplierCreation = { name: this.supplier.name, nif: this.supplier.nif, locations: this.supplier.locations ?? [], initialBalance: this.supplier.initialBalance ?? null } as SupplierCreation;
 
       if (this.supplier.originId) {
-        this.supplierService.updateSupplier(this.supplier.originId, supplierCreation).subscribe(() => {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Fornecedor atualizado com sucesso.' });
-          this.supplierDialog = false;
-          this.supplier = {};
-          this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+        this.supplierService.updateSupplier(this.supplier.originId, supplierCreation).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Fornecedor atualizado com sucesso.' });
+            this.supplierDialog = false;
+            this.supplier = {};
+            this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+          },
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível atualizar o fornecedor.' })
         });
       } else {
-        this.supplierService.createSupplier(supplierCreation).subscribe(() => {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Fornecedor adicionado com sucesso.' });
-          this.supplierDialog = false;
-          this.supplier = {};
-          this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+        this.supplierService.createSupplier(supplierCreation).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Fornecedor adicionado com sucesso.' });
+            this.supplierDialog = false;
+            this.supplier = {};
+            this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+          },
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível adicionar o fornecedor.' })
         });
       }
     }

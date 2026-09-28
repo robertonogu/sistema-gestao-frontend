@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { ExternalEntity } from 'src/app/demo/api/externalEntity';
 import { ExternalEntityCreation } from 'src/app/demo/data/model/externalEntityCreation.model';
@@ -60,7 +60,7 @@ export class ListExternalEntitiesComponent {
     this.submitted = true;
 
     if (this.externalEntity.name?.trim()) {
-      const externalEntityCreation = { name: this.externalEntity.name, nif: this.externalEntity.nif } as ExternalEntityCreation;
+      const externalEntityCreation = { name: this.externalEntity.name, nif: this.externalEntity.nif, initialBalance: this.externalEntity.initialBalance ?? null } as ExternalEntityCreation;
 
       if (this.externalEntity.originId) {
         this.externalEntityService.updateExternalEntity(this.externalEntity.originId, externalEntityCreation).subscribe(() => {
