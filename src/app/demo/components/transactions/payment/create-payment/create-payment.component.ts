@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AccountName } from 'src/app/demo/api/accountName';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
@@ -50,7 +51,8 @@ export class CreatePaymentComponent {
     private expenseService: ExpenseService,
     private messageService: MessageService,
     private paymentService: PaymentService,
-    private _location: Location
+    private _location: Location,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +63,14 @@ export class CreatePaymentComponent {
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
     });
+
+    // Vindo da listagem de débitos: origem escolhida e a fatura já selecionada com o valor em débito
+    const params = this.route.snapshot.queryParamMap;
+    const originId = Number(params.get('originId'));
+    if (originId) {
+      this.selectedOrigin = originId;
+      this.getExpenses(Number(params.get('expenseId')) || undefined);
+    }
   }
 
   back() {
@@ -79,13 +89,20 @@ export class CreatePaymentComponent {
     }
   }
 
-  getExpenses() {
+  getExpenses(preselectExpenseId?: number) {
     this.expenseService.getExpensesFromOrigin(this.selectedOrigin).subscribe((expenses) => {
       this.expenses = [...expenses].sort((a, b) => this.expenseTime(a) - this.expenseTime(b) || a.id - b.id);
       this.expensesSelected = [];
       this.expenseValues = this.expenses.map(() => 0);
       this.sumTotalValues = 0;
       this.totalToPay = null;
+
+      const preselected = this.expenses.find(expense => expense.id === preselectExpenseId);
+      if (preselected) {
+        this.expensesSelected = [preselected];
+        this.expenseValues[this.expenses.indexOf(preselected)] = preselected.debtValue;
+        this.updateSum();
+      }
     });
   }
 

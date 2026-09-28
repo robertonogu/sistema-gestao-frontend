@@ -44,6 +44,7 @@
                         </th>
                         <th>Valor</th>
                         <th>Débito</th>
+                        <th></th>
                     </tr>
                 </ng-template>
 
@@ -68,6 +69,17 @@
                         <td>{{ expenseInDebt.origin }}</td>
                         <td>{{ expenseInDebt.totalValue | number: '1.2-2' }} €</td>
                         <td class="text-red-600 font-semibold">{{ expenseInDebt.debtValue | number: '1.2-2' }} €</td>
+                        <td class="text-right">
+                            <button
+                                class="p-button-rounded p-button-text"
+                                (click)="payDebt(expenseInDebt)"
+                                icon="pi pi-wallet"
+                                pButton
+                                pTooltip="Pagar"
+                                tooltipPosition="left"
+                                type="button"
+                            ></button>
+                        </td>
                     </tr>
                 </ng-template>
 
@@ -75,6 +87,7 @@
                     <tr>
                         <td colspan="5">Valor total em débito</td>
                         <td>{{ totalInDebt | number: '1.2-2' }} €</td>
+                        <td></td>
                     </tr>
                 </ng-template>
                 
