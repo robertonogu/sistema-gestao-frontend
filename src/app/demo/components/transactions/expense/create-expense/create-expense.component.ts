@@ -24,7 +24,6 @@ import { ExternalEntityCreation } from 'src/app/demo/data/model/externalEntityCr
 import { ItemCreation } from 'src/app/demo/data/model/itemCreation.model';
 import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
 import { ToolCreation } from 'src/app/demo/data/model/toolCreation.model';
-import { PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from 'src/app/demo/service/company/accountService';
 import { ExternalEntityService } from 'src/app/demo/service/company/externalEntityService';
 import { OriginService } from 'src/app/demo/service/company/originService';
@@ -330,8 +329,6 @@ export class CreateExpenseComponent implements OnInit {
   quickAddOriginSubmitted: boolean = false;
   quickAddOriginName: string | null = null;
   quickAddOriginNif: number | null = null;
-  quickAddOriginAddress: string | null = null;
-  quickAddOriginPlaceId: string | null = null;
 
   quickAddToolEquipmentDialogVisible: boolean = false;
   quickAddToolEquipmentType: 'tool' | 'equipment' | null = null;
@@ -461,19 +458,12 @@ export class CreateExpenseComponent implements OnInit {
     this.quickAddOriginSubmitted = false;
     this.quickAddOriginName = null;
     this.quickAddOriginNif = null;
-    this.quickAddOriginAddress = null;
-    this.quickAddOriginPlaceId = null;
     this.quickAddOriginDialogVisible = true;
   }
 
   closeQuickAddOrigin(): void {
     this.quickAddOriginDialogVisible = false;
     this.quickAddOriginType = null;
-  }
-
-  onQuickAddOriginPlaceSelected(place: PlaceSelection): void {
-    this.quickAddOriginAddress = place.address;
-    this.quickAddOriginPlaceId = place.placeId;
   }
 
   private afterOriginCreated(originId: number): void {
@@ -493,7 +483,8 @@ export class CreateExpenseComponent implements OnInit {
     const nif = this.quickAddOriginNif as number;
 
     if (this.quickAddOriginType === 'supplier') {
-      this.supplierService.createSupplier({ name, nif, address: this.quickAddOriginAddress, placeId: this.quickAddOriginPlaceId } as SupplierCreation)
+      // Criado a partir da despesa só com nome e NIF; as localizações são geridas na ficha do fornecedor
+      this.supplierService.createSupplier({ name, nif } as SupplierCreation)
         .subscribe({
           next: supplier => this.afterOriginCreated(supplier.originId),
           error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível criar o fornecedor.' })

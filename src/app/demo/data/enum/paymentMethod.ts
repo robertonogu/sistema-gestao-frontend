@@ -4,6 +4,7 @@ export enum PaymentMethod {
     DIRECT_DEBIT = "Débito Direto",
     CREDIT_CARD = "Cartão de Crédito",
     DEBIT_CARD = "Cartão de Débito",
+    MEAL_CARD = "Cartão Refeição",
     CHECK = "Cheque",
     PAYMENT_REFERENCE = "Referência de Pagamento",
     MB_WAY = "MB WAY",

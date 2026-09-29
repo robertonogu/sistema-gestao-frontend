@@ -19,6 +19,7 @@ export const PAYMENT_METHODS_BY_ACCOUNT_TYPE: Record<'bank' | 'cash', PaymentMet
     PaymentMethod.DIRECT_DEBIT,
     PaymentMethod.CREDIT_CARD,
     PaymentMethod.DEBIT_CARD,
+    PaymentMethod.MEAL_CARD,
     PaymentMethod.CHECK,
     PaymentMethod.PAYMENT_REFERENCE,
     PaymentMethod.MB_WAY,

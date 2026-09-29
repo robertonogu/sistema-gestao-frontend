@@ -8,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { ListCurrentAccountsComponent } from './list-current-accounts.component';
 import { ListCurrentAccountsRoutingModule } from './list-current-accounts-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
   	imports: [
@@ -18,7 +19,8 @@ import { TooltipModule } from 'primeng/tooltip';
 		DropdownModule,
 		ListCurrentAccountsRoutingModule,
 		TagModule,
-		TooltipModule
+		TooltipModule,
+		CalendarModule
   ],
   declarations: [ListCurrentAccountsComponent]
 })

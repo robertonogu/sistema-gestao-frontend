@@ -1,9 +1,15 @@
-﻿<div class="grid">
+<div class="grid">
 	<div class="col-12">
 		<div class="card">
 
-            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
-                <div class="text-900 text-xl font-semibold">Conta Corrente</div>
+            <div class="flex flex-column sm:flex-row sm:align-items-center gap-4 mb-3">
+                <div class="flex flex-column gap-1">
+                    <div class="text-900 text-xl font-semibold">Conta Corrente</div>
+                    <div class="text-500 font-medium" *ngIf="selectedOrigin != null && balance !== null">
+                        Saldo:
+                        <span class="font-semibold" [ngClass]="balance > 0 ? 'text-green-500' : balance < 0 ? 'text-red-500' : 'text-900'">{{ balance | number: '1.2-2' }} €</span>
+                    </div>
+                </div>
                 <div class="flex gap-4 sm:ml-auto">
                     <p-dropdown
                         styleClass="w-18rem"
@@ -47,11 +53,23 @@
                 [totalRecords]="totalRecords"
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="currentAccountLogs"
+                [(first)]="first"
             >
             
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Data</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Data
+                                <p-columnFilter field="date" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-calendar [ngModel]="value" selectionMode="range" dateFormat="dd/mm/yy" [showButtonBar]="true"
+                                            placeholder="Dia ou período" appendTo="body" (ngModelChange)="filter($event)" (onClearClick)="filter(null)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Número de Documento</th>
                         <th>Método de Pagamento</th>
                         <th>Descrição</th>

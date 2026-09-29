@@ -16,7 +16,6 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
 import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
 @NgModule({
@@ -39,7 +38,6 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
     TooltipModule,
 		CreateExpenseRoutingModule,
 		ToastModule,
-		GooglePlaceAutocompleteDirective,
 		UppercaseDirective
   ]
 })

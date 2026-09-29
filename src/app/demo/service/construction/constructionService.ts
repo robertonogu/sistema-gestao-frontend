@@ -10,6 +10,7 @@ import { Construction } from '../../api/construction';
 import { ConstructionDetails } from '../../api/constructionDetails';
 import { BudgetItem } from '../../api/budgetItem';
 import { WorkLogDetailsResponse } from '../../data/model/workLogDetail.model';
+import { toLocalDates } from '../localDate.interceptor';
 import { MaterialExport } from '../../api/materialExport';
 
 @Injectable({
@@ -85,7 +86,7 @@ export class ConstructionService {
 
     private buildConstructionFormData(construction: ConstructionInput, image?: File) : FormData {
         const formData = new FormData();
-        formData.append('construction', new Blob([JSON.stringify(construction)], { type: 'application/json' }));
+        formData.append('construction', new Blob([JSON.stringify(toLocalDates(construction))], { type: 'application/json' }));
         if (image) {
             formData.append('image', image, image.name);
         }
