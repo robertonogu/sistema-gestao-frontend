@@ -25,6 +25,8 @@
             </div>
 
 			<p-table
+                stateStorage="session"
+                stateKey="table-worklogs"
                 #dt
                 currentPageReportTemplate="{first} de {last} de {totalRecords} registos de trabalho"
                 [lazy]="true"

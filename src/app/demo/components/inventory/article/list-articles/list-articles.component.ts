@@ -19,7 +19,9 @@ export class ListArticlesComponent {
   articlesStock!: ArticleStock[];
   pageSize: number = 20;
   currentPage: number = 0;
-  totalRecords: number = 0;
+  entriesTotal: number = 0;
+  exitsTotal: number = 0;
+  stockTotal: number = 0;
   originNames: ItemName[] = [];
 
   entriesFilters: StockMovementFilters = {};
@@ -37,11 +39,19 @@ export class ListArticlesComponent {
     private datePipe: DatePipe
   ) {}
 
+  // Separador ativo, guardado na sessão para voltar ao mesmo separador depois de abrir uma despesa
+  activeTab: number = 0;
+  private static readonly TAB_STORAGE_KEY = 'articles-active-tab';
+
   ngOnInit() {
     this.originService.getOriginNames().subscribe((origins) => {
       this.originNames = origins;
     });
-    this.getStockEntries();
+    try {
+      this.activeTab = Number(sessionStorage.getItem(ListArticlesComponent.TAB_STORAGE_KEY)) || 0;
+    } catch {
+      this.activeTab = 0;
+    }
   }
 
   newArticleExit() {
@@ -68,14 +78,14 @@ export class ListArticlesComponent {
   getStockEntries() {
     this.stockMovementService.getStockEntries(this.currentPage, this.pageSize, this.entriesFilters).subscribe((stockEntries) => {
       this.stockEntries = stockEntries.objectList;
-      this.totalRecords = stockEntries.totalElements;
+      this.entriesTotal = stockEntries.totalElements;
     });
   }
 
   getStockExits() {
     this.stockMovementService.getStockExits(this.currentPage, this.pageSize, this.exitsFilters).subscribe((stockExits) => {
       this.stockExits = stockExits.objectList;
-      this.totalRecords = stockExits.totalElements;
+      this.exitsTotal = stockExits.totalElements;
     });
   }
 
@@ -98,7 +108,7 @@ export class ListArticlesComponent {
     if (dt != null) {
       this.stockMovementService.getStockAsOfDate(dt, this.currentPage, this.pageSize, this.stockFilters).subscribe((articles) => {
         this.articlesStock = articles.objectList;
-        this.totalRecords = articles.totalElements;
+        this.stockTotal = articles.totalElements;
       });
     }
   }
@@ -112,15 +122,11 @@ export class ListArticlesComponent {
 
   handleChange(e: any) {
     var index = e.index;
-    this.currentPage = 0;
-    if (index == 1) {
-      this.getStockExits();
-    }
-    else if (index == 2) {
-      this.getStockAsOfDate();
-    }
-    else {
-      this.getStockEntries();
+    this.activeTab = index;
+    try {
+      sessionStorage.setItem(ListArticlesComponent.TAB_STORAGE_KEY, String(index));
+    } catch {
+      // sem armazenamento de sessão: só não se lembra do separador
     }
   }
 }

@@ -32,3 +32,10 @@ export function toLocalDates(value: any): any {
   }
   return value;
 }
+
+// Lê uma data "yyyy-MM-dd" da API como dia local (new Date("yyyy-MM-dd") seria meia-noite UTC)
+export function parseLocalDate(value: string | null | undefined): Date | undefined {
+  if (!value) return undefined;
+  const [year, month, day] = value.substring(0, 10).split('-').map(Number);
+  return new Date(year, month - 1, day);
+}

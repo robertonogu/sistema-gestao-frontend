@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { PaymentList } from '../../api/paymentList';
 import { environment } from 'src/environments/environment';
 import { ListPaymentCreation } from '../../data/model/listPaymentCreation.model';
-import { Payment } from '../../api/payment';
+import { ExpensePayment, PaymentDocumentDetail } from '../../api/payment';
 
 export interface PaymentFilters {
     documentNumber?: string;
@@ -18,6 +18,7 @@ export interface PaymentFilters {
 export class PaymentService {
 
     private paymentUrl = `${environment.apiUrl}/payments`;
+    private expensesUrl = `${environment.apiUrl}/expenses`;
 
     constructor(private http: HttpClient) { }
 
@@ -31,7 +32,23 @@ export class PaymentService {
         return this.http.get<PaymentList>(url);
     }
 
-    createPayment(listPayments: ListPaymentCreation) : Observable<Payment[]> {
-        return this.http.post<Payment[]>(this.paymentUrl, listPayments, environment.httpOptions);
+    getPayment(paymentDocumentId: number) : Observable<PaymentDocumentDetail> {
+        return this.http.get<PaymentDocumentDetail>(this.paymentUrl + "/" + paymentDocumentId);
+    }
+
+    getPaymentsForExpense(expenseId: number) : Observable<ExpensePayment[]> {
+        return this.http.get<ExpensePayment[]>(this.expensesUrl + "/" + expenseId + "/payments");
+    }
+
+    createPayment(listPayments: ListPaymentCreation) : Observable<void> {
+        return this.http.post<void>(this.paymentUrl, listPayments, environment.httpOptions);
+    }
+
+    updatePayment(paymentDocumentId: number, listPayments: ListPaymentCreation) : Observable<void> {
+        return this.http.put<void>(this.paymentUrl + "/" + paymentDocumentId, listPayments, environment.httpOptions);
+    }
+
+    deletePayment(paymentDocumentId: number) : Observable<void> {
+        return this.http.delete<void>(this.paymentUrl + "/" + paymentDocumentId);
     }
 }

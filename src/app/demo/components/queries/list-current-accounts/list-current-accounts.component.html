@@ -5,7 +5,7 @@
             <div class="flex flex-column sm:flex-row sm:align-items-center gap-4 mb-3">
                 <div class="flex flex-column gap-1">
                     <div class="text-900 text-xl font-semibold">Conta Corrente</div>
-                    <div class="text-500 font-medium" *ngIf="selectedOrigin != null && balance !== null">
+                    <div class="text-500 font-medium">
                         Saldo:
                         <span class="font-semibold" [ngClass]="balance > 0 ? 'text-green-500' : balance < 0 ? 'text-red-500' : 'text-900'">{{ balance | number: '1.2-2' }} €</span>
                     </div>
@@ -40,7 +40,9 @@
                 </div>
             </div>
 
-			<p-table 
+			<p-table
+                stateStorage="session"
+                stateKey="table-current-accounts" 
                 currentPageReportTemplate="{first} de {last} de {totalRecords} registos de conta corrente"
                 [lazy]="true"
                 [loading]="loading"

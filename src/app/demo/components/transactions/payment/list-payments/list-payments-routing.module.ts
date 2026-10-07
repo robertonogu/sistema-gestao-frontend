@@ -6,6 +6,7 @@ import { ListPaymentsComponent } from './list-payments.component';
 	imports: [RouterModule.forChild([
 		{ path: '', component: ListPaymentsComponent },
 		{ path: 'create-payment', data: { breadcrumb: 'Novo Pagamento' }, loadChildren: () => import('../create-payment/create-payment.module').then(m => m.CreatePaymentModule) },
+		{ path: 'edit-payment/:paymentDocumentId', data: { breadcrumb: 'Editar Pagamento' }, loadChildren: () => import('../create-payment/create-payment.module').then(m => m.CreatePaymentModule) },
 	])],
 	exports: [RouterModule]
 })

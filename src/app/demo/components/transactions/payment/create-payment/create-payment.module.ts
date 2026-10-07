@@ -15,6 +15,7 @@ import { CreatePaymentRoutingModule } from './create-payment-routing.module';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
 @NgModule({
@@ -37,7 +38,8 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
     TooltipModule,
     FormsModule,
     TableModule,
-    UppercaseDirective
+    UppercaseDirective,
+  ConfirmDialogModule
   ]
 })
 

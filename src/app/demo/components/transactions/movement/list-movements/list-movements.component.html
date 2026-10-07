@@ -1,4 +1,4 @@
-﻿<div class="grid">
+<div class="grid">
 	<div class="col-12">
 		<div class="card">
 
@@ -25,6 +25,8 @@
             </div>
 
 			<p-table
+                stateStorage="session"
+                stateKey="table-movements"
                 #dt
                 currentPageReportTemplate="{first} de {last} de {totalRecords} movimentos totais"
                 [lazy]="true"

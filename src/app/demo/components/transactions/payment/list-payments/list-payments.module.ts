@@ -16,6 +16,7 @@ import { TagModule } from 'primeng/tag';
 import { ListPaymentsComponent } from './list-payments.component';
 import { ListPaymentsRoutingModule } from './list-payments-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import { TooltipModule } from 'primeng/tooltip';
 		ToastModule,
 		TagModule,
 		ListPaymentsRoutingModule,
-		TooltipModule
+		TooltipModule,
+		ConfirmDialogModule
   ],
   declarations: [ListPaymentsComponent]
 })

@@ -3,7 +3,7 @@
 		<div class="card">
 
 			<div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
-				<div class="text-900 text-xl font-semibold">Novo Pagamento</div>
+				<div class="text-900 text-xl font-semibold">{{ editingPaymentId ? 'Editar Pagamento' : 'Novo Pagamento' }}</div>
 				<div class="flex gap-2 sm:ml-auto">
                     <button
 						class="p-button-rounded p-button-outlined"
@@ -11,6 +11,16 @@
 						icon="pi pi-arrow-left"
 						pButton
 						pTooltip="Voltar"
+						tooltipPosition="bottom"
+						type="button"
+					></button>
+					<button
+						*ngIf="editingPaymentId"
+						class="p-button-rounded bg-red-500 border-red-500"
+						(click)="deletePayment()"
+						icon="pi pi-trash"
+						pButton
+						pTooltip="Eliminar"
 						tooltipPosition="bottom"
 						type="button"
 					></button>
@@ -92,6 +102,7 @@
 						optionLabel="label"
 						optionValue="value"
 						appendTo="body"
+						[disabled]="!!editingPaymentId"
 						[ngClass]="{ 'ng-dirty ng-invalid': !selectedOrigin }"
 					>
 						<ng-template let-group pTemplate="group">
@@ -109,7 +120,6 @@
 						(onInput)="distributeTotal($event.value)"
 						[disabled]="expenses.length === 0"
 						[min]="0"
-						placeholder="Distribui pelas faturas mais antigas"
 						mode="decimal"
 						[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 						locale="en-US" [useGrouping]="false"
@@ -183,3 +193,21 @@
 </div>
 
 <p-toast />
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton label="Eliminar" (click)="cd.accept()" class="bg-red-500 border-transparent text-white w-8rem"></button>
+                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>

@@ -1,6 +1,6 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { LazyLoadEvent } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Payment } from 'src/app/demo/api/payment';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
@@ -9,6 +9,7 @@ import { OriginService } from 'src/app/demo/service/company/originService';
 
 @Component({
   templateUrl: './list-payments.component.html',
+  providers: [ConfirmationService, MessageService]
 })
 export class ListPaymentsComponent {
 
@@ -21,11 +22,14 @@ export class ListPaymentsComponent {
 
   PaymentMethod: any = PaymentMethod;
   originNames: ItemName[] = [];
+  private lastLazyEvent: any = { first: 0, rows: 20 };
 
   constructor(
     private paymentService: PaymentService,
     private originService: OriginService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +52,7 @@ export class ListPaymentsComponent {
   }
 
   nextPage(event: any) {
+    this.lastLazyEvent = event;
     this.loading = true;
 
     this.currentPage = event.first / event.rows;
@@ -64,6 +69,26 @@ export class ListPaymentsComponent {
 
   newPayment() {
     this.router.navigate(['./transactions/payments/create-payment']);
+  }
+
+  editPayment(payment: Payment) {
+    this.router.navigate(['./transactions/payments/edit-payment', payment.paymentDocumentId]);
+  }
+
+  deletePayment(payment: Payment) {
+    this.confirmationService.confirm({
+      header: 'Tem a certeza que pretende eliminar este pagamento?',
+      message: 'As faturas ' + payment.invoices + ' voltam a ficar em dívida pelo valor pago e os lançamentos na conta e na conta corrente são removidos.',
+      accept: () => {
+        this.paymentService.deletePayment(payment.paymentDocumentId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pagamento eliminado com sucesso.' });
+            this.nextPage(this.lastLazyEvent);
+          },
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível eliminar o pagamento.' })
+        });
+      }
+    });
   }
 
   getPaymentMethodSeverity (paymentMethod: PaymentMethod) {

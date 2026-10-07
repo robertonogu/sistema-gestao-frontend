@@ -23,6 +23,8 @@ export enum SubCategoryType {
     FONT_RETENTION = 'Retenção de Fonte',
     IMI = 'IMI',
     FINES_PENALTIES = 'Coimas / Penalizações',
+    LATE_PAYMENT_INTEREST = 'Juros de Mora',
+    LEGAL_COSTS = 'Custas Processuais',
     OTHER_TAXES = 'Outras Taxas',
 
     // PEOPLE

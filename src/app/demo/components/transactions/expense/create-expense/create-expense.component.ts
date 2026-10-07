@@ -1,8 +1,9 @@
 import { Location } from '@angular/common';
+import { ExpenseItemName } from 'src/app/demo/api/expenseItemName';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MenuItem, MessageService, TreeNode } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
 import { AccountName } from 'src/app/demo/api/accountName';
 import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
@@ -28,6 +29,8 @@ import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from
 import { ExternalEntityService } from 'src/app/demo/service/company/externalEntityService';
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
+import { PaymentService } from 'src/app/demo/service/transactions/paymentService';
+import { ExpensePayment } from 'src/app/demo/api/payment';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 import { EquipmentService } from 'src/app/demo/service/inventory/equipment.service';
 import { ToolService } from 'src/app/demo/service/inventory/tool.service';
@@ -36,7 +39,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 @Component({
   templateUrl: './create-expense.component.html',
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   styles: [`
 .section-title {
   margin: 0 0 0.5rem 0;
@@ -225,7 +228,8 @@ export class CreateExpenseComponent implements OnInit {
     ],
     [CategoryType.TAXES]: [
       SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.IES, SubCategoryType.FONT_RETENTION,
-      SubCategoryType.IMI, SubCategoryType.FINES_PENALTIES, SubCategoryType.OTHER_TAXES
+      SubCategoryType.IMI, SubCategoryType.FINES_PENALTIES, SubCategoryType.LATE_PAYMENT_INTEREST,
+      SubCategoryType.LEGAL_COSTS, SubCategoryType.OTHER_TAXES
     ],
     [CategoryType.PEOPLE]: [
       SubCategoryType.SALARIES, SubCategoryType.SOCIAL_SECURITY_CONTRIBUTIONS, SubCategoryType.IRS,
@@ -235,7 +239,7 @@ export class CreateExpenseComponent implements OnInit {
     ],
     [CategoryType.OPERATION]: [
       SubCategoryType.FACILITY_RENT, SubCategoryType.ELECTRICITY, SubCategoryType.WATER, SubCategoryType.GAS, SubCategoryType.COMMUNICATIONS,
-      SubCategoryType.OFFICE_SUPPLIES, SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION, SubCategoryType.OFFICE_EQUIPMENT_REPAIR,
+      SubCategoryType.OFFICE_SUPPLIES, SubCategoryType.OFFICE_EQUIPMENT_REPAIR,
       SubCategoryType.CLOUD_STORAGE, SubCategoryType.SOFTWARE, SubCategoryType.ACCOUNTING_SERVICES, SubCategoryType.LEGAL_SERVICES,
       SubCategoryType.CONSULTING_SERVICES, SubCategoryType.COMPANY_INSURANCE, SubCategoryType.CLEANING, SubCategoryType.FACILITY_SECURITY,
       SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.DUES
@@ -249,7 +253,8 @@ export class CreateExpenseComponent implements OnInit {
       SubCategoryType.VEHICLE_LEASING, SubCategoryType.VEHICLE_RENTAL
     ],
     [CategoryType.EQUIPMENTS]: [
-      SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.EQUIPMENTS_MAINTENANCE, SubCategoryType.EQUIPMENT_CONSUMABLES,
+      SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION, SubCategoryType.EQUIPMENTS_MAINTENANCE,
+      SubCategoryType.EQUIPMENT_CONSUMABLES,
       SubCategoryType.EQUIPMENT_RENTAL, SubCategoryType.EQUIPMENT_FUEL
     ],
     [CategoryType.TOOLS]: [
@@ -310,6 +315,11 @@ export class CreateExpenseComponent implements OnInit {
   bulkAssociateBudgetTree: TreeNode[] = [];
   selectedBulkAssociateBudgetNode?: TreeNode;
   bulkAssociateValidationAttempted: boolean = false;
+  // Categoria comum dos itens selecionados: define a que se associam (obra, veículo, equipamento ou ferramenta)
+  bulkAssociateCategory: CategoryType | null = null;
+  bulkAssociateVehicleId: number | null = null;
+  bulkAssociateEquipmentId: number | null = null;
+  bulkAssociateToolId: number | null = null;
 
   vehicleNames: ItemName[] = [];
   toolNames: ItemName[] = [];
@@ -317,7 +327,8 @@ export class CreateExpenseComponent implements OnInit {
   // Names of items already used in expenses, and the subcategory (enum key) last used for each
   itemNames: string[] = [];
   filteredItemNames: string[] = [];
-  private lastSubCategoryByItemName = new Map<string, string>();
+  // Última utilização de cada item (subcategoria, unidade e IVA), por nome em maiúsculas
+  private lastUseByItemName = new Map<string, ExpenseItemName>();
 
   quickAddOriginOptions: MenuItem[] = [
     { label: 'Fornecedor', icon: 'pi pi-truck', command: () => this.openQuickAddOrigin('supplier') },
@@ -336,6 +347,9 @@ export class CreateExpenseComponent implements OnInit {
   quickAddToolEquipmentName: string | null = null;
 
   editingExpenseId?: number;
+
+  // Pagamentos da despesa em edição (cada um é um documento de pagamento, que pode liquidar outras faturas)
+  expensePayments: ExpensePayment[] = [];
   loadingEdit: boolean = false;
 
   constructor(
@@ -347,6 +361,8 @@ export class CreateExpenseComponent implements OnInit {
     private equipmentService: EquipmentService,
     private expenseService: ExpenseService,
     private supplierService: SupplierService,
+    private paymentService: PaymentService,
+    private confirmationService: ConfirmationService,
     private externalEntityService: ExternalEntityService,
     private messageService: MessageService,
     private fb: FormBuilder,
@@ -364,7 +380,7 @@ export class CreateExpenseComponent implements OnInit {
 
     this.expenseService.getUsedItemNames().subscribe((items) => {
       this.itemNames = items.map(item => item.name);
-      this.lastSubCategoryByItemName = new Map(items.map(item => [item.name.toUpperCase(), item.subCategoryType]));
+      this.lastUseByItemName = new Map(items.map(item => [item.name.toUpperCase(), item]));
     });
 
     this.validIvaRates = [0, 6, 13, 23];
@@ -384,6 +400,7 @@ export class CreateExpenseComponent implements OnInit {
     const expenseId = Number(this.route.snapshot.params['expenseId']);
     if (expenseId) {
       this.editingExpenseId = expenseId;
+      this.loadExpensePayments();
       this.loadingEdit = true;
       this.expenseService.getExpenseForEdit(expenseId).subscribe({
         next: (expenseEdit) => {
@@ -418,7 +435,7 @@ export class CreateExpenseComponent implements OnInit {
   private buildItemInputFromEdit(item: ExpenseItemEdit): FormGroup {
     const costAllocation = item.costAllocations?.[0];
     const subCategoryType = (SubCategoryType as any)[item.subCategoryType] ?? null;
-    const isInventory = this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
+    const isSelectable = this.isBulkAssociable(subCategoryType);
 
     const group = this.fb.group({
       subCategoryType: [subCategoryType, Validators.required],
@@ -434,7 +451,7 @@ export class CreateExpenseComponent implements OnInit {
       vehicleId: [item.vehicleId ?? null],
       toolId: [item.toolId ?? null],
       equipmentId: [item.equipmentId ?? null],
-      selected: [{ value: false, disabled: !isInventory }],
+      selected: [{ value: false, disabled: !isSelectable }],
     });
     this.wireSelectedDisabling(group);
     this.wirePurchaseLinkReset(group);
@@ -443,6 +460,44 @@ export class CreateExpenseComponent implements OnInit {
 
   back() {
     this._location.back();
+  }
+
+  paymentMethodLabel(key: string): string {
+    return (PaymentMethod as any)[key] ?? key;
+  }
+
+  private loadExpensePayments(): void {
+    if (!this.editingExpenseId) return;
+    this.paymentService.getPaymentsForExpense(this.editingExpenseId).subscribe(payments => this.expensePayments = payments);
+  }
+
+  newExpensePayment(): void {
+    this.router.navigate(['/transactions/payments/create-payment'], {
+      queryParams: { originId: this.selectedOrigin, expenseId: this.editingExpenseId }
+    });
+  }
+
+  editExpensePayment(payment: ExpensePayment): void {
+    this.router.navigate(['/transactions/payments/edit-payment', payment.paymentDocumentId]);
+  }
+
+  deleteExpensePayment(payment: ExpensePayment): void {
+    const shared = payment.documentValue > payment.value + 0.005;
+    this.confirmationService.confirm({
+      header: 'Tem a certeza que pretende eliminar este pagamento?',
+      message: shared
+        ? 'Este pagamento também liquida outras faturas, que voltam igualmente a ficar em dívida. Os lançamentos na conta e na conta corrente são removidos.'
+        : 'A fatura volta a ficar em dívida pelo valor pago e os lançamentos na conta e na conta corrente são removidos.',
+      accept: () => {
+        this.paymentService.deletePayment(payment.paymentDocumentId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pagamento eliminado com sucesso.' });
+            this.loadExpensePayments();
+          },
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível eliminar o pagamento.' })
+        });
+      }
+    });
   }
 
   get quickAddOriginTitle(): string {
@@ -690,7 +745,7 @@ export class CreateExpenseComponent implements OnInit {
   private wireSelectedDisabling(group: FormGroup): void {
     group.get('subCategoryType')?.valueChanges.subscribe((value) => {
       const selectedControl = group.get('selected');
-      if (this.categoryOf(value) === CategoryType.INVENTORY) {
+      if (this.isBulkAssociable(value)) {
         selectedControl?.enable({ emitEvent: false });
       } else {
         selectedControl?.disable({ emitEvent: false });
@@ -809,12 +864,22 @@ export class CreateExpenseComponent implements OnInit {
     this.filteredItemNames = this.itemNames.filter((name) => name.toUpperCase().includes(query));
   }
 
-  // Picking an item already used fills in the subcategory it had the last time
+  // Picking an item already used fills in the subcategory, unit and VAT rate it had the last time
   onItemNameSelect(index: number, event: { value: string }) {
-    const key = this.lastSubCategoryByItemName.get((event.value ?? '').toUpperCase());
-    const subCategoryType = key ? (SubCategoryType as any)[key] : null;
+    const lastUse = this.lastUseByItemName.get((event.value ?? '').toUpperCase());
+    if (!lastUse) return;
+
+    const row = this.itemInputs.at(index);
+    const subCategoryType = lastUse.subCategoryType ? (SubCategoryType as any)[lastUse.subCategoryType] : null;
     if (subCategoryType) {
-      this.itemInputs.at(index).get('subCategoryType')?.setValue(subCategoryType);
+      row.get('subCategoryType')?.setValue(subCategoryType);
+    }
+    if (lastUse.unit) {
+      row.get('unit')?.setValue(lastUse.unit);
+    }
+    if (lastUse.iva != null && this.validIvaRates.includes(lastUse.iva)) {
+      row.get('iva')?.setValue(lastUse.iva);
+      this.onItemIvaChange(index);
     }
   }
 
@@ -846,13 +911,20 @@ export class CreateExpenseComponent implements OnInit {
     return subCategoryType === SubCategoryType.TOOLS_PURCHASE;
   }
 
+  // Aquisições que criam automaticamente um equipamento ao guardar (igual ao backend)
+  private readonly equipmentPurchaseSubCategories: SubCategoryType[] = [
+    SubCategoryType.EQUIPMENTS_PURCHASE,
+    SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,
+  ];
+
   showEquipmentPurchaseLink(subCategoryType: SubCategoryType | null): boolean {
-    return subCategoryType === SubCategoryType.EQUIPMENTS_PURCHASE;
+    return subCategoryType !== null && this.equipmentPurchaseSubCategories.includes(subCategoryType);
   }
 
   // Purchases of equipment/tools cannot be associated manually: the backend creates the tool/equipment and links it
   private readonly nonAssociableSubCategories: SubCategoryType[] = [
     SubCategoryType.EQUIPMENTS_PURCHASE,
+    SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,
     SubCategoryType.TOOLS_PURCHASE,
     SubCategoryType.ELECTRIC_TOOLS_PURCHASE,
   ];
@@ -863,7 +935,7 @@ export class CreateExpenseComponent implements OnInit {
 
   autoPurchaseTooltip(index: number): string {
     const row = this.itemInputs.at(index).value;
-    const isEquipment = row.subCategoryType === SubCategoryType.EQUIPMENTS_PURCHASE;
+    const isEquipment = this.showEquipmentPurchaseLink(row.subCategoryType);
     const alreadyCreated = isEquipment ? !!row.equipmentId : !!row.toolId;
     if (isEquipment) {
       return alreadyCreated ? 'Associado ao equipamento criado com esta despesa' : 'Será criado um equipamento ao guardar';
@@ -1027,25 +1099,76 @@ export class CreateExpenseComponent implements OnInit {
     });
   }
 
-  isInventoryItem(index: number): boolean {
-    const subCategoryType = this.itemInputs.at(index).value.subCategoryType;
-    return this.categoryOf(subCategoryType) === CategoryType.INVENTORY;
+  // Categorias cujos itens se podem associar em conjunto (as aquisições ficam de fora: criam o seu próprio equipamento/ferramenta)
+  private readonly bulkAssociableCategories: CategoryType[] = [
+    CategoryType.INVENTORY, CategoryType.VEHICLES, CategoryType.EQUIPMENTS, CategoryType.TOOLS
+  ];
+
+  isBulkAssociable(subCategoryType: SubCategoryType | null): boolean {
+    const category = this.categoryOf(subCategoryType);
+    return !!category && this.bulkAssociableCategories.includes(category) && !this.isNonAssociable(subCategoryType);
   }
 
-  get hasSelectedInventoryItems(): boolean {
-    return this.itemInputs.controls.some((control, index) => control.value.selected && this.isInventoryItem(index));
+  private get selectedItemControls() {
+    return this.itemInputs.controls.filter(control => control.value.selected && this.isBulkAssociable(control.value.subCategoryType));
+  }
+
+  get bulkAssociateTitle(): string {
+    switch (this.bulkAssociateCategory) {
+      case CategoryType.VEHICLES: return 'Associar Itens a um Veículo';
+      case CategoryType.EQUIPMENTS: return 'Associar Itens a um Equipamento';
+      case CategoryType.TOOLS: return 'Associar Itens a uma Ferramenta';
+      default: return 'Associar Itens a uma Obra';
+    }
+  }
+
+  get bulkAssociatesToConstruction(): boolean {
+    return this.bulkAssociateCategory === CategoryType.INVENTORY;
+  }
+
+  get bulkAssociatesToVehicle(): boolean {
+    return this.bulkAssociateCategory === CategoryType.VEHICLES;
+  }
+
+  get bulkAssociatesToEquipment(): boolean {
+    return this.bulkAssociateCategory === CategoryType.EQUIPMENTS;
+  }
+
+  get bulkAssociatesToTool(): boolean {
+    return this.bulkAssociateCategory === CategoryType.TOOLS;
   }
 
   openBulkAssociateDialog() {
-    if (!this.hasSelectedInventoryItems) {
-      this.messageService.add({ severity: 'warn', summary: 'Nenhum item selecionado', detail: 'Selecione pelo menos um item de Inventário para associar.' });
+    const selected = this.selectedItemControls;
+    if (selected.length === 0) {
+      this.messageService.add({ severity: 'warn', summary: 'Nenhum item selecionado', detail: 'Selecione pelo menos um item de Inventário, Veículos, Equipamentos ou Ferramentas para associar.' });
       return;
     }
+
+    const categories = new Set(selected.map(control => this.categoryOf(control.value.subCategoryType)));
+    if (categories.size > 1) {
+      this.messageService.add({ severity: 'warn', summary: 'Categorias diferentes', detail: 'Os itens selecionados têm de ser todos da mesma categoria para os associar.' });
+      return;
+    }
+
+    this.bulkAssociateCategory = [...categories][0] ?? null;
     this.bulkAssociateValidationAttempted = false;
     this.bulkAssociateConstructionId = null;
     this.bulkAssociateBudgetTree = [];
     this.selectedBulkAssociateBudgetNode = undefined;
-    this.getConstructionNames();
+    this.bulkAssociateVehicleId = null;
+    this.bulkAssociateEquipmentId = null;
+    this.bulkAssociateToolId = null;
+
+    if (this.bulkAssociatesToVehicle && this.vehicleNames.length === 0) {
+      this.vehicleService.getActiveVehicleNames().subscribe(names => this.vehicleNames = names);
+    } else if (this.bulkAssociatesToEquipment && this.equipmentNames.length === 0) {
+      this.equipmentService.getActiveEquipmentNames().subscribe(names => this.equipmentNames = names);
+    } else if (this.bulkAssociatesToTool && this.toolNames.length === 0) {
+      this.toolService.getActiveToolNames().subscribe(names => this.toolNames = names);
+    } else if (this.bulkAssociatesToConstruction) {
+      this.getConstructionNames();
+    }
     this.bulkAssociateDialogVisible = true;
   }
 
@@ -1061,23 +1184,32 @@ export class CreateExpenseComponent implements OnInit {
   }
 
   saveBulkAssociateDialog() {
-    if (!this.bulkAssociateConstructionId || !this.selectedBulkAssociateBudgetNode) {
-      this.bulkAssociateValidationAttempted = true;
-      this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Selecione a Obra e o Item antes de guardar.' });
-      return;
-    }
+    const selected = this.selectedItemControls;
 
-    const budgetItemId = this.selectedBulkAssociateBudgetNode.data;
-    this.itemInputs.controls.forEach((control, index) => {
-      if (control.value.selected && this.isInventoryItem(index)) {
-        control.patchValue({
-          constructionId: this.bulkAssociateConstructionId,
-          budgetItemId: budgetItemId,
-          allocationQuantity: control.value.quantity,
-          selected: false
-        });
+    if (this.bulkAssociatesToConstruction) {
+      if (!this.bulkAssociateConstructionId || !this.selectedBulkAssociateBudgetNode) {
+        this.bulkAssociateValidationAttempted = true;
+        this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Selecione a Obra e o Item antes de guardar.' });
+        return;
       }
-    });
+      const budgetItemId = this.selectedBulkAssociateBudgetNode.data;
+      selected.forEach(control => control.patchValue({
+        constructionId: this.bulkAssociateConstructionId,
+        budgetItemId: budgetItemId,
+        allocationQuantity: control.value.quantity,
+        selected: false
+      }));
+    } else {
+      const targetId = this.bulkAssociatesToVehicle ? this.bulkAssociateVehicleId
+        : this.bulkAssociatesToEquipment ? this.bulkAssociateEquipmentId : this.bulkAssociateToolId;
+      if (!targetId) {
+        this.bulkAssociateValidationAttempted = true;
+        this.messageService.add({ severity: 'warn', summary: 'Campo obrigatório', detail: 'Selecione a que associar os itens antes de guardar.' });
+        return;
+      }
+      const field = this.bulkAssociatesToVehicle ? 'vehicleId' : this.bulkAssociatesToEquipment ? 'equipmentId' : 'toolId';
+      selected.forEach(control => control.patchValue({ [field]: targetId, selected: false }));
+    }
 
     this.closeBulkAssociateDialog();
   }

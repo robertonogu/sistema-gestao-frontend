@@ -13,7 +13,7 @@ export class ListCurrentAccountsComponent implements OnInit {
   origins!: Origin[];
   selectedOrigin!: number;
 
-  balance: number | null = null;
+  balance: number = 0;
 
   loading: boolean = false;
   totalRecords: number = 0;

@@ -16,7 +16,9 @@
                 </div>
             </div>
 
-			<p-table 
+			<p-table
+                stateStorage="session"
+                stateKey="table-debts" 
                 styleClass="p-datatable-striped" 
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="expensesInDebt"

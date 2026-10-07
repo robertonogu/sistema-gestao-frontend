@@ -202,6 +202,44 @@
 						/>
 					</div>
 				</ng-container>
+
+				<!-- Em edição: os pagamentos são documentos próprios, geridos aqui ou na listagem de pagamentos -->
+				<div class="col-12" *ngIf="editingExpenseId">
+					<div class="flex align-items-center justify-content-between mb-2">
+						<span class="font-semibold">Pagamentos</span>
+						<button pButton type="button" icon="pi pi-plus" label="Novo Pagamento" class="p-button-rounded p-button-outlined p-button-sm w-auto" (click)="newExpensePayment()"></button>
+					</div>
+					<p-table [value]="expensePayments" styleClass="p-datatable-sm p-datatable-striped">
+						<ng-template pTemplate="header">
+							<tr>
+								<th>Data</th>
+								<th>Documento</th>
+								<th>Método</th>
+								<th>Conta</th>
+								<th>Valor nesta fatura</th>
+								<th>Total do pagamento</th>
+								<th></th>
+							</tr>
+						</ng-template>
+						<ng-template pTemplate="body" let-payment>
+							<tr>
+								<td>{{ payment.date | date: 'dd/MM/yyyy' }}</td>
+								<td class="font-semibold">{{ payment.documentNumber }}</td>
+								<td>{{ paymentMethodLabel(payment.paymentMethod) }}</td>
+								<td>{{ payment.account }}</td>
+								<td>{{ payment.value | number: '1.2-2' }} €</td>
+								<td>{{ payment.documentValue | number: '1.2-2' }} €</td>
+								<td class="text-right white-space-nowrap">
+									<button pButton type="button" icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-success" pTooltip="Editar" (click)="editExpensePayment(payment)"></button>
+									<button pButton type="button" icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" pTooltip="Eliminar" (click)="deleteExpensePayment(payment)"></button>
+								</td>
+							</tr>
+						</ng-template>
+						<ng-template pTemplate="emptymessage">
+							<tr><td colspan="7">Esta despesa ainda não tem pagamentos.</td></tr>
+						</ng-template>
+					</p-table>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -284,7 +322,7 @@
 						</div>
 
 						<div class="item-col-num">
-							<p-inputNumber formControlName="quantity" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="2" styleClass="item-col-num" />
+							<p-inputNumber formControlName="quantity" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="3" styleClass="item-col-num" />
 						</div>
 
 						<div>
@@ -302,7 +340,7 @@
 							<p-inputNumber
 								formControlName="value"
 								mode="decimal"
-								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
+								[minFractionDigits]="2" [maxFractionDigits]="3" suffix=" €"
 								locale="en-US" [useGrouping]="false"
 								styleClass="item-col-num"
 								(onInput)="onItemValueChange(j)"
@@ -332,7 +370,7 @@
 							<p-inputNumber
 								formControlName="total"
 								mode="decimal"
-								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
+								[minFractionDigits]="2" [maxFractionDigits]="3" suffix=" €"
 								locale="en-US" [useGrouping]="false"
 								styleClass="item-col-num"
 								(onInput)="onItemTotalChange(j)"
@@ -522,14 +560,62 @@
 </p-dialog>
 
 <p-dialog
-	header="Associar Itens"
+	[header]="bulkAssociateTitle"
 	[(visible)]="bulkAssociateDialogVisible"
 	[modal]="true"
 	[dismissableMask]="true"
 	[style]="{ width: '36rem' }"
 	(onHide)="closeBulkAssociateDialog()"
 >
-	<div class="p-fluid flex flex-column gap-3">
+	<div class="p-fluid flex flex-column gap-3" *ngIf="!bulkAssociatesToConstruction">
+		<div class="field" *ngIf="bulkAssociatesToVehicle">
+			<label>Veículo</label>
+			<p-dropdown
+				[(ngModel)]="bulkAssociateVehicleId"
+				[ngModelOptions]="{ standalone: true }"
+				[options]="vehicleNames"
+				optionLabel="name"
+				optionValue="id"
+				placeholder="Selecione um Veículo"
+				[filter]="true"
+				filterBy="name"
+				appendTo="body"
+				[ngClass]="{ 'ng-dirty ng-invalid': bulkAssociateValidationAttempted && !bulkAssociateVehicleId }"
+			/>
+		</div>
+		<div class="field" *ngIf="bulkAssociatesToEquipment">
+			<label>Equipamento</label>
+			<p-dropdown
+				[(ngModel)]="bulkAssociateEquipmentId"
+				[ngModelOptions]="{ standalone: true }"
+				[options]="equipmentNames"
+				optionLabel="name"
+				optionValue="id"
+				placeholder="Selecione um Equipamento"
+				[filter]="true"
+				filterBy="name"
+				appendTo="body"
+				[ngClass]="{ 'ng-dirty ng-invalid': bulkAssociateValidationAttempted && !bulkAssociateEquipmentId }"
+			/>
+		</div>
+		<div class="field" *ngIf="bulkAssociatesToTool">
+			<label>Ferramenta</label>
+			<p-dropdown
+				[(ngModel)]="bulkAssociateToolId"
+				[ngModelOptions]="{ standalone: true }"
+				[options]="toolNames"
+				optionLabel="name"
+				optionValue="id"
+				placeholder="Selecione uma Ferramenta"
+				[filter]="true"
+				filterBy="name"
+				appendTo="body"
+				[ngClass]="{ 'ng-dirty ng-invalid': bulkAssociateValidationAttempted && !bulkAssociateToolId }"
+			/>
+		</div>
+	</div>
+
+	<div class="p-fluid flex flex-column gap-3" *ngIf="bulkAssociatesToConstruction">
 		<div class="field">
 			<label>Obra</label>
 			<p-dropdown
@@ -647,5 +733,21 @@
 		<button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveQuickAddOrigin()"></button>
 	</ng-template>
 </p-dialog>
+
+<p-confirmDialog #cd>
+	<ng-template pTemplate="headless" let-message>
+		<div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+			<div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+				<i class="pi pi-question text-5xl"></i>
+			</div>
+			<span class="font-bold text-2xl block mb-2 mt-4">{{ message.header }}</span>
+			<p class="mb-0">{{ message.message }}</p>
+			<div class="flex align-items-center gap-2 mt-4">
+				<button pButton label="Eliminar" (click)="cd.accept()" class="bg-red-500 border-transparent text-white w-8rem"></button>
+				<button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+			</div>
+		</div>
+	</ng-template>
+</p-confirmDialog>
 
 <p-toast />

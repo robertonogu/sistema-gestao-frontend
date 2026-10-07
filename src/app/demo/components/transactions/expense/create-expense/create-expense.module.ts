@@ -15,6 +15,8 @@ import { DialogModule } from 'primeng/dialog';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
+import { TableModule } from 'primeng/table';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive';
 
@@ -36,6 +38,8 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
     SplitButtonModule,
     MenuModule,
     TooltipModule,
+    TableModule,
+    ConfirmDialogModule,
 		CreateExpenseRoutingModule,
 		ToastModule,
 		UppercaseDirective

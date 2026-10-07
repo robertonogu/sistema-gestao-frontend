@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AccountName } from 'src/app/demo/api/accountName';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
 import { Origin } from 'src/app/demo/api/origin';
@@ -12,10 +12,12 @@ import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 import { PaymentService } from 'src/app/demo/service/transactions/paymentService';
+import { PaymentDocumentDetail } from 'src/app/demo/api/payment';
+import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
 
 @Component({
   templateUrl: './create-payment.component.html',
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   styles: [`
      :host ::ng-deep .selected {
         border-left: 5px solid;
@@ -45,6 +47,9 @@ export class CreatePaymentComponent {
   totalToPay: number | null = null;
   saving: boolean = false;
 
+  // Edição de um pagamento existente (documento de pagamento com uma ou mais faturas)
+  editingPaymentId?: number;
+
   constructor(
     private originService: OriginService,
     private accountService: AccountService,
@@ -52,7 +57,8 @@ export class CreatePaymentComponent {
     private messageService: MessageService,
     private paymentService: PaymentService,
     private _location: Location,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
@@ -60,9 +66,17 @@ export class CreatePaymentComponent {
       this.origins = origins;
     });
 
+    const paymentDocumentId = Number(this.route.snapshot.paramMap.get('paymentDocumentId'));
+    if (paymentDocumentId) this.editingPaymentId = paymentDocumentId;
+
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
+      if (this.editingPaymentId) {
+        this.paymentService.getPayment(this.editingPaymentId).subscribe((payment) => this.loadPayment(payment));
+      }
     });
+
+    if (this.editingPaymentId) return;
 
     // Vindo da listagem de débitos: origem escolhida e a fatura já selecionada com o valor em débito
     const params = this.route.snapshot.queryParamMap;
@@ -104,6 +118,30 @@ export class CreatePaymentComponent {
         this.updateSum();
       }
     });
+  }
+
+  // Preenche o formulário com o pagamento a editar: as faturas que ele paga ficam selecionadas com o valor pago
+  private loadPayment(payment: PaymentDocumentDetail) {
+    this.date = parseLocalDate(payment.date) as Date;
+    this.documentNumber = payment.documentNumber ?? (undefined as any);
+    this.selectedAccount = payment.accountId;
+    this.onAccountChange();
+    this.selectedPaymentMethod = payment.paymentMethod as unknown as PaymentMethod;
+    this.selectedOrigin = payment.originId;
+
+    this.expenses = payment.lines.map(line => ({
+      id: line.expenseId,
+      date: parseLocalDate(line.date),
+      paymentDeadline: parseLocalDate(line.paymentDeadline),
+      originId: payment.originId,
+      origin: '',
+      documentNumber: line.documentNumber,
+      totalValue: line.totalValue,
+      debtValue: line.debtValue
+    }));
+    this.expenseValues = payment.lines.map(line => line.paidValue);
+    this.expensesSelected = this.expenses.filter((_, i) => this.expenseValues[i] > 0);
+    this.updateSum();
   }
 
   private expenseTime(expense: ExpenseInDebt): number {
@@ -195,6 +233,22 @@ export class CreatePaymentComponent {
     };
 
     this.saving = true;
+
+    if (this.editingPaymentId) {
+      this.paymentService.updatePayment(this.editingPaymentId, listPayments).subscribe({
+        next: () => {
+          this.saving = false;
+          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pagamento atualizado com sucesso.' });
+          this.back();
+        },
+        error: (err) => {
+          this.saving = false;
+          this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível atualizar o pagamento.' });
+        }
+      });
+      return;
+    }
+
     this.paymentService.createPayment(listPayments).subscribe({
       next: () => {
         this.saving = false;
@@ -204,6 +258,25 @@ export class CreatePaymentComponent {
       error: (err) => {
         this.saving = false;
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível registar o pagamento.' });
+      }
+    });
+  }
+
+  deletePayment() {
+    if (!this.editingPaymentId) return;
+    const paymentDocumentId = this.editingPaymentId;
+
+    this.confirmationService.confirm({
+      header: 'Tem a certeza que pretende eliminar este pagamento?',
+      message: 'As faturas voltam a ficar em dívida pelo valor pago e os lançamentos na conta e na conta corrente são removidos.',
+      accept: () => {
+        this.paymentService.deletePayment(paymentDocumentId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Pagamento eliminado com sucesso.' });
+            this.back();
+          },
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível eliminar o pagamento.' })
+        });
       }
     });
   }

@@ -18,6 +18,8 @@
       </div>
 
       <p-table
+                stateStorage="session"
+                [stateKey]="'table-worklog-details-' + constructionId"
         [value]="workLogs"
         [lazy]="true"
         [loading]="loading"

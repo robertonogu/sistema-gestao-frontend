@@ -42,6 +42,8 @@
             </div>
 
 			<p-table
+                stateStorage="session"
+                stateKey="table-account-logs"
                 #dt
                 currentPageReportTemplate="{first} de {last} de {totalRecords} registos de conta"
                 [lazy]="true"

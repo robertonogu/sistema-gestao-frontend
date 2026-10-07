@@ -1,4 +1,4 @@
-﻿<div class="grid">
+<div class="grid">
 	<div class="col-12">
 		<div class="card">
 
@@ -24,7 +24,9 @@
                 </div>
             </div>
 
-			<p-table 
+			<p-table
+                stateStorage="session"
+                stateKey="table-payments" 
                 currentPageReportTemplate="{first} de {last} de {totalRecords} pagamentos totais"
                 [lazy]="true"
                 [loading]="loading"
@@ -89,14 +91,16 @@
                     <tr>
                         <td>{{ payment.date | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ payment.origin }}</td>
-                        <td>{{ payment.documentNumber }}</td>
+                        <td class="font-semibold">{{ payment.documentNumber }}</td>
                         <td class="text-red-500 font-semibold">- {{ payment.value | number: '1.2-2' }} €</td>
                         <td><span [class]="'payment-badge status-' + payment.paymentMethod.toLowerCase()">{{ PaymentMethod[payment.paymentMethod] }}</span></td>
                         <td>{{ payment.account }}</td>
                         <td>
                             <p-button 
                                 pRipple 
-                                icon="pi pi-pencil" 
+                                icon="pi pi-pencil"
+                                (onClick)="editPayment(payment)"
+                                pTooltip="Editar" 
                                 class="mr-2" 
                                 [rounded]="true" 
                                 [text]="true" 
@@ -104,7 +108,9 @@
                             />
                             <p-button 
                                 pRipple 
-                                icon="pi pi-trash" 
+                                icon="pi pi-trash"
+                                (onClick)="deletePayment(payment)"
+                                pTooltip="Eliminar" 
                                 severity="danger" 
                                 [rounded]="true" 
                                 [text]="true" 
@@ -118,3 +124,23 @@
 		</div>
 	</div>
 </div>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">
+                {{ message.header }}
+            </span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton label="Eliminar" (click)="cd.accept()" class="bg-red-500 border-transparent text-white w-8rem"></button>
+                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-toast />
