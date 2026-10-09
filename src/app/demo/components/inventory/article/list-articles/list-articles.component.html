@@ -19,7 +19,7 @@
                         </div>
                     </div>
 
-                    <p-table
+                    <p-table #dtEntries
                 stateStorage="session"
                 stateKey="table-articles-entries"
                         [lazy]="true"
@@ -34,6 +34,13 @@
                         [totalRecords]="entriesTotal"
                         [value]="stockEntries"
                     >
+                        <ng-template pTemplate="caption">
+                            <div class="flex justify-content-end">
+                                <button pButton type="button" icon="pi pi-filter-slash" label="Limpar filtros"
+                                    class="p-button-outlined p-button-sm" (click)="dtEntries.clear(); dtEntries.clearState()"></button>
+                            </div>
+                        </ng-template>
+
 
                         <ng-template pTemplate="header">
                             <tr>
@@ -109,7 +116,7 @@
                         </div>
                     </div>
 
-                    <p-table
+                    <p-table #dtExits
                 stateStorage="session"
                 stateKey="table-articles-exits"
                         [lazy]="true"
@@ -124,6 +131,13 @@
                         [totalRecords]="exitsTotal"
                         [value]="stockExits"
                     >
+                        <ng-template pTemplate="caption">
+                            <div class="flex justify-content-end">
+                                <button pButton type="button" icon="pi pi-filter-slash" label="Limpar filtros"
+                                    class="p-button-outlined p-button-sm" (click)="dtExits.clear(); dtExits.clearState()"></button>
+                            </div>
+                        </ng-template>
+
 
                         <ng-template pTemplate="header">
                             <tr>
@@ -220,7 +234,7 @@
                         </div>
                     </div>
 
-                    <p-table
+                    <p-table #dtStock
                 stateStorage="session"
                 stateKey="table-articles-stock"
                         [lazy]="true"
@@ -235,6 +249,13 @@
                         [totalRecords]="stockTotal"
                         [value]="articlesStock"
                     >
+                        <ng-template pTemplate="caption">
+                            <div class="flex justify-content-end">
+                                <button pButton type="button" icon="pi pi-filter-slash" label="Limpar filtros"
+                                    class="p-button-outlined p-button-sm" (click)="dtStock.clear(); dtStock.clearState()"></button>
+                            </div>
+                        </ng-template>
+
 
                         <ng-template pTemplate="header">
                             <tr>

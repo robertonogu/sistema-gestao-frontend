@@ -1,6 +1,6 @@
-﻿import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { AccountName } from 'src/app/demo/api/accountName';
 import { Movement } from 'src/app/demo/api/movement';
@@ -11,7 +11,7 @@ import { MovementService } from 'src/app/demo/service/transactions/movementServi
 
 @Component({
   templateUrl: './list-movements.component.html',
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class ListMovementsComponent implements OnInit {
 
@@ -36,6 +36,7 @@ export class ListMovementsComponent implements OnInit {
     private movementService: MovementService,
     private accountService: AccountService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private route: ActivatedRoute
   ) {}
 
@@ -84,6 +85,22 @@ export class ListMovementsComponent implements OnInit {
     this.movement = { targetAccountId: this.cashAccountId };
     this.submitted = false;
     this.movementDialog = true;
+  }
+
+  deleteMovement(movement: Movement) {
+    this.confirmationService.confirm({
+      header: 'Tem a certeza que pretende eliminar este movimento?',
+      message: 'Os lançamentos nas duas contas (' + movement.originAccount + ' e ' + movement.targetAccount + ') também são removidos.',
+      accept: () => {
+        this.movementService.deleteMovement(movement.movementId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Movimento eliminado com sucesso.' });
+            this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize, filters: this.table?.filters });
+          },
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível eliminar o movimento.' })
+        });
+      }
+    });
   }
 
   editMovement(movement: Movement) {

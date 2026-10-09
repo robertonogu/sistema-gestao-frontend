@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { ObjectList } from '../../api/objectList';
+import { formatLocalDate } from '../localDate.interceptor';
 import { environment } from 'src/environments/environment';
 import { Sale } from '../../api/sale';
 import { SaleCreation } from '../../api/saleCreation';
@@ -18,14 +19,12 @@ export class SaleService {
 
     constructor(private http: HttpClient) { }
 
-    getSales(currentPage: number, pageSize: number, year?: number) : Observable<ObjectList & { netValue: number }> {
+    getSales(currentPage: number, pageSize: number, dateFrom?: Date, dateTo?: Date, clientId?: number) : Observable<ObjectList & { netValue: number }> {
       let url = this.salesUrl + "?pageNo=" +  currentPage + "&pageSize=" + pageSize;
-      if (year != null) url += "&year=" + year;
+      if (dateFrom) url += "&dateFrom=" + formatLocalDate(dateFrom);
+      if (dateTo) url += "&dateTo=" + formatLocalDate(dateTo);
+      if (clientId != null) url += "&clientId=" + clientId;
       return this.http.get<ObjectList & { netValue: number }>(url);
-    }
-
-    getSaleYears() : Observable<number[]> {
-      return this.http.get<number[]>(this.salesUrl + "/years");
     }
 
     getSale(saleId: number) : Observable<Sale> {

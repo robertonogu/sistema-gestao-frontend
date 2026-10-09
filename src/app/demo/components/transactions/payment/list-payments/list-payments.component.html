@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-			<p-table
+			<p-table #dt
                 stateStorage="session"
                 stateKey="table-payments" 
                 currentPageReportTemplate="{first} de {last} de {totalRecords} pagamentos totais"
@@ -40,6 +40,13 @@
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="payments"
             >
+			    <ng-template pTemplate="caption">
+			        <div class="flex justify-content-end">
+			            <button pButton type="button" icon="pi pi-filter-slash" label="Limpar filtros"
+			                class="p-button-outlined p-button-sm" (click)="dt.clear(); dt.clearState()"></button>
+			        </div>
+			    </ng-template>
+
 
                 <ng-template pTemplate="header">
                     <tr>

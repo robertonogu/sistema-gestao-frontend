@@ -280,6 +280,7 @@
 					<div>Valor s/ IVA</div>
 					<div>IVA</div>
 					<div>Total</div>
+					<div>Associado a</div>
 					<div></div>
 				</div>
 
@@ -375,6 +376,10 @@
 								styleClass="item-col-num"
 								(onInput)="onItemTotalChange(j)"
 							/>
+						</div>
+
+						<div class="item-col-assoc white-space-nowrap overflow-hidden text-overflow-ellipsis" [pTooltip]="associationLabel(j)" tooltipPosition="top">
+							{{ associationLabel(j) }}
 						</div>
 
 						<div class="item-col-actions">

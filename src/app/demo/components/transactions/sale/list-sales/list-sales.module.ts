@@ -9,6 +9,7 @@ import { ListSalesRoutingModule } from './list-sales-routing.module';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
   imports: [
@@ -20,7 +21,8 @@ import { TooltipModule } from 'primeng/tooltip';
     TableModule,
     DropdownModule,
     TooltipModule,
-    ToastModule
+    ToastModule,
+    CalendarModule
   ],
   declarations: [ListSalesComponent]
 })

@@ -20,6 +20,7 @@ export interface ExpenseItemEdit {
     equipmentId?: number;
     constructionId?: number;
     costAllocations: CostAllocationEdit[];
+    associationName?: string | null;
 }
 
 export interface ExpenseEdit {

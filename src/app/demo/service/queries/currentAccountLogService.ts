@@ -1,8 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ObjectList } from '../../api/objectList';
+import { CurrentAccountLog } from '../../api/currentAccountLog';
 import { environment } from 'src/environments/environment';
+
+// Página da conta corrente com os totais de todos os registos filtrados
+export interface CurrentAccountLogPage {
+    objectList: CurrentAccountLog[];
+    totalElements: number;
+    totalCredit: number;
+    totalDebt: number;
+    balance: number;
+}
 
 export interface CurrentAccountLogFilters {
     dateFrom?: Date;
@@ -18,9 +27,9 @@ export class CurrentAccountLogService {
 
     constructor(private http: HttpClient) { }
 
-    getCurrentAccountLogs(currentPage: number, pageSize: number, originId: number, filters?: CurrentAccountLogFilters) : Observable<ObjectList> {
+    getCurrentAccountLogs(currentPage: number, pageSize: number, originId: number, filters?: CurrentAccountLogFilters) : Observable<CurrentAccountLogPage> {
         let url = this.currentAccountLogsUrl + originId + "?pageNo=" + currentPage + "&pageSize=" + pageSize + this.filterParams(filters);
-        return this.http.get<ObjectList>(url);
+        return this.http.get<CurrentAccountLogPage>(url);
     }
 
     private filterParams(filters?: CurrentAccountLogFilters): string {

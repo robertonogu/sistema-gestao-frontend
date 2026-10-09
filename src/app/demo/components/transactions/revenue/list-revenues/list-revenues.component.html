@@ -1,4 +1,4 @@
-﻿<div class="grid">
+<div class="grid">
 	<div class="col-12">
 		<div class="card">
           
@@ -24,7 +24,16 @@
                 </div>
             </div>
 
-			<p-table 
+            <div class="flex flex-column sm:flex-row sm:align-items-center gap-3 mb-4">
+                <div class="sm:ml-auto text-right">
+                    <span class="text-500 text-sm block">Total de receitas</span>
+                    <span class="text-900 text-xl font-bold">{{ totalValue | number: '1.2-2' }} €</span>
+                </div>
+            </div>
+
+			<p-table #dt
+                stateStorage="session"
+                stateKey="table-revenues"
                 currentPageReportTemplate="{first} de {last} de {totalRecords} receitas totais"
                 [lazy]="true"
                 [loading]="loading"
@@ -38,9 +47,27 @@
                 [tableStyle]="{ 'min-width': '50rem' }"
                 [value]="revenues"
             >
+			    <ng-template pTemplate="caption">
+			        <div class="flex justify-content-end">
+			            <button pButton type="button" icon="pi pi-filter-slash" label="Limpar filtros"
+			                class="p-button-outlined p-button-sm" (click)="dt.clear(); dt.clearState()"></button>
+			        </div>
+			    </ng-template>
+
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Data</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Data
+                                <p-columnFilter field="date" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-calendar [ngModel]="value" selectionMode="range" dateFormat="dd/mm/yy" [showButtonBar]="true"
+                                            placeholder="Dia ou período" appendTo="body" (ngModelChange)="filter($event)" (onClearClick)="filter(null)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>Tipo</th>
                         <th>Nº Documento</th>
                         <th>Origem</th>
@@ -70,7 +97,8 @@
                             />
                             <p-button 
                                 pRipple 
-                                icon="pi pi-trash" 
+                                icon="pi pi-trash"
+                                (click)="deleteRevenue(revenue)" 
                                 severity="danger" 
                                 [rounded]="true" 
                                 [text]="true" 
@@ -84,3 +112,21 @@
 		</div>
 	</div>
 </div>
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">{{ message.header }}</span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton label="Eliminar" (click)="cd.accept()" class="bg-red-500 border-transparent text-white w-8rem"></button>
+                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-toast />

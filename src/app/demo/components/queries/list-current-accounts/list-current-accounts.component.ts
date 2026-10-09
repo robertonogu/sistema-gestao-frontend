@@ -14,6 +14,8 @@ export class ListCurrentAccountsComponent implements OnInit {
   selectedOrigin!: number;
 
   balance: number = 0;
+  totalCredit: number = 0;
+  totalDebt: number = 0;
 
   loading: boolean = false;
   totalRecords: number = 0;
@@ -25,6 +27,12 @@ export class ListCurrentAccountsComponent implements OnInit {
 
   PaymentMethod: any = PaymentMethod;
   private filters: CurrentAccountLogFilters = {};
+
+  // Período por omissão: o ano corrente (um filtro guardado na sessão sobrepõe-se a este)
+  private readonly currentYear = new Date().getFullYear();
+  defaultFilters: any = {
+    date: [{ value: [new Date(this.currentYear, 0, 1), new Date(this.currentYear, 11, 31)], matchMode: 'equals', operator: 'and' }]
+  };
 
   constructor(
     private originService: OriginService,
@@ -73,10 +81,10 @@ export class ListCurrentAccountsComponent implements OnInit {
     this.currentAccountLogService.getCurrentAccountLogs(this.currentPage, this.pageSize, this.selectedOrigin, this.filters).subscribe((currentAccountLogs) => {
       this.currentAccountLogs = currentAccountLogs.objectList;
       this.totalRecords = currentAccountLogs.totalElements;
-      // A lista vem dos mais recentes para os mais antigos: a primeira linha da página 0 tem o saldo no fim do período
-      if (this.currentPage === 0) {
-        this.balance = this.currentAccountLogs[0]?.balance ?? 0;
-      }
+      // Totais e saldo de todos os registos filtrados (não só desta página)
+      this.totalCredit = currentAccountLogs.totalCredit;
+      this.totalDebt = currentAccountLogs.totalDebt;
+      this.balance = currentAccountLogs.balance;
       this.loading = false;
     });
   }

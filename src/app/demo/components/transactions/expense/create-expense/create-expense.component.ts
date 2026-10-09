@@ -86,7 +86,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  grid-template-columns: 36px minmax(420px, 2fr) 320px 90px 130px 130px 130px 130px 84px;
+  grid-template-columns: 36px minmax(420px, 2fr) 320px 90px 130px 130px 130px 130px 200px 84px;
   align-items: center;
   column-gap: 8px;
   min-width: fit-content;
@@ -395,6 +395,11 @@ export class CreateExpenseComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getConstructionNames();
+    this.vehicleService.getActiveVehicleNames().subscribe(names => this.vehicleNames = names);
+    this.toolService.getActiveToolNames().subscribe(names => this.toolNames = names);
+    this.equipmentService.getActiveEquipmentNames().subscribe(names => this.equipmentNames = names);
+
     this.categories = this.transformCategoriesAndSubCategories(this.categoriesAndSubCategories);
 
     const expenseId = Number(this.route.snapshot.params['expenseId']);
@@ -451,6 +456,7 @@ export class CreateExpenseComponent implements OnInit {
       vehicleId: [item.vehicleId ?? null],
       toolId: [item.toolId ?? null],
       equipmentId: [item.equipmentId ?? null],
+      associationName: [item.associationName ?? null],
       selected: [{ value: false, disabled: !isSelectable }],
     });
     this.wireSelectedDisabling(group);
@@ -1097,6 +1103,18 @@ export class CreateExpenseComponent implements OnInit {
         ? undefined
         : this.findBudgetTreeNode(this.linkBudgetTree, row?.budgetItemId);
     });
+  }
+
+  // Nome do que está associado ao item (coluna "Associado a"): usa as listas carregadas, para refletir
+  // alterações feitas no formulário, e o nome vindo da despesa para associações já inativas
+  associationLabel(index: number): string {
+    const row = this.itemInputs.at(index).value;
+    const original = this.itemInputs.at(index).get('associationName')?.value ?? null;
+    if (row.vehicleId) return this.vehicleNames.find(v => v.id === row.vehicleId)?.name ?? original ?? '';
+    if (row.equipmentId) return this.equipmentNames.find(e => e.id === row.equipmentId)?.name ?? original ?? '';
+    if (row.toolId) return this.toolNames.find(t => t.id === row.toolId)?.name ?? original ?? '';
+    if (row.constructionId) return this.constructionNames?.find(c => c.constructionId === row.constructionId)?.name ?? original ?? '';
+    return '';
   }
 
   // Categorias cujos itens se podem associar em conjunto (as aquisições ficam de fora: criam o seu próprio equipamento/ferramenta)

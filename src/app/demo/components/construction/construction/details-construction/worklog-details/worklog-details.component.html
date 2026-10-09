@@ -17,7 +17,7 @@
         </div>
       </div>
 
-      <p-table
+      <p-table #dt
                 stateStorage="session"
                 [stateKey]="'table-worklog-details-' + constructionId"
         [value]="workLogs"
@@ -32,6 +32,13 @@
         currentPageReportTemplate="{first} de {last} de {totalRecords} registos"
         styleClass="p-datatable-striped"
       >
+          <ng-template pTemplate="caption">
+              <div class="flex justify-content-end">
+                  <button pButton type="button" icon="pi pi-filter-slash" label="Limpar filtros"
+                      class="p-button-outlined p-button-sm" (click)="dt.clear(); dt.clearState()"></button>
+              </div>
+          </ng-template>
+
         <ng-template pTemplate="header">
           <tr>
             <th>Data</th>

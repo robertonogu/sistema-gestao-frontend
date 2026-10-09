@@ -34,6 +34,10 @@ export class MovementService {
         return this.http.post<Movement>(this.movementsUrl, newMovement, environment.httpOptions);
     }
 
+    deleteMovement(movementId: number) : Observable<void> {
+        return this.http.delete<void>(this.movementsUrl + "/" + movementId);
+    }
+
     updateMovement(movementId: number, movement: MovementCreation) : Observable<Movement> {
         let url = this.movementByIdUrl + movementId;
         return this.http.put<Movement>(url, movement, environment.httpOptions);

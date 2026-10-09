@@ -12,9 +12,11 @@ import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
   imports: [
+    ConfirmDialogModule,
     ButtonModule,
     CommonModule,
     ListMovementsRoutingModule,
