@@ -7,6 +7,7 @@ import { SaleForRevenue } from 'src/app/demo/api/saleForRevenue';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { RevenueType } from 'src/app/demo/data/enum/revenueType';
 import { RevenueCreation } from 'src/app/demo/data/model/revenueCreation.model';
+import { RevenueSaleLine, RevenueSalesSelection } from 'src/app/demo/data/model/revenueSalesSelection';
 import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from 'src/app/demo/service/company/accountService';
 import { OriginService } from 'src/app/demo/service/company/originService';
 import { RevenueService } from 'src/app/demo/service/transactions/revenueService';
@@ -23,7 +24,7 @@ export class CreateRevenueComponent {
   accountNames!: AccountName[];
   paymentMethods = PaymentMethod;
   validIvaRates!: number[];
-  sales: SaleForRevenue[] = [];
+  salesSelection = new RevenueSalesSelection();
 
   private readonly defaultRevenueType = 'SALES' as unknown as RevenueType;
 
@@ -35,7 +36,6 @@ export class CreateRevenueComponent {
   selectedPaymentMethod!: PaymentMethod;
   iva!: number;
   totalValue!: number;
-  selectedSale!: number;
 
   revenue!: RevenueCreation;
 
@@ -95,12 +95,13 @@ export class CreateRevenueComponent {
     return !!clientsCategory && clientsCategory.items.some(item => item.value === this.selectedOrigin);
   }
 
-  getSalesForClient() {
-    this.sales = [];
+  getSalesForClient(lines: RevenueSaleLine[] = []) {
+    this.salesSelection.clear();
 
     if (this.isSalesRevenueType && this.isSelectedOriginAClient()) {
       this.saleService.getSalesPendingForRevenue(this.selectedOrigin).subscribe((sales) => {
-        this.sales = sales;
+        this.salesSelection.load(sales, lines);
+        if (lines.length > 0) this.iva = this.salesSelection.commonIvaRate ?? this.iva;
       });
     }
   }
@@ -110,20 +111,65 @@ export class CreateRevenueComponent {
   }
 
   onRevenueTypeChange() {
-    this.selectedSale = undefined as any;
     this.getSalesForClient();
   }
 
-  onSaleChange() {
-    const sale = this.sales.find(s => s.saleId === this.selectedSale);
-    if (!sale) return;
+  // ---- Vendas liquidadas pela receita (várias, como as faturas num pagamento) ----
+  onSaleSelect(sale: SaleForRevenue) {
+    this.salesSelection.onSelect(sale);
+    this.syncTotalsFromSales();
+  }
 
-    this.iva = sale.ivaRate;
-    this.totalValue = sale.pendingValue;
+  onSaleUnselect(sale: SaleForRevenue) {
+    this.salesSelection.onUnselect(sale);
+    this.syncTotalsFromSales();
+  }
+
+  onSelectAllSales(checked: boolean) {
+    this.salesSelection.selectAll(checked);
+    this.syncTotalsFromSales();
+  }
+
+  onSaleValueChange() {
+    this.salesSelection.updateTotal();
+    this.syncTotalsFromSales();
+  }
+
+  // O Valor Total, numa receita de vendas com vendas pendentes, é repartido pelas vendas da mais antiga para a mais recente
+  onTotalInput(value: number | string | null) {
+    if (!this.isSalesRevenueType || this.salesSelection.sales.length === 0) return;
+    this.salesSelection.distribute(value);
+    this.iva = this.salesSelection.commonIvaRate as number;
+  }
+
+  private syncTotalsFromSales() {
+    this.totalValue = this.salesSelection.total;
+    this.iva = this.salesSelection.commonIvaRate as number;
+  }
+
+  // Valor recebido a mais do que o distribuído pelas vendas: fica como crédito do cliente na conta corrente
+  get revenueExcess(): number {
+    return Math.max(0, Math.round(((this.totalValue ?? 0) - this.salesSelection.total) * 100) / 100);
+  }
+
+  private buildSaleLines(): RevenueSaleLine[] | null {
+    if (!this.isSalesRevenueType) return [];
+    const { lines, error } = this.salesSelection.lines();
+    if (error) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: error });
+      return null;
+    }
+    if (lines.length > 0 && (this.totalValue ?? 0) + 0.005 < this.salesSelection.total) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O valor total é inferior ao valor distribuído pelas vendas.' });
+      return null;
+    }
+    return lines;
   }
 
   newRevenue() {
-    this.revenue = new RevenueCreation(this.date, this.selectedRevenueType, this.documentNumber, this.selectedOrigin, this.selectedAccount, this.selectedPaymentMethod, this.totalValue, this.iva, this.selectedSale);
+    const saleLines = this.buildSaleLines();
+    if (saleLines === null) return;
+    this.revenue = new RevenueCreation(this.date, this.selectedRevenueType, this.documentNumber, this.selectedOrigin, this.selectedAccount, this.selectedPaymentMethod, this.totalValue, this.iva, 0, saleLines);
     console.log(this.revenue);
     if (this.revenue != null) {
       this.revenueService.createRevenue(this.revenue).subscribe({
@@ -151,7 +197,6 @@ export class CreateRevenueComponent {
     this.refreshPaymentMethodOptions();
     this.iva = undefined as any;
     this.totalValue = undefined as any;
-    this.selectedSale = undefined as any;
-    this.sales = [];
+    this.salesSelection.clear();
   }
 }

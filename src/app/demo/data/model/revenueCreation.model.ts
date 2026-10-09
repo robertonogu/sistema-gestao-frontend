@@ -1,5 +1,6 @@
 import { PaymentMethod } from "../enum/paymentMethod";
 import { RevenueType } from "../enum/revenueType";
+import { RevenueSaleLine } from "./revenueSalesSelection";
 
 export class RevenueCreation {
     date: Date;
@@ -11,6 +12,8 @@ export class RevenueCreation {
     totalValue: number;
     iva: number;
     saleId: number;
+    // Vendas liquidadas pela receita e valor recebido de cada uma
+    sales: RevenueSaleLine[];
 
     constructor(
         date: Date,
@@ -21,7 +24,8 @@ export class RevenueCreation {
         paymentMethod: PaymentMethod,
         totalValue: number,
         iva: number,
-        saleId: number
+        saleId: number,
+        sales: RevenueSaleLine[] = []
     ) {
         this.date = date;
         this.revenueType = revenueType;
@@ -32,6 +36,7 @@ export class RevenueCreation {
         this.totalValue = totalValue;
         this.iva = iva;
         this.saleId = saleId;
+        this.sales = sales;
     }
 
 }

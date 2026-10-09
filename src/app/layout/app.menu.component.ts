@@ -216,6 +216,11 @@ export class AppMenuComponent implements OnInit {
                         label: 'Contas',
                         icon: 'pi pi-fw pi-lock',
                         routerLink: ['/company/accounts']
+                    },
+                    {
+                        label: 'Categorias de Despesa',
+                        icon: 'pi pi-fw pi-sitemap',
+                        routerLink: ['/company/expenseCategories']
                     }
                 ]
             },

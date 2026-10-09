@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,6 +15,7 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
 
 @NgModule({
   imports: [
+    TableModule,
     ButtonModule,
     CommonModule,
     CreateRevenueRoutingModule,

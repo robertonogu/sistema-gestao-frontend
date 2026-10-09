@@ -1,3 +1,4 @@
+import { RevenueSaleLine } from './revenueSalesSelection';
 import { PaymentMethod } from "../enum/paymentMethod";
 import { RevenueType } from "../enum/revenueType";
 
@@ -13,4 +14,5 @@ export interface RevenueEdit {
     originId: number;
     accountId: number;
     saleId: number | null;
+    sales?: RevenueSaleLine[];
 }

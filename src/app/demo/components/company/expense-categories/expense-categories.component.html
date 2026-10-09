@@ -1,0 +1,50 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="flex flex-column sm:flex-row sm:align-items-center gap-3 mb-3">
+                <div class="flex flex-column gap-1">
+                    <div class="text-900 text-xl font-semibold">Categorias de Despesa</div>
+                    <div class="text-500 font-medium">{{ categories.length }} categorias · {{ totalSubCategories }} subcategorias</div>
+                </div>
+                <span class="p-input-icon-left sm:ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" [(ngModel)]="search" placeholder="Pesquisar categoria ou subcategoria" class="w-full sm:w-20rem" />
+                </span>
+            </div>
+
+            <div class="flex flex-wrap align-items-center gap-3 mb-4 text-sm text-600">
+                <span class="flex align-items-center gap-2"><p-tag value="Entra em stock" severity="info" /> cria artigos no inventário</span>
+                <span class="flex align-items-center gap-2"><p-tag value="Cria equipamento" severity="success" /> cria o equipamento ao guardar a despesa</span>
+                <span class="flex align-items-center gap-2"><p-tag value="Cria ferramenta" severity="warning" /> cria a ferramenta ao guardar a despesa</span>
+            </div>
+
+            <div class="grid">
+                <div class="col-12 md:col-6 xl:col-4" *ngFor="let category of filteredCategories">
+                    <div class="border-1 surface-border border-round h-full">
+                        <div class="flex align-items-center justify-content-between px-3 py-2 surface-100 border-round-top">
+                            <span class="font-semibold text-900">{{ category.label }}</span>
+                            <span class="text-500 text-sm">{{ category.subCategories.length }}</span>
+                        </div>
+                        <ul class="list-none m-0 p-0">
+                            <li *ngFor="let sub of category.subCategories"
+                                class="flex align-items-center justify-content-between gap-2 px-3 py-2 border-top-1 surface-border">
+                                <span>{{ sub.label }}</span>
+                                <span class="flex gap-1 flex-shrink-0">
+                                    <p-tag *ngIf="sub.goesToStock" value="Stock" severity="info" pTooltip="Entra em stock" tooltipPosition="top" />
+                                    <p-tag *ngIf="sub.createsEquipment" value="Equipamento" severity="success" pTooltip="Cria o equipamento ao guardar a despesa" tooltipPosition="top" />
+                                    <p-tag *ngIf="sub.createsTool" value="Ferramenta" severity="warning" pTooltip="Cria a ferramenta ao guardar a despesa" tooltipPosition="top" />
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center text-500 py-5" *ngIf="filteredCategories.length === 0">
+                    Nenhuma categoria ou subcategoria corresponde à pesquisa.
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
