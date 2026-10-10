@@ -225,7 +225,8 @@ export class CreateExpenseComponent implements OnInit {
 
   categories: any[] = [];
   origins: Origin[] = [];
-  documentTypes = DocumentType;
+  // O "Saldo Inicial" é criado a partir da ficha do fornecedor/funcionário/entidade, não no formulário de despesas
+  documentTypes = Object.fromEntries(Object.entries(DocumentType).filter(([key]) => key !== 'OPENING_BALANCE'));
   validIvaRates: number[];
   disablePaidValue: boolean = false;
   accountNames: AccountName[] = [];

@@ -6,5 +6,6 @@ export enum DocumentType {
     PAYMENT_GUIDE = "Guia de Pagamento",
     SINGLE_COLLECTION_DOCUMENT = "Documento Único de Cobrança",
     SALARY_RECEIPT = "Recibo de Vencimento",
-    COLLECTION_NOTE = "Nota de Cobrança"
+    COLLECTION_NOTE = "Nota de Cobrança",
+    OPENING_BALANCE = "Saldo Inicial"
 }
