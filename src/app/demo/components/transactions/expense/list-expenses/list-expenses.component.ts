@@ -9,8 +9,7 @@ import { PaymentStatus } from 'src/app/demo/data/enum/paymentStatus';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { ExpenseFilters, ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 import { OriginService } from 'src/app/demo/service/company/originService';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { euros, exportStatementPdf, periodLabel } from 'src/app/demo/service/statementPdf';
 import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
 
 @Component({
@@ -146,33 +145,33 @@ export class ListExpensesComponent implements OnInit {
 
     const filters = this.table?.filters ?? {};
 
-    this.expenseService.exportExpenses(this.buildFilters(filters)).subscribe({
+    const exportFilters = this.buildFilters(filters);
+    this.expenseService.exportExpenses(exportFilters).subscribe({
       next: (result) => {
-        // A4 vertical, letra 9, cabeçalhos a negrito
-        const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
+        // Com uma só origem filtrada, o título indica-a
+        const originIds: number[] | undefined = exportFilters.originIds as any;
+        const originName = originIds?.length === 1 ? this.originNames.find(origin => origin.id === originIds[0])?.name : undefined;
+        const dates = result.map((expense: ExpenseListItem) => parseLocalDate(expense.date as any));
 
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Despesas', 14, 15);
-
-        autoTable(doc, {
-          startY: 20,
-          styles: { fontSize: 9 },
-          headStyles: { fontSize: 9, fontStyle: 'bold' },
-          columnStyles: { 5: { halign: 'right' }, 6: { halign: 'right' } },
-          head: [['Data', 'Origem', 'Nº Documento', 'Estado', 'Meio de Pagamento', 'Valor', 'Valor Pendente']],
-          body: result.map((expense: ExpenseListItem) => [
-            expense.date ? parseLocalDate(expense.date as any)!.toLocaleDateString('pt-PT') : '',
+        exportStatementPdf({
+          title: originName ? `Despesas de ${originName.trim()}` : 'Despesas',
+          period: periodLabel(dates),
+          head: ['Data', 'Origem', 'Nº Documento', 'Estado', 'Meio de Pagamento', 'Valor', 'Valor Pendente'],
+          body: result.map((expense: ExpenseListItem, i: number) => [
+            dates[i]?.toLocaleDateString('pt-PT') ?? '',
             expense.origin ?? '',
             expense.documentNumber,
             this.PaymentStatus[expense.paymentStatus] ?? expense.paymentStatus,
             this.paymentMethodsLabel(expense.paymentMethods),
-            `${expense.totalValue.toFixed(2)} €`,
-            `${expense.pendingValue.toFixed(2)} €`
-          ])
+            euros(expense.totalValue),
+            euros(expense.pendingValue)
+          ]),
+          foot: [['Total', '', '', '', '',
+            euros(result.reduce((sum: number, expense: ExpenseListItem) => sum + expense.totalValue, 0)),
+            euros(result.reduce((sum: number, expense: ExpenseListItem) => sum + expense.pendingValue, 0))]],
+          rightAlignedColumns: [5, 6],
+          fileName: 'despesas'
         });
-
-        doc.save('despesas.pdf');
         this.exporting = false;
       },
       error: () => {

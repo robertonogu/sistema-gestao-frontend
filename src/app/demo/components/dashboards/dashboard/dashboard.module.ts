@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './dashboard.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
+import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +18,7 @@ import { RippleModule } from 'primeng/ripple';
 	imports: [
 		CommonModule,
 		DashboardRoutingModule,
+		TooltipModule,
 		ButtonModule,
 		RippleModule,
 		DropdownModule,

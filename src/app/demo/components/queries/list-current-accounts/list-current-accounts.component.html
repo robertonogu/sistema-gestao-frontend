@@ -31,11 +31,14 @@
                     </p-dropdown>
                     <button 
                         class="p-button-rounded"
-                        icon="pi pi-download" 
-                        pButton 
-                        pTooltip="Exportar" 
-                        tooltipPosition="bottom" 
-                        type="button" 
+                        icon="pi pi-download"
+                        pTooltip="Exportar"
+                        tooltipPosition="bottom"
+                        pButton
+                        type="button"
+                        [loading]="exporting"
+                        [disabled]="selectedOrigin == null"
+                        (click)="exportPdf()"
                     ></button>
                 </div>
             </div>

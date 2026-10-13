@@ -34,7 +34,7 @@ export enum SubCategoryType {
     IRS = 'IRS',
     COMPENSATION_FUNDS = 'Fundos de Compensação',
     INSURANCE_PEOPLE = 'Seguros',
-    SAFETY = 'Segurança',
+    SAFETY = 'Segurança no Trabalho',
     HYGIENE = 'Higiene',
     MEALS = 'Refeições Suportadas',
     WORK_ACCIDENT_INSURANCE = 'Seguro de Acidentes de Trabalho',

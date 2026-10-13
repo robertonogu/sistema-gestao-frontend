@@ -32,6 +32,12 @@ export class CurrentAccountLogService {
         return this.http.get<CurrentAccountLogPage>(url);
     }
 
+    // Todos os registos filtrados (do mais antigo para o mais recente), para exportar
+    exportCurrentAccountLogs(originId: number, filters?: CurrentAccountLogFilters) : Observable<{ objectList: CurrentAccountLog[] }> {
+        const url = `${environment.apiUrl}/currentAccountLogsExport/` + originId + "?" + this.filterParams(filters).substring(1);
+        return this.http.get<{ objectList: CurrentAccountLog[] }>(url);
+    }
+
     private filterParams(filters?: CurrentAccountLogFilters): string {
         let params = "";
         if (filters?.dateFrom) params += "&dateFrom=" + this.formatDate(filters.dateFrom);

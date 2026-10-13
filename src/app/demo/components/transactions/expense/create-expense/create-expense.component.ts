@@ -87,9 +87,11 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  grid-template-columns: 36px minmax(420px, 2fr) 320px 90px 130px 130px 130px 130px 200px 84px;
+  /* seleção | nome | categoria | qtd | unidade | valor s/ IVA | IVA | total | associado a | ações
+     (colunas flexíveis encolhem até ao mínimo, para caber sem scroll horizontal num ecrã normal) */
+  grid-template-columns: 32px minmax(150px, 1.6fr) minmax(150px, 1.3fr) 92px 150px 108px 112px 108px minmax(90px, 0.6fr) 84px;
   align-items: center;
-  column-gap: 8px;
+  column-gap: 6px;
   min-width: fit-content;
 }
 
@@ -116,6 +118,9 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 }
 
 .item-row:last-child { border-bottom: none; }
+
+/* As células podem encolher abaixo da largura natural dos campos (senão impunham um mínimo e forçavam scroll) */
+.item-head > *, .item-row > * { min-width: 0; }
 
 .item-col-num { text-align: right; font-family: var(--font-mono); }
 .item-col-total { font-weight: 600; }

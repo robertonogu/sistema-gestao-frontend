@@ -93,9 +93,12 @@ export class ListSuppliersComponent {
       header: 'Tem a certeza que pretende eliminar o fornecedor ' + supplier.name + '?',
       message: 'Confirme para prosseguir.',
       accept: () => {
-        this.supplierService.deleteSupplier(supplier.originId).subscribe(() => {
-          this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Fornecedor eliminado com sucesso.' });
-          this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+        this.supplierService.deleteSupplier(supplier.originId).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Fornecedor eliminado com sucesso.' });
+            this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+          },
+          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível eliminar o fornecedor.' })
         });
       },
       reject: () => {

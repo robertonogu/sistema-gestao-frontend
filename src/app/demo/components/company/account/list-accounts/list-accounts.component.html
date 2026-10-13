@@ -109,8 +109,9 @@
                 [(ngModel)]="account.initialBalance"
                 mode="decimal"
                 [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-                locale="en-US"
+                locale="pt-PT"
                 [useGrouping]="false"
+                placeholder="0,00 €"
                 [disabled]="!!account.accountId"
             />
         </div>

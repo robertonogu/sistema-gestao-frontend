@@ -4,6 +4,8 @@ import { Origin } from 'src/app/demo/api/origin';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { CurrentAccountLogFilters, CurrentAccountLogService } from 'src/app/demo/service/queries/currentAccountLogService';
 import { OriginService } from 'src/app/demo/service/company/originService';
+import { euros, exportStatementPdf, periodLabel } from 'src/app/demo/service/statementPdf';
+import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
 
 @Component({
   templateUrl: './list-current-accounts.component.html'
@@ -27,6 +29,7 @@ export class ListCurrentAccountsComponent implements OnInit {
 
   PaymentMethod: any = PaymentMethod;
   private filters: CurrentAccountLogFilters = {};
+  exporting: boolean = false;
 
   // Período por omissão: o ano corrente (um filtro guardado na sessão sobrepõe-se a este)
   private readonly currentYear = new Date().getFullYear();
@@ -86,6 +89,50 @@ export class ListCurrentAccountsComponent implements OnInit {
       this.totalDebt = currentAccountLogs.totalDebt;
       this.balance = currentAccountLogs.balance;
       this.loading = false;
+    });
+  }
+
+  private get selectedOriginName(): string {
+    for (const group of this.origins ?? []) {
+      const item = group.items.find(origin => origin.value === this.selectedOrigin);
+      if (item) return item.label.trim();
+    }
+    return '';
+  }
+
+  // Extrato em PDF de todos os registos filtrados, com os totais no fim
+  exportPdf() {
+    if (this.selectedOrigin == null) return;
+    this.exporting = true;
+
+    this.currentAccountLogService.exportCurrentAccountLogs(this.selectedOrigin, this.filters).subscribe({
+      next: (result) => {
+        const logs = result.objectList;
+        const dates = logs.map(log => parseLocalDate(log.date as any));
+        const totalCredit = logs.reduce((sum, log) => sum + log.credit, 0);
+        const totalDebt = logs.reduce((sum, log) => sum + log.debt, 0);
+        const balance = logs.length > 0 ? logs[logs.length - 1].balance : 0;
+
+        exportStatementPdf({
+          title: `Extrato da Conta Corrente de ${this.selectedOriginName}`,
+          period: periodLabel(dates),
+          head: ['Data', 'Nº Documento', 'Método de Pagamento', 'Descrição', 'Crédito', 'Débito', 'Saldo'],
+          body: logs.map((log, i) => [
+            dates[i]?.toLocaleDateString('pt-PT') ?? '',
+            log.documentNumber ?? '',
+            log.paymentMethod ? (this.PaymentMethod[log.paymentMethod] ?? log.paymentMethod) : '',
+            log.description ?? '',
+            log.credit !== 0 ? euros(log.credit) : '',
+            log.debt !== 0 ? euros(log.debt) : '',
+            euros(log.balance)
+          ]),
+          foot: [['Total', '', '', '', euros(totalCredit), euros(totalDebt), euros(balance)]],
+          rightAlignedColumns: [4, 5, 6],
+          fileName: ('extrato-conta-corrente-' + this.selectedOriginName).replace(/\s+/g, '-').toLowerCase()
+        });
+        this.exporting = false;
+      },
+      error: () => this.exporting = false
     });
   }
 
