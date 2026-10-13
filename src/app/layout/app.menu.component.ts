@@ -99,7 +99,7 @@ export class AppMenuComponent implements OnInit {
                         routerLink: ['/queries/debts']
                     },
                     {
-                        label: 'Extratos de Conta',
+                        label: 'Extrato de Conta',
                         icon: 'pi pi-fw pi-lock',
                         routerLink: ['/queries/accountLogs']
                     },

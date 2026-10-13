@@ -11,6 +11,7 @@ import { ExpenseFilters, ExpenseService } from 'src/app/demo/service/transaction
 import { OriginService } from 'src/app/demo/service/company/originService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
 
 @Component({
   templateUrl: 'list-expenses.component.html',
@@ -147,23 +148,27 @@ export class ListExpensesComponent implements OnInit {
 
     this.expenseService.exportExpenses(this.buildFilters(filters)).subscribe({
       next: (result) => {
-        const doc = new jsPDF({ orientation: 'landscape' });
+        // A4 vertical, letra 9, cabeçalhos a negrito
+        const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
 
         doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
         doc.text('Despesas', 14, 15);
 
         autoTable(doc, {
           startY: 20,
-          head: [['Data', 'Documento', 'Origem', 'Estado', 'Meio de Pagamento', 'Valor', 'Valor Pendente', 'Data Limite']],
+          styles: { fontSize: 9 },
+          headStyles: { fontSize: 9, fontStyle: 'bold' },
+          columnStyles: { 5: { halign: 'right' }, 6: { halign: 'right' } },
+          head: [['Data', 'Origem', 'Nº Documento', 'Estado', 'Meio de Pagamento', 'Valor', 'Valor Pendente']],
           body: result.map((expense: ExpenseListItem) => [
-            expense.date ? new Date(expense.date).toLocaleDateString('pt-PT') : '',
-            expense.documentNumber,
+            expense.date ? parseLocalDate(expense.date as any)!.toLocaleDateString('pt-PT') : '',
             expense.origin ?? '',
+            expense.documentNumber,
             this.PaymentStatus[expense.paymentStatus] ?? expense.paymentStatus,
             this.paymentMethodsLabel(expense.paymentMethods),
             `${expense.totalValue.toFixed(2)} €`,
-            `${expense.pendingValue.toFixed(2)} €`,
-            expense.paymentDeadline ? new Date(expense.paymentDeadline).toLocaleDateString('pt-PT') : ''
+            `${expense.pendingValue.toFixed(2)} €`
           ])
         });
 

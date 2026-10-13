@@ -104,8 +104,8 @@ export class ListAccountLogsComponent {
     this.accountLogService.exportAccountLogs(this.selectedAccount, this.filters).subscribe({
       next: async (result) => {
         const data = {
-          title: `Mapa Banco - ${this.selectedAccountName}`,
-          fileName: `mapa-banco-${this.selectedAccountName}`.replace(/\s+/g, '-').toLowerCase(),
+          title: `Extrato de Conta - ${this.selectedAccountName}`,
+          fileName: `extrato-conta-${this.selectedAccountName}`.replace(/\s+/g, '-').toLowerCase(),
           dateFrom: this.filters.dateFrom,
           dateTo: this.filters.dateTo,
           logs: result,

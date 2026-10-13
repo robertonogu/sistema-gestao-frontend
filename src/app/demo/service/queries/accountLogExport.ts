@@ -4,9 +4,9 @@ import autoTable from 'jspdf-autotable';
 import { AccountLog } from '../../api/accountLogs';
 import { MovementType } from '../../data/enum/movementType';
 
-// Shared PDF/Excel export for the bank ("Mapa Banco") and cash ("Extrato Caixa") statements.
+// Shared PDF/Excel export for the bank ("Extrato de Conta") and cash ("Extrato Caixa") statements.
 export interface AccountLogExport {
-    title: string;          // e.g. "Mapa Banco - Conta X"
+    title: string;          // e.g. "Extrato de Conta - Conta X"
     fileName: string;       // without extension
     dateFrom?: Date;
     dateTo?: Date;
