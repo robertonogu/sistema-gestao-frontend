@@ -4,7 +4,8 @@
     "scripts": {
         "ng": "ng",
         "build": "node scripts/set-env.js && ng build",
-        "start": "node scripts/set-env.js && ng serve",
+        "start": "serve -s dist/apollo-ng -l ${PORT:-4200}",
+        "dev": "node scripts/set-env.js && ng serve",
         "watch": "node scripts/set-env.js && ng build --watch --configuration development",
         "test": "ng test",
         "lint": "ng lint"
