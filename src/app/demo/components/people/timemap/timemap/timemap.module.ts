@@ -13,6 +13,9 @@ import { ToastModule } from 'primeng/toast';
 import { SliderModule } from 'primeng/slider';
 import { RatingModule } from 'primeng/rating';
 import { TabMenuModule } from 'primeng/tabmenu';
+import { DialogModule } from 'primeng/dialog';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { TooltipModule } from 'primeng/tooltip';
 import { TimeMapComponent } from './timemap.component';
 import { TimeMapRoutingModule } from './timemap-routing.module';
 
@@ -33,6 +36,9 @@ import { TimeMapRoutingModule } from './timemap-routing.module';
 		ProgressBarModule,
 		ToastModule,
 		TabMenuModule,
+		DialogModule,
+		InputNumberModule,
+		TooltipModule,
 		TimeMapRoutingModule
   	]
 })

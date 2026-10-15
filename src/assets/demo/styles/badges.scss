@@ -320,6 +320,36 @@
         color: #C63737;
     }
 
+    &.status-sick_leave {
+        background: #B3E5FC;
+        color: #23547B;
+    }
+
+    &.status-unpaid_leave {
+        background: #ECCFFF;
+        color: #694382;
+    }
+
+    &.status-bereavement {
+        background: #CFD8DC;
+        color: #37474F;
+    }
+
+    &.status-marriage {
+        background: #F8BBD0;
+        color: #880E4F;
+    }
+
+    &.status-childbirth {
+        background: #FFE0B2;
+        color: #8C4A00;
+    }
+
+    &.status-work_accident {
+        background: #FF8A80;
+        color: #7F0000;
+    }
+
 }
 
 

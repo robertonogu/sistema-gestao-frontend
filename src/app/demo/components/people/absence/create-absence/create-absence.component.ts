@@ -4,7 +4,7 @@ import { MessageService } from 'primeng/api';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { SaleCreation } from 'src/app/demo/api/saleCreation';
-import { AbsenceType } from 'src/app/demo/data/enum/absenceType';
+import { AbsenceType, absenceTypeAllowsHours } from 'src/app/demo/data/enum/absenceType';
 import { AbsenceCreation } from 'src/app/demo/data/model/absenceCreation.model';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
 import { AbsenceService } from 'src/app/demo/service/people/absence.service';
@@ -41,16 +41,20 @@ export class CreateAbsenceComponent {
     });
   }
 
+  get hoursEnabled(): boolean {
+    return absenceTypeAllowsHours(this.selectedAbsenceType as unknown as string);
+  }
+
   back() {
     this._location.back();
   }
 
   newAbsence() {
-    if (this.date[1] == null && !this.hours) {
+    if (this.hoursEnabled && this.date[1] == null && !this.hours) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Erro no campo horas.' });
     }
   
-    this.absence = { employeeId: this.selectedEmployee, absenceType: this.selectedAbsenceType, initialDate: this.date[0], finalDate: this.date[1], hours: this.hours } as AbsenceCreation;
+    this.absence = { employeeId: this.selectedEmployee, absenceType: this.selectedAbsenceType, initialDate: this.date[0], finalDate: this.date[1], hours: this.hoursEnabled ? this.hours : 0 } as AbsenceCreation;
 
     if (this.absence != null) {
       this.absenceService.createAbsence(this.absence).subscribe(newAbsence => {

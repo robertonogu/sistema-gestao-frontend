@@ -65,6 +65,7 @@
                                 [rounded]="true" 
                                 [text]="true" 
                                 severity="success" 
+                                (click)="editAbsence(absence)"
                             />
                             <p-button 
                                 pRipple 
@@ -84,7 +85,7 @@
 </div>
 
 <p-dialog
-    header="Registo de Ausência"
+    [header]="editingAbsenceId ? 'Editar Ausência' : 'Registo de Ausência'"
     [(visible)]="absenceDialog"
     [style]="{ width: '550px' }"
     [modal]="true"
@@ -116,8 +117,14 @@
                 optionValue="key"
                 placeholder="Selecione um Tipo"
                 appendTo="body"
+                (onChange)="onDateChange()"
                 [ngClass]="{ 'ng-dirty ng-invalid': submitted && !selectedAbsenceType }"
             />
+        </div>
+
+        <div class="field flex align-items-center gap-2" *ngIf="selectedAbsenceType === 'VACATION'">
+            <p-checkbox inputId="previousYear" [(ngModel)]="previousYear" [binary]="true"></p-checkbox>
+            <label for="previousYear" class="mb-0">{{ vacationYearOptionLabel }}</label>
         </div>
 
         <div class="field">
@@ -143,9 +150,10 @@
                 pInputText
                 type="number"
                 [(ngModel)]="hours"
-                [disabled]="!isSingleDay"
+                [disabled]="!hoursEnabled"
             />
             <small class="text-500" *ngIf="!isSingleDay">Só disponível quando o período é de um único dia.</small>
+            <small class="text-500" *ngIf="isSingleDay && !hoursEnabled">Este tipo de ausência não tem horas.</small>
         </div>
     </ng-template>
 

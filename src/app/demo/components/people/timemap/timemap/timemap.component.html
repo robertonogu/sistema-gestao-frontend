@@ -1,10 +1,20 @@
 <div class="grid">
   <div class="col-12 md:col-6 xl:col-3">
     <div class="card">
-      <span class="font-semibold text-lg">Horas Trabalhadas</span>
+      <span class="font-semibold text-lg">Dias de Férias Utilizados</span>
       <div class="flex justify-content-between align-items-start mt-3">
         <div class="w-6">
-          <span class="text-3xl font-bold text-900">{{ annualTotalWorkedHours }}</span>
+          <span class="text-3xl font-bold text-900">{{ vacationSummary?.currentUsed ?? '-' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 md:col-6 xl:col-3">
+    <div class="card">
+      <span class="font-semibold text-lg">Dias de Férias por Utilizar</span>
+      <div class="flex justify-content-between align-items-start mt-3">
+        <div class="w-6">
+          <span class="text-3xl font-bold text-900">{{ vacationSummary?.currentRemaining ?? '-' }}</span>
         </div>
       </div>
     </div>
@@ -29,16 +39,6 @@
       </div>
     </div>
   </div>
-  <div class="col-12 md:col-6 xl:col-3">
-    <div class="card">
-      <span class="font-semibold text-lg">Dias de Trabalho</span>
-      <div class="flex justify-content-between align-items-start mt-3">
-        <div class="w-6">
-          <span class="text-3xl font-bold text-900">{{ annualTotalWorkedDays }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="col-12">
     <div class="card">
@@ -47,6 +47,8 @@
         <p-tabMenu [model]="scopeTabs" [activeItem]="activeScopeTab"
           (activeItemChange)="onScopeTabChange($event)"></p-tabMenu>
         <div class="sm:ml-auto flex gap-2">
+          <button pButton type="button" class="p-button-rounded" icon="pi pi-download" pTooltip="Exportar PDF" tooltipPosition="bottom"
+            [disabled]="selectedEmployee == null" (click)="exportPdf()"></button>
           <p-dropdown [options]="years" [(ngModel)]="year" (onChange)="onYearChange()" />
           <p-dropdown [options]="employeeNames" [(ngModel)]="selectedEmployee" optionLabel="name" optionValue="id"
             placeholder="Selecione um Funcionário" [filter]="true" filterBy="name" (onChange)="loadTimeMap()" />
@@ -58,14 +60,14 @@
           <tr>
             <th rowspan="2" class="text-center">Dia</th>
             <ng-container *ngFor="let month of months; let i = index">
-              <th colspan="3" class="text-center">{{ month }}</th>
+              <th colspan="3" class="text-center month-start month-top" [class.month-end]="i === months.length - 1">{{ month }}</th>
             </ng-container>
           </tr>
           <tr>
             <ng-container *ngFor="let month of months; let i = index">
-              <th class="text-center">H.T</th>
+              <th class="text-center month-start">H.T</th>
               <th class="text-center">H.E</th>
-              <th class="text-center">H.F</th>
+              <th class="text-center" [class.month-end]="i === months.length - 1">H.F</th>
             </ng-container>
           </tr>
         </ng-template>
@@ -75,19 +77,19 @@
             <td class="font-bold text-center">{{ day }}</td>
             <ng-container *ngFor="let month of months; let k = index">
               <ng-container *ngIf="day > daysPerMonth[k]">
-                <td colspan="3" class="bg-gray-100"></td>
+                <td colspan="3" class="month-start" [class.month-end]="k === months.length - 1" style="border-top-width: 0" [style.border-bottom-width]="day === days.length ? '0' : null"></td>
               </ng-container>
               <ng-container *ngIf="day <= daysPerMonth[k]">
                 <ng-container *ngIf="isHoliday(day, month)">
-                  <td colspan="3" class="bg-green-400 text-white text-center font-bold">{{ getHolidayName(day, month) }}</td>
+                  <td colspan="3" class="bg-green-400 text-white text-center font-bold month-start" [class.month-end]="k === months.length - 1" [class.month-last-day]="day === daysPerMonth[k]">{{ getHolidayName(day, month) }}</td>
                 </ng-container>
-                <ng-container *ngIf="!isHoliday(day, month) && isVacation(day, month)">
-                  <td colspan="3" class="bg-blue-300 text-blue-900 text-center font-bold">Férias</td>
+                <ng-container *ngIf="!isHoliday(day, month) && wholeDayAbsence(day, month) as absence">
+                  <td colspan="3" class="text-center font-bold month-start" [class.month-end]="k === months.length - 1" [class.month-last-day]="day === daysPerMonth[k]" [ngStyle]="absenceStyle(absence)" [title]="absenceLabel(absence)">{{ absenceLabel(absence) }}</td>
                 </ng-container>
-                <ng-container *ngIf="!isHoliday(day, month) && !isVacation(day, month)">
-                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day - 1]?.workedHours }}</td>
-                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day - 1]?.extraHours }}</td>
-                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)">{{ timeMaps[k][day - 1]?.absenceHours }}</td>
+                <ng-container *ngIf="!isHoliday(day, month) && !wholeDayAbsence(day, month)">
+                  <td class="text-center month-start" [class.bg-gray-300]="isWeekend(day, month)" [class.month-last-day]="day === daysPerMonth[k]">{{ timeMaps[k][day - 1]?.workedHours }}</td>
+                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)" [class.month-last-day]="day === daysPerMonth[k]">{{ timeMaps[k][day - 1]?.extraHours }}</td>
+                  <td class="text-center" [class.bg-gray-300]="isWeekend(day, month)" [class.month-end]="k === months.length - 1" [class.month-last-day]="day === daysPerMonth[k]" [ngStyle]="absenceHoursStyle(day, month)">{{ timeMaps[k][day - 1]?.absenceHours }}</td>
                 </ng-container>
               </ng-container>
             </ng-container>
@@ -96,21 +98,78 @@
 
         <ng-template pTemplate="footer">
           <tr>
-            <td class="font-bold text-center">Total</td>
+            <td class="font-bold text-center">Horas Trabalhadas</td>
             <ng-container *ngFor="let month of months; let k = index">
-              <td class="text-center font-bold">{{ monthlySummaryFor(k)?.totalWorkedHours ?? 0 }}</td>
-              <td class="text-center font-bold">{{ monthlySummaryFor(k)?.totalExtraHours ?? 0 }}</td>
-              <td class="text-center font-bold">{{ monthlySummaryFor(k)?.totalAbsenceHours ?? 0 }}</td>
+              <td colspan="3" class="text-center font-bold" [style.border-top-width]="daysPerMonth[k] < days.length ? '0' : null">{{ monthlySummaryFor(k)?.totalWorkedHours ?? 0 }}</td>
+            </ng-container>
+          </tr>
+          <tr>
+            <td class="font-bold text-center">Horas Extra</td>
+            <ng-container *ngFor="let month of months; let k = index">
+              <td colspan="3" class="text-center font-bold">{{ monthlySummaryFor(k)?.totalExtraHours ?? 0 }}</td>
+            </ng-container>
+          </tr>
+          <tr>
+            <td class="font-bold text-center">Horas de Falta</td>
+            <ng-container *ngFor="let month of months; let k = index">
+              <td colspan="3" class="text-center font-bold">{{ monthlySummaryFor(k)?.totalAbsenceHours ?? 0 }}</td>
             </ng-container>
           </tr>
           <tr>
             <td class="font-bold text-center">Dias de Trabalho</td>
             <ng-container *ngFor="let month of months; let k = index">
-              <td colspan="3" class="text-center font-bold">{{ monthlySummaryFor(k)?.totalWorkedDays ?? 0 }}</td>
+              <td colspan="3" class="text-center font-bold">{{ workedDaysInMonth(k) }}</td>
+            </ng-container>
+          </tr>
+          <tr>
+            <td class="font-bold text-center">Dias de Férias</td>
+            <ng-container *ngFor="let month of months; let k = index">
+              <td colspan="3" class="text-center font-bold">{{ vacationDaysInMonth(k) }}</td>
             </ng-container>
           </tr>
         </ng-template>
       </p-table>
     </div>
   </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="flex align-items-center justify-content-between">
+        <span class="font-semibold text-lg">Resumo de Férias</span>
+        <button *ngIf="vacationSummary?.carriedOverEditable" pButton type="button" icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
+          pTooltip="Indicar férias transitadas do ano anterior" tooltipPosition="left" (click)="openVacationDialog()"></button>
+      </div>
+      <div *ngIf="!vacationSummary" class="text-500 mt-3">Selecione um funcionário.</div>
+      <div *ngIf="vacationSummary as v" class="grid mt-2">
+        <div class="col-12 md:col-6">
+          <div class="text-600 font-medium mb-2">Transporte do ano anterior ({{ v.year - 1 }})</div>
+          <div class="flex justify-content-between"><span>Transitadas</span><span class="font-bold text-900">{{ v.carriedOverDays }}</span></div>
+          <div class="flex justify-content-between"><span>Utilizadas</span><span class="font-bold text-900">{{ v.carriedOverUsed }}</span></div>
+          <div class="flex justify-content-between"><span>Por utilizar</span><span class="font-bold" [class.text-red-500]="v.carriedOverRemaining < 0" [class.text-900]="v.carriedOverRemaining >= 0">{{ v.carriedOverRemaining }}</span></div>
+        </div>
+        <div class="col-12 md:col-6">
+          <div class="text-600 font-medium mb-2">Ano atual ({{ v.year }})</div>
+          <div class="flex justify-content-between"><span>Dias de férias</span><span class="font-bold text-900">{{ v.entitledDays }}</span></div>
+          <div class="flex justify-content-between"><span>Utilizadas</span><span class="font-bold text-900">{{ v.currentUsed }}</span></div>
+          <div class="flex justify-content-between"><span>Por utilizar</span><span class="font-bold" [class.text-red-500]="v.currentRemaining < 0" [class.text-900]="v.currentRemaining >= 0">{{ v.currentRemaining }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<p-dialog header="Férias transitadas para {{ year }}" [(visible)]="vacationDialog" [style]="{ width: '420px' }" [modal]="true" class="p-fluid">
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="carriedOverDays" class="block font-bold mb-3">Transitadas do ano anterior ({{ year - 1 }})</label>
+      <p-inputNumber inputId="carriedOverDays" [(ngModel)]="editCarriedOverDays" [min]="0" [max]="vacationSummary?.entitledDays ?? 22"></p-inputNumber>
+    </div>
+    <small class="text-500">Só se indica no primeiro ano registado no sistema; nos anos seguintes é calculado automaticamente.</small>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="vacationDialog = false"></button>
+    <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveVacationBalance()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-toast />

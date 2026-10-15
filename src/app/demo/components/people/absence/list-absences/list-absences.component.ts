@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api';
 import { Absence } from 'src/app/demo/api/absence';
 import { ItemName } from 'src/app/demo/api/itemName';
-import { AbsenceType } from 'src/app/demo/data/enum/absenceType';
+import { AbsenceType, absenceTypeAllowsHours } from 'src/app/demo/data/enum/absenceType';
 import { AbsenceCreation } from 'src/app/demo/data/model/absenceCreation.model';
 import { AbsenceService } from 'src/app/demo/service/people/absence.service';
 import { EmployeeService } from 'src/app/demo/service/people/employee.service';
@@ -29,9 +29,11 @@ export class ListAbsencesComponent implements OnInit {
   employeeNames: ItemName[] = [];
   absenceTypes = AbsenceType;
   selectedEmployee: number | null = null;
-  selectedAbsenceType: AbsenceType | null = null;
+  selectedAbsenceType: string | null = null; // AbsenceType key (e.g. VACATION)
   dateRange: Date[] = [];
   hours: number | null = null;
+  previousYear: boolean = false;
+  editingAbsenceId: number | null = null;
 
   constructor(
     private absenceService: AbsenceService,
@@ -66,18 +68,44 @@ export class ListAbsencesComponent implements OnInit {
     return !r[1] || r[0].toDateString() === r[1].toDateString();
   }
 
+  // Hours only make sense for a single day and for types that are not whole-day leaves
+  get hoursEnabled(): boolean {
+    return this.isSingleDay && absenceTypeAllowsHours(this.selectedAbsenceType);
+  }
+
+  // Year the vacation being registered is taken from: the previous one when the box is ticked
+  get vacationYearOptionLabel(): string {
+    const year = this.dateRange?.[0]?.getFullYear() ?? new Date().getFullYear();
+    return 'Férias do ano anterior (' + (year - 1) + ')';
+  }
+
   onDateChange(): void {
-    if (!this.isSingleDay) {
+    if (!this.hoursEnabled) {
       this.hours = null;
     }
   }
 
   newAbsence() {
+    this.editingAbsenceId = null;
     this.submitted = false;
     this.selectedEmployee = null;
     this.selectedAbsenceType = null;
     this.dateRange = [];
     this.hours = null;
+    this.previousYear = false;
+    this.absenceDialog = true;
+  }
+
+  editAbsence(absence: Absence) {
+    this.editingAbsenceId = absence.absenceId;
+    this.submitted = false;
+    this.selectedEmployee = absence.employeeId;
+    this.selectedAbsenceType = absence.absenceType as unknown as string;
+    const start = toLocalDate(absence.initialDate);
+    const end = absence.finalDate ? toLocalDate(absence.finalDate) : null;
+    this.dateRange = end ? [start, end] : [start];
+    this.hours = absence.hours || null;
+    this.previousYear = !!absence.previousYear;
     this.absenceDialog = true;
   }
 
@@ -97,13 +125,20 @@ export class ListAbsencesComponent implements OnInit {
       absenceType: this.selectedAbsenceType,
       initialDate: this.dateRange[0],
       finalDate: this.dateRange[1] ?? null,
-      hours: this.isSingleDay ? (this.hours ?? 0) : 0
+      hours: this.hoursEnabled ? (this.hours ?? 0) : 0,
+      previousYear: this.selectedAbsenceType === 'VACATION' && this.previousYear
     } as unknown as AbsenceCreation;
 
-    this.absenceService.createAbsence(absence).subscribe(() => {
-      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Ausência adicionada com sucesso.' });
-      this.absenceDialog = false;
-      this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+    const request = this.editingAbsenceId
+      ? this.absenceService.updateAbsence(this.editingAbsenceId, absence)
+      : this.absenceService.createAbsence(absence);
+    request.subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: this.editingAbsenceId ? 'Ausência atualizada com sucesso.' : 'Ausência adicionada com sucesso.' });
+        this.absenceDialog = false;
+        this.nextPage({ first: this.currentPage * this.pageSize, rows: this.pageSize });
+      },
+      error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível guardar a ausência.' })
     });
   }
 
@@ -122,4 +157,10 @@ export class ListAbsencesComponent implements OnInit {
       }
     });
   }
+}
+
+// "yyyy-MM-dd" from the API as a local date (new Date(string) would read it as UTC midnight)
+function toLocalDate(value: Date | string): Date {
+  const [year, month, day] = String(value).substring(0, 10).split('-').map(Number);
+  return new Date(year, month - 1, day);
 }

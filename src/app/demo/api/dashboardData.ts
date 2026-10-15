@@ -10,4 +10,7 @@ export interface DashboardData {
     expensesPerMonth: number[];
     categoryCosts: CategoryCost[];
     expensesInDebt: ExpenseInDebt[];
+    invoicedValue: number;
+    previousYearExpensesValue: number;
+    overdueDebtsCount: number;
 }

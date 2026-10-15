@@ -6,6 +6,7 @@ export class AbsenceCreation {
     initialDate: Date;
     finalDate: Date;
     hours: number;
+    previousYear?: boolean;
 
     constructor(
         employeeId: number, 

@@ -3,9 +3,9 @@
     "version": "17.0.0",
     "scripts": {
         "ng": "ng",
-        "build": "node scripts/set-prod-env.js && ng build",
-        "start": "ng serve",
-        "watch": "ng build --watch --configuration development",
+        "build": "node scripts/set-env.js && ng build",
+        "start": "node scripts/set-env.js && ng serve",
+        "watch": "node scripts/set-env.js && ng build --watch --configuration development",
         "test": "ng test",
         "lint": "ng lint"
     },

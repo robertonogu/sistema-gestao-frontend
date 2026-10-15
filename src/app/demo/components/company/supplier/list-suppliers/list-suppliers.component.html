@@ -91,6 +91,15 @@
 >
     <ng-template pTemplate="content">
         <div class="field">
+            <label for="nif" class="block font-bold mb-4">NIF</label>
+            <div class="flex gap-2">
+                <p-inputNumber id="nif" class="flex-1" [(ngModel)]="supplier.nif" [useGrouping]="false"></p-inputNumber>
+                <button *ngIf="!supplier.originId" pButton type="button" class="p-button-outlined"
+                    [icon]="nifLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search'" [disabled]="nifLoading"
+                    pTooltip="Preencher dados a partir do NIF" tooltipPosition="top" (click)="lookupNif()"></button>
+            </div>
+        </div>
+        <div class="field">
             <label for="name" class="block font-bold mb-4">Nome</label>
             <input
                 type="text"
@@ -104,10 +113,6 @@
             <small class="ng-dirty ng-invalid" *ngIf="submitted && !supplier.name">Nome é obrigatório.</small>
         </div>
 
-        <div class="field">
-            <label for="nif" class="block font-bold mb-4">NIF</label>
-            <p-inputNumber id="nif" [(ngModel)]="supplier.nif" [useGrouping]="false"></p-inputNumber>
-        </div>
 
         <div class="field">
             <label for="initialBalance" class="block font-bold mb-4">Saldo Inicial</label>

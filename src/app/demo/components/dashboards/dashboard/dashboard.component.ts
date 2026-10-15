@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, debounceTime } from 'rxjs';
-import { Product } from 'src/app/demo/api/product';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
-import { ProductService } from 'src/app/demo/service/product.service';
 import { Table } from 'primeng/table';
 import { DashboardService } from 'src/app/demo/service/dashboard/dashboardService';
 import { CategoryCost } from 'src/app/demo/api/categoryCost';
@@ -27,7 +25,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     pieOptions: any;
 
-    products: Product[] = [];
 
     subscription: Subscription;
 
@@ -37,6 +34,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     expensesValue: number = 0;
     debtsValue: number = 0;
     balance: number = 0;
+    invoicedValue: number = 0;
+    previousYearExpensesValue: number = 0;
+    overdueDebtsCount: number = 0;
     revenuesPerMonth: number[] = [];
     expensesPerMonth: number[] = [];
     categoryCosts: CategoryCost[] = [];
@@ -44,7 +44,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     CategoryType: any = CategoryType;
 
     constructor(
-        private productService: ProductService,
         private layoutService: LayoutService,
         private dashboardService: DashboardService
     ) {
@@ -93,10 +92,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.loadDashboardData();
 
-        this.productService
-            .getProductsSmall()
-            .then((data) => (this.products = data));
-
         this.cols = [
             { header: 'Name', field: 'name' },
             { header: 'Category', field: 'category' },
@@ -105,12 +100,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ];
     }
 
+    // Share of the invoiced value already received (revenues of the year over sales of the year)
+    get receivedPercentage(): number | null {
+        return this.invoicedValue > 0 ? Math.round(this.revenuesValue / this.invoicedValue * 100) : null;
+    }
+
+    // Expenses change against the previous year, in %
+    get expensesVariation(): number | null {
+        if (this.previousYearExpensesValue <= 0) return null;
+        return Math.round((this.expensesValue - this.previousYearExpensesValue) / this.previousYearExpensesValue * 100);
+    }
+
     loadDashboardData(): void {
         this.dashboardService.getDashboardData(this.selectedYear).subscribe((dashboardData) => {
             this.revenuesValue = dashboardData.revenuesValue;
             this.expensesValue = dashboardData.expensesValue;
             this.debtsValue = dashboardData.debtsValue;
             this.balance = dashboardData.balance;
+            this.invoicedValue = dashboardData.invoicedValue ?? 0;
+            this.previousYearExpensesValue = dashboardData.previousYearExpensesValue ?? 0;
+            this.overdueDebtsCount = dashboardData.overdueDebtsCount ?? 0;
             this.revenuesPerMonth = dashboardData.revenuesPerMonth;
             this.expensesPerMonth = dashboardData.expensesPerMonth;
             this.categoryCosts = dashboardData.categoryCosts;

@@ -11,7 +11,6 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputTextModule } from 'primeng/inputtext';
 import { ChartModule } from 'primeng/chart';
 import { KnobModule } from 'primeng/knob';
-import { RatingModule } from 'primeng/rating';
 import { RippleModule } from 'primeng/ripple';
 
 @NgModule({
@@ -27,7 +26,6 @@ import { RippleModule } from 'primeng/ripple';
 		InputTextModule,
 		InputTextareaModule,
 		ChartModule,
-		RatingModule,
 		KnobModule
 	],
 	declarations: [DashboardComponent]

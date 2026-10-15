@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { ObjectList } from '../../api/objectList';
 import { AbsenceCreation } from '../../data/model/absenceCreation.model';
 import { Absence } from '../../api/absence';
+import { AbsenceDay } from '../../api/absenceDay';
 
 @Injectable({
     providedIn: 'root'
@@ -25,12 +26,16 @@ export class AbsenceService {
         return this.http.post<Absence>(this.absencesUrl, newAbsence, environment.httpOptions);
     }
 
+    updateAbsence(absenceId: number, absence: AbsenceCreation) : Observable<Absence> {
+        return this.http.put<Absence>(this.absencesUrl + "/" + absenceId, absence, environment.httpOptions);
+    }
+
     deleteAbsence(absenceId: number) {
         let url = this.deleteAbsenceUrl + absenceId;
         return this.http.delete(url);
     }
 
-    getVacationDays(employeeId: number, year: number) : Observable<string[]> {
-        return this.http.get<string[]>(`${this.absencesUrl}/employee/${employeeId}/vacationDays/${year}`);
+    getAbsenceDays(employeeId: number, year: number) : Observable<AbsenceDay[]> {
+        return this.http.get<AbsenceDay[]>(`${this.absencesUrl}/employee/${employeeId}/days/${year}`);
     }
 }

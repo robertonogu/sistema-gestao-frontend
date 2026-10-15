@@ -3,11 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 import { HttpHeaders } from "@angular/common/http";
+import { secrets } from "./secrets";
 
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080',
-  googleMapsApiKey: 'AIzaSyBmyACEsjhwVOcelFmwdnE3WTerhdXO_zA',
+  googleMapsApiKey: secrets.googleMapsApiKey,
 
   httpOptions: {
     headers: new HttpHeaders({

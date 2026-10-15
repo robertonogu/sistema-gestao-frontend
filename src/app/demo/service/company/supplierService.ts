@@ -6,6 +6,7 @@ import { ObjectList } from '../../api/objectList';
 import { ItemName } from '../../api/itemName';
 import { SupplierCreation } from '../../data/model/supplierCreation.model';
 import { Supplier } from '../../api/supplier';
+import { NifLookup } from '../../api/nifLookup';
 
 @Injectable({
     providedIn: 'root'
@@ -34,6 +35,11 @@ export class SupplierService {
     updateSupplier(supplierId: number, supplier: SupplierCreation) : Observable<Supplier> {
         let url = this.suppliersUrl + "/" + supplierId;
         return this.http.put<Supplier>(url, supplier, environment.httpOptions);
+    }
+
+    lookupNif(nif: number) : Observable<NifLookup> {
+        let url = this.suppliersUrl + "/nif-lookup/" + nif;
+        return this.http.get<NifLookup>(url);
     }
 
     deleteSupplier(supplierId: number) {
