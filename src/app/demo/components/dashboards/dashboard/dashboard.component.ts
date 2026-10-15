@@ -100,9 +100,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ];
     }
 
-    // Share of the invoiced value already received (revenues of the year over sales of the year)
+    // Share of the invoiced value already received (revenues of the year over sales of the year), with one decimal
+    // rounded down so it only shows 100% when everything was received
     get receivedPercentage(): number | null {
-        return this.invoicedValue > 0 ? Math.round(this.revenuesValue / this.invoicedValue * 100) : null;
+        return this.invoicedValue > 0 ? Math.floor(this.revenuesValue / this.invoicedValue * 1000) / 10 : null;
     }
 
     // Expenses change against the previous year, in %

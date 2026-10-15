@@ -7,7 +7,7 @@
                     <span class="text-3xl font-bold text-900">{{ revenuesValue | number: '1.2-2' }} €</span>
                     <div class="text-600 mt-1">
                         Faturado: <span class="font-medium text-900">{{ invoicedValue | number: '1.2-2' }} €</span>
-                        <span *ngIf="receivedPercentage !== null"> ({{ receivedPercentage }}% recebido)</span>
+                        <span *ngIf="receivedPercentage !== null"> ({{ receivedPercentage | number: '1.0-1' }}% recebido)</span>
                     </div>
                 </div>
                 <div class="w-6">
