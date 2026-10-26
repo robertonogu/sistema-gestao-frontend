@@ -7,7 +7,8 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
   [CategoryType.BANK]: [
     SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS,
     SubCategoryType.CREDIT, SubCategoryType.CARD_COMMISSIONS, SubCategoryType.LOAN_INTEREST,
-    SubCategoryType.OTHER_INTEREST, SubCategoryType.BANK_GUARANTEES, SubCategoryType.FINANCING_CHARGES
+    SubCategoryType.OTHER_INTEREST, SubCategoryType.BANK_GUARANTEES, SubCategoryType.FINANCING_CHARGES,
+    SubCategoryType.STAMP_DUTY
   ],
   [CategoryType.TAXES]: [
     SubCategoryType.IVA, SubCategoryType.IRC, SubCategoryType.IES, SubCategoryType.FONT_RETENTION,

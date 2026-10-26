@@ -13,6 +13,7 @@ export enum SubCategoryType {
     OTHER_INTEREST = 'Outros Juros',
     BANK_GUARANTEES = 'Garantias Bancárias',
     FINANCING_CHARGES = 'Encargos Associados a Financiamentos',
+    STAMP_DUTY = 'Imposto do Selo',
     BANK_OPERATING_COSTS = 'Custos de Funcionamento',
 
     // TAXES

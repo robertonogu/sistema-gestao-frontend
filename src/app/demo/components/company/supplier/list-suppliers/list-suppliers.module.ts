@@ -13,8 +13,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { RippleModule } from 'primeng/ripple';
-import { GooglePlaceAutocompleteDirective } from 'src/app/demo/directives/google-place-autocomplete.directive';
-import { LocationsEditorComponent } from 'src/app/demo/components/shared/locations-editor/locations-editor.component';
+import { SupplierFormDialogComponent } from '../supplier-form-dialog/supplier-form-dialog.component';
 
 @NgModule({
   imports: [
@@ -31,8 +30,7 @@ import { LocationsEditorComponent } from 'src/app/demo/components/shared/locatio
     InputNumberModule,
     FormsModule,
     RippleModule,
-    GooglePlaceAutocompleteDirective,
-    LocationsEditorComponent
+    SupplierFormDialogComponent
   ],
   declarations: [ListSuppliersComponent]
 })

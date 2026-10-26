@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { SupplierFormDialogComponent } from 'src/app/demo/components/company/supplier/supplier-form-dialog/supplier-form-dialog.component';
 import { CommonModule } from '@angular/common';
 import { CreateExpenseComponent } from './create-expense.component';
 import { InputNumberModule } from "primeng/inputnumber";
@@ -42,7 +43,8 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
     ConfirmDialogModule,
 		CreateExpenseRoutingModule,
 		ToastModule,
-		UppercaseDirective
+		UppercaseDirective,
+		SupplierFormDialogComponent
   ]
 })
 

@@ -1,0 +1,51 @@
+<p-dialog
+    [header]="supplier.originId ? 'Editar Fornecedor' : 'Novo Fornecedor'"
+    [(visible)]="visible"
+    [style]="{ width: '680px' }"
+    [modal]="true"
+    class="p-fluid"
+    appendTo="body"
+    (onHide)="hide()"
+>
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="supplierNif" class="block font-bold mb-4">NIF</label>
+            <div class="flex gap-2">
+                <p-inputNumber id="supplierNif" class="flex-1" [(ngModel)]="supplier.nif" [ngModelOptions]="{ standalone: true }" [useGrouping]="false"></p-inputNumber>
+                <button *ngIf="!supplier.originId" pButton type="button" class="p-button-outlined"
+                    [icon]="nifLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search'" [disabled]="nifLoading"
+                    pTooltip="Preencher dados a partir do NIF" tooltipPosition="top" (click)="lookupNif()"></button>
+            </div>
+        </div>
+        <div class="field">
+            <label for="supplierName" class="block font-bold mb-4">Nome</label>
+            <input
+                type="text"
+                pInputText
+                id="supplierName"
+                [(ngModel)]="supplier.name"
+                [ngModelOptions]="{ standalone: true }"
+                required
+                autofocus
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !supplier.name }"
+            />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !supplier.name">Nome é obrigatório.</small>
+        </div>
+
+        <div class="field">
+            <label for="supplierInitialBalance" class="block font-bold mb-4">Saldo Inicial</label>
+            <p-inputNumber id="supplierInitialBalance" [(ngModel)]="supplier.initialBalance" [ngModelOptions]="{ standalone: true }" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
+                suffix=" €" locale="pt-PT" [useGrouping]="false" placeholder="0,00 €"></p-inputNumber>
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-4">Localizações</label>
+            <app-locations-editor [(locations)]="supplier.locations!"></app-locations-editor>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hide()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="save()"></button>
+    </ng-template>
+</p-dialog>

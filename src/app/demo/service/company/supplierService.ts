@@ -18,8 +18,10 @@ export class SupplierService {
 
     constructor(private http: HttpClient) { }
 
-    getSuppliers(currentPage: number, pageSize: number) : Observable<ObjectList> {
-        let url = this.suppliersUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+    // name: pesquisa na base de dados (todos os fornecedores), não só na página carregada
+    getSuppliers(currentPage: number, pageSize: number, name?: string) : Observable<ObjectList> {
+        let url = this.suppliersUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize
+            + (name?.trim() ? "&name=" + encodeURIComponent(name.trim()) : "");
         return this.http.get<ObjectList>(url);
     }
 

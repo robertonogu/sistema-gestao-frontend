@@ -152,7 +152,7 @@
 			</p>
 
 			<div class="grid p-formgrid p-fluid" *ngIf="!isCreditNote">
-				<div class="field col-12 md:col-4">
+				<div class="field col-12 md:col-6">
 					<label>Condições de Pagamento</label>
 					<p-dropdown
 						[(ngModel)]="selectedPaymentCondition"
@@ -165,7 +165,7 @@
 					/>
 				</div>
 
-				<div class="field col-12 md:col-4">
+				<div class="field col-12 md:col-6">
 					<label>Data Limite Pagamento</label>
 					<p-calendar
 						[(ngModel)]="paymentDeadline"
@@ -178,16 +178,7 @@
 				</div>
 
 				<ng-container *ngIf="!editingExpenseId">
-					<div class="col-12 md:col-2 flex align-items-center gap-3">
-						<p-checkbox
-							(onChange)="onCheckboxChange()"
-							[binary]="true"
-							[(ngModel)]="isIntegralPayment"
-						/>
-						<label>Pagamento Integral</label>
-					</div>
-
-					<div class="field col-12 md:col-3">
+					<div class="field col-12 md:col-4">
 						<label>Valor Pago</label>
 						<p-inputNumber
 							[(ngModel)]="paymentValue"
@@ -197,6 +188,15 @@
 							locale="en-US" [useGrouping]="false"
 							[disabled]="disablePaidValue"
 						/>
+						<div class="flex align-items-center gap-2 mt-2">
+							<p-checkbox
+								inputId="integralPayment"
+								(onChange)="onCheckboxChange()"
+								[binary]="true"
+								[(ngModel)]="isIntegralPayment"
+							/>
+							<label for="integralPayment" class="m-0">Pagamento Integral</label>
+						</div>
 					</div>
 
 					<div class="field col-12 md:col-4">
@@ -210,7 +210,7 @@
 						optionValue="value"
 						placeholder="Selecione uma Conta ou Credor"
 						appendTo="body"
-						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaidFrom }"
+						[ngClass]="{ 'ng-dirty ng-invalid': hasPaymentValue && !selectedPaidFrom }"
 					>
 						<ng-template let-group pTemplate="group">
 							<span class="font-semibold">{{ group.label }}</span>
@@ -227,7 +227,7 @@
 							optionValue="key"
 							placeholder="Selecione um Método de Pagamento"
 							[disabled]="isCashAccountSelected"
-							[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaymentMethod }"
+							[ngClass]="{ 'ng-dirty ng-invalid': hasPaymentValue && !selectedPaymentMethod }"
 						/>
 					</div>
 				</ng-container>
@@ -817,6 +817,8 @@
 		<button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveQuickAddToolEquipment()"></button>
 	</ng-template>
 </p-dialog>
+
+<app-supplier-form-dialog (saved)="onSupplierCreated($event)"></app-supplier-form-dialog>
 
 <p-dialog
 	[header]="quickAddOriginTitle"

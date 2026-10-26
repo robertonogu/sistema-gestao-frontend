@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { ExpenseItemName } from 'src/app/demo/api/expenseItemName';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
@@ -26,12 +26,12 @@ import { EquipmentCreation } from 'src/app/demo/data/model/equipmentCreation.mod
 import { ExpenseCreation } from 'src/app/demo/data/model/expenseCreation.model';
 import { ExternalEntityCreation } from 'src/app/demo/data/model/externalEntityCreation.model';
 import { ItemCreation } from 'src/app/demo/data/model/itemCreation.model';
-import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model';
 import { ToolCreation } from 'src/app/demo/data/model/toolCreation.model';
 import { AccountService, CASH_PAYMENT_METHOD_KEY, getPaymentMethodEntries } from 'src/app/demo/service/company/accountService';
 import { ExternalEntityService } from 'src/app/demo/service/company/externalEntityService';
 import { OriginService } from 'src/app/demo/service/company/originService';
-import { SupplierService } from 'src/app/demo/service/company/supplierService';
+import { Supplier } from 'src/app/demo/api/supplier';
+import { SupplierFormDialogComponent } from 'src/app/demo/components/company/supplier/supplier-form-dialog/supplier-form-dialog.component';
 import { PaymentService } from 'src/app/demo/service/transactions/paymentService';
 import { ExpensePayment } from 'src/app/demo/api/payment';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
@@ -292,12 +292,15 @@ export class CreateExpenseComponent implements OnInit {
   private lastUseByItemName = new Map<string, ExpenseItemName>();
 
   quickAddOriginOptions: MenuItem[] = [
-    { label: 'Fornecedor', icon: 'pi pi-truck', command: () => this.openQuickAddOrigin('supplier') },
+    { label: 'Fornecedor', icon: 'pi pi-truck', command: () => this.supplierForm.openNew() },
     { label: 'Entidade Externa', icon: 'pi pi-building', command: () => this.openQuickAddOrigin('externalEntity') },
   ];
 
   quickAddOriginDialogVisible: boolean = false;
-  quickAddOriginType: 'supplier' | 'externalEntity' | null = null;
+  quickAddOriginType: 'externalEntity' | null = null;
+
+  // Novo fornecedor: o mesmo formulário da página de Fornecedores (NIF com pesquisa, saldo inicial, localizações)
+  @ViewChild(SupplierFormDialogComponent) supplierForm!: SupplierFormDialogComponent;
   quickAddOriginSubmitted: boolean = false;
   quickAddOriginName: string | null = null;
   quickAddOriginNif: number | null = null;
@@ -359,7 +362,6 @@ export class CreateExpenseComponent implements OnInit {
     private toolService: ToolService,
     private equipmentService: EquipmentService,
     private expenseService: ExpenseService,
-    private supplierService: SupplierService,
     private paymentService: PaymentService,
     private creditorService: CreditorService,
     private confirmationService: ConfirmationService,
@@ -676,13 +678,12 @@ export class CreateExpenseComponent implements OnInit {
 
   get quickAddOriginTitle(): string {
     switch (this.quickAddOriginType) {
-      case 'supplier': return 'Novo Fornecedor';
       case 'externalEntity': return 'Nova Entidade Externa';
       default: return '';
     }
   }
 
-  openQuickAddOrigin(type: 'supplier' | 'externalEntity'): void {
+  openQuickAddOrigin(type: 'externalEntity'): void {
     this.quickAddOriginType = type;
     this.quickAddOriginSubmitted = false;
     this.quickAddOriginName = null;
@@ -698,6 +699,14 @@ export class CreateExpenseComponent implements OnInit {
   private afterOriginCreated(originId: number): void {
     this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Origem criada com sucesso.' });
     this.quickAddOriginDialogVisible = false;
+    this.selectNewOrigin(originId);
+  }
+
+  onSupplierCreated(supplier: Supplier): void {
+    this.selectNewOrigin(supplier.originId);
+  }
+
+  private selectNewOrigin(originId: number): void {
     this.originService.getOriginsGrouped().subscribe(origins => {
       this.origins = origins;
       this.selectedOrigin = originId;
@@ -711,14 +720,7 @@ export class CreateExpenseComponent implements OnInit {
     const name = this.quickAddOriginName;
     const nif = this.quickAddOriginNif as number;
 
-    if (this.quickAddOriginType === 'supplier') {
-      // Criado a partir da despesa só com nome e NIF; as localizações são geridas na ficha do fornecedor
-      this.supplierService.createSupplier({ name, nif } as SupplierCreation)
-        .subscribe({
-          next: supplier => this.afterOriginCreated(supplier.originId),
-          error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err?.error?.message ?? 'Não foi possível criar o fornecedor.' })
-        });
-    } else if (this.quickAddOriginType === 'externalEntity') {
+    if (this.quickAddOriginType === 'externalEntity') {
       this.externalEntityService.createExternalEntity({ name, nif } as ExternalEntityCreation)
         .subscribe(externalEntity => this.afterOriginCreated(externalEntity.originId));
     }
@@ -785,7 +787,7 @@ export class CreateExpenseComponent implements OnInit {
     }
     else {
       this.disablePaidValue = false;
-      this._paymentValue = this.totalValue;
+      this._paymentValue = 0;
     }
   }
 
@@ -1437,6 +1439,11 @@ export class CreateExpenseComponent implements OnInit {
     return this.roundCents(this.netValue + this.iva);
   }
 
+  // Só há pagamento (e por isso conta/credor e método obrigatórios) quando há valor pago
+  get hasPaymentValue(): boolean {
+    return !this.isCreditNote && this.paymentValue > 0;
+  }
+
   get paymentValue(): number {
     return this.isIntegralPayment ? this.totalValue : this._paymentValue;
   }
@@ -1461,6 +1468,14 @@ export class CreateExpenseComponent implements OnInit {
     }
     if (!this.isCreditNote && this.totalValue < 0) {
       this.messageService.add({ severity: 'warn', summary: 'Valor inválido', detail: 'Um documento com valor total negativo tem de ser registado como Nota de Crédito.' });
+      return;
+    }
+    if (this.hasPaymentValue && !this.selectedPaidFrom) {
+      this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Indique a conta ou o credor que pagou.' });
+      return;
+    }
+    if (this.hasPaymentValue && !this.selectedPaymentMethod) {
+      this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Indique o meio de pagamento.' });
       return;
     }
 
