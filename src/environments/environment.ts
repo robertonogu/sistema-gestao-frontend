@@ -7,7 +7,9 @@ import { secrets } from "./secrets";
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080',
+  // Mesmo endereço por onde a página foi aberta: localhost no PC, ou o IP do PC na rede (ex.: 192.168.1.79)
+  // quando a página é aberta pelo telemóvel para testar a leitura de faturas
+  apiUrl: `http://${window.location.hostname}:8080`,
   googleMapsApiKey: secrets.googleMapsApiKey,
 
   httpOptions: {

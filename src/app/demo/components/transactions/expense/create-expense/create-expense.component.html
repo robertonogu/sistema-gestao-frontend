@@ -23,6 +23,17 @@
 						type="button"
 					></button>
 					<button
+						*ngIf="!editingExpenseId"
+						class="p-button-rounded p-button-outlined"
+						(click)="openReadInvoice()"
+						icon="pi pi-camera"
+						label="Ler fatura"
+						pButton
+						pTooltip="Ler os dados de uma fatura com o telemóvel ou a partir de uma fotografia/PDF"
+						tooltipPosition="bottom"
+						type="button"
+					></button>
+					<button
 						class="p-button-rounded"
 						(click)="newExpense()"
 						icon="pi pi-save"
@@ -34,6 +45,27 @@
 				</div>
 			</div>
 
+		</div>
+	</div>
+</div>
+
+<div class="grid" *ngIf="invoiceReading">
+	<div class="col-12">
+		<div class="card border-left-3 border-primary py-3">
+			<div class="flex flex-wrap align-items-center gap-3">
+				<i class="pi pi-camera text-primary text-xl"></i>
+				<div class="flex-1">
+					<div class="font-semibold">Dados lidos da fatura{{ invoiceReading.qrRead ? ' (QR code)' : '' }}{{ invoiceReading.aiRead ? ' e linhas pela IA' : '' }}</div>
+					<div class="text-600 text-sm">Confirme o fornecedor, as linhas e as subcategorias antes de guardar.</div>
+				</div>
+				<button *ngIf="invoiceReading.supplierNif && !invoiceReading.originId" pButton type="button" icon="pi pi-plus"
+					label="Criar fornecedor (NIF {{ invoiceReading.supplierNif }})" class="p-button-sm p-button-outlined" (click)="createReadSupplier()"></button>
+				<button pButton type="button" icon="pi pi-times" class="p-button-sm p-button-text p-button-secondary"
+					pTooltip="Fechar" (click)="invoiceReading = null"></button>
+			</div>
+			<ul *ngIf="invoiceReading.warnings.length" class="text-orange-600 text-sm mt-2 mb-0">
+				<li *ngFor="let warning of invoiceReading.warnings">{{ warning }}</li>
+			</ul>
 		</div>
 	</div>
 </div>
@@ -819,6 +851,29 @@
 </p-dialog>
 
 <app-supplier-form-dialog (saved)="onSupplierCreated($event)"></app-supplier-form-dialog>
+
+<p-dialog
+	header="Ler fatura"
+	[(visible)]="readDialogVisible"
+	[style]="{ width: '440px' }"
+	[modal]="true"
+	(onHide)="closeReadInvoice()"
+>
+	<div class="flex flex-column align-items-center text-center gap-3">
+		<ng-container *ngIf="readCapture?.status !== 'PROCESSING'; else reading">
+			<div class="text-700">Aponte a câmara do telemóvel para este código e fotografe a fatura.</div>
+			<img *ngIf="readQrUrl" [src]="readQrUrl" alt="QR code para o telemóvel" width="220" height="220" class="border-1 surface-border border-round" />
+			<i *ngIf="!readQrUrl && !readError" class="pi pi-spin pi-spinner text-2xl"></i>
+			<div class="text-600 text-sm"><i class="pi pi-spin pi-spinner mr-1"></i>À espera da fotografia…</div>
+		</ng-container>
+		<ng-template #reading>
+			<i class="pi pi-spin pi-spinner text-3xl text-primary"></i>
+			<div class="text-700">A ler a fatura… pode demorar alguns segundos.</div>
+		</ng-template>
+
+		<div *ngIf="readError" class="text-red-600 text-sm"><i class="pi pi-exclamation-triangle mr-1"></i>{{ readError }}</div>
+	</div>
+</p-dialog>
 
 <p-dialog
 	[header]="quickAddOriginTitle"

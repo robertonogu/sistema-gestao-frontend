@@ -1,0 +1,48 @@
+<div class="surface-ground min-h-screen flex justify-content-center p-3">
+    <div class="surface-card border-round-xl shadow-2 p-4 w-full" style="max-width: 28rem">
+        <div class="flex align-items-center gap-2 mb-3">
+            <i class="pi pi-camera text-2xl text-primary"></i>
+            <span class="text-900 text-xl font-semibold">Ler fatura</span>
+        </div>
+
+        <ng-container [ngSwitch]="state">
+            <div *ngSwitchCase="'loading'" class="text-600"><i class="pi pi-spin pi-spinner mr-2"></i>A abrir…</div>
+
+            <div *ngSwitchCase="'invalid'" class="text-700">
+                Esta leitura não existe ou já expirou. No computador, feche e volte a abrir "Ler fatura" para gerar um código novo.
+            </div>
+
+            <ng-container *ngSwitchCase="'ready'">
+                <p class="text-700 mt-0">Fotografe a fatura inteira, bem iluminada e com o QR code visível.</p>
+                <label class="p-button p-button-lg w-full justify-content-center">
+                    <i class="pi pi-camera mr-2"></i>Fotografar fatura
+                    <input type="file" accept="image/*" capture="environment" class="hidden" (change)="onFileSelected($event)" />
+                </label>
+            </ng-container>
+
+            <div *ngSwitchCase="'sending'" class="text-700"><i class="pi pi-spin pi-spinner mr-2"></i>{{ message }}</div>
+
+            <div *ngSwitchCase="'done'">
+                <div class="flex align-items-center gap-2 text-green-600 font-semibold mb-2">
+                    <i class="pi pi-check-circle text-xl"></i>Fatura lida
+                </div>
+                <p class="text-700 m-0">Os dados já estão no computador. Confirme-os na Nova Despesa antes de guardar.</p>
+                <ul *ngIf="capture?.result?.warnings?.length" class="text-orange-600 text-sm pl-3 mb-0">
+                    <li *ngFor="let warning of capture?.result?.warnings">{{ warning }}</li>
+                </ul>
+            </div>
+
+            <ng-container *ngSwitchCase="'error'">
+                <div class="flex align-items-start gap-2 text-red-600 mb-3">
+                    <i class="pi pi-exclamation-triangle mt-1"></i><span>{{ message }}</span>
+                </div>
+                <label class="p-button p-button-lg w-full justify-content-center">
+                    <i class="pi pi-camera mr-2"></i>Tentar de novo
+                    <input type="file" accept="image/*" capture="environment" class="hidden" (change)="onFileSelected($event)" />
+                </label>
+            </ng-container>
+        </ng-container>
+
+        <img *ngIf="previewUrl" [src]="previewUrl" alt="Fotografia da fatura" class="w-full border-round mt-3" />
+    </div>
+</div>

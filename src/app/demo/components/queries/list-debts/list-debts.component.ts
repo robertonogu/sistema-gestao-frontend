@@ -20,13 +20,15 @@ export class ListDebtsComponent {
 
   constructor(private expenseService: ExpenseService, private router: Router) {}
 
-  // Origins that currently have debts (options of the origin filter)
-  originOptions: string[] = [];
+  // Origins that currently have debts (options of the origin filter). Objects, not plain strings: the multiselect
+  // search only looks at a field (label), so with plain strings typing a name never matched anything
+  originOptions: { label: string; value: string }[] = [];
 
   ngOnInit(): void {
     this.expenseService.getExpensesInDebt(this.currentPage, this.pageSize).subscribe((expensesInDebt) => {
       this.expensesInDebt = expensesInDebt;
-      this.originOptions = [...new Set(expensesInDebt.map(expense => expense.origin).filter(Boolean))].sort();
+      this.originOptions = [...new Set(expensesInDebt.map(expense => expense.origin).filter(Boolean))].sort()
+        .map(origin => ({ label: origin, value: origin }));
       this.updateTotal(this.expensesInDebt);
     });
   }

@@ -1,6 +1,8 @@
 import { Location } from '@angular/common';
 import { ExpenseItemName } from 'src/app/demo/api/expenseItemName';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { InvoiceCapture, InvoiceReading } from 'src/app/demo/api/invoiceCapture';
+import { InvoiceCaptureService } from 'src/app/demo/service/transactions/invoiceCapture.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
@@ -228,7 +230,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 }`]
 })
 
-export class CreateExpenseComponent implements OnInit {
+export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   categoriesAndSubCategories = EXPENSE_CATEGORIES;
 
@@ -301,6 +303,16 @@ export class CreateExpenseComponent implements OnInit {
 
   // Novo fornecedor: o mesmo formulário da página de Fornecedores (NIF com pesquisa, saldo inicial, localizações)
   @ViewChild(SupplierFormDialogComponent) supplierForm!: SupplierFormDialogComponent;
+
+  // ===== Ler fatura: o PC mostra um QR, o telemóvel fotografa e o formulário é preenchido com os dados lidos =====
+  // (só pelo telemóvel: o PC não envia ficheiros)
+  readDialogVisible: boolean = false;
+  readCapture: InvoiceCapture | null = null;
+  readQrUrl: string | null = null;
+  readError: string | null = null;
+  private readPollTimer: any = null;
+  // Depois de preenchido: avisos da leitura e NIF do fornecedor que ainda não existe
+  invoiceReading: InvoiceReading | null = null;
   quickAddOriginSubmitted: boolean = false;
   quickAddOriginName: string | null = null;
   quickAddOriginNif: number | null = null;
@@ -364,6 +376,7 @@ export class CreateExpenseComponent implements OnInit {
     private expenseService: ExpenseService,
     private paymentService: PaymentService,
     private creditorService: CreditorService,
+    private invoiceCaptureService: InvoiceCaptureService,
     private confirmationService: ConfirmationService,
     private externalEntityService: ExternalEntityService,
     private messageService: MessageService,
@@ -397,6 +410,10 @@ export class CreateExpenseComponent implements OnInit {
     this.dynamicItemForm = this.fb.group({
       itemInputs: this.fb.array([this.buildItemInput()])
     });
+  }
+
+  ngOnDestroy() {
+    this.stopReadPolling();
   }
 
   ngOnInit() {
@@ -676,6 +693,98 @@ export class CreateExpenseComponent implements OnInit {
     });
   }
 
+  openReadInvoice(): void {
+    this.readDialogVisible = true;
+    this.readError = null;
+    this.readCapture = null;
+    this.invoiceCaptureService.create().subscribe({
+      next: (capture) => {
+        this.readCapture = capture;
+        this.readQrUrl = this.invoiceCaptureService.qrImageUrl(capture.token);
+        this.startReadPolling(capture.token);
+      },
+      error: () => this.readError = 'Não foi possível iniciar a leitura. Tente de novo.'
+    });
+  }
+
+  closeReadInvoice(): void {
+    this.readDialogVisible = false;
+    this.stopReadPolling();
+  }
+
+  // O telemóvel envia a fotografia para a mesma leitura; o PC vai perguntando o estado até estar pronta
+  private startReadPolling(token: string): void {
+    this.stopReadPolling();
+    this.readPollTimer = setInterval(() => {
+      this.invoiceCaptureService.get(token).subscribe(capture => this.onReadCaptureUpdate(capture));
+    }, 2000);
+  }
+
+  private stopReadPolling(): void {
+    if (this.readPollTimer) clearInterval(this.readPollTimer);
+    this.readPollTimer = null;
+  }
+
+  private onReadCaptureUpdate(capture: InvoiceCapture): void {
+    if (!this.readDialogVisible) return;
+    this.readCapture = capture;
+    if (capture.status === 'READY' && capture.result) {
+      this.closeReadInvoice();
+      this.applyInvoiceReading(capture.result);
+    } else if (capture.status === 'FAILED') {
+      // Fica à espera de nova fotografia (o telemóvel pode tentar de novo)
+      this.readError = capture.errorMessage ?? 'Não foi possível ler a fatura.';
+    } else if (capture.status === 'PROCESSING') {
+      this.readError = null;
+    }
+  }
+
+  // Preenche a despesa com os dados lidos, como se o utilizador os tivesse escrito (os mesmos eventos de alteração)
+  private applyInvoiceReading(reading: InvoiceReading): void {
+    this.invoiceReading = reading;
+
+    if (reading.date) {
+      this.date = new Date(reading.date + 'T00:00:00');
+      this.onDateChange();
+    }
+    this.selectedDocumentType = reading.documentType as any;
+    this.onDocumentTypeChange();
+    if (reading.documentNumber) this.documentNumber = reading.documentNumber;
+    if (reading.originId) {
+      this.selectedOrigin = reading.originId;
+      this.onOriginChange();
+    }
+    // Fatura-recibo e fatura simplificada são pagas no momento
+    if (reading.documentType === 'INVOICE_RECEIPT' || reading.documentType === 'SIMPLIFIED_INVOICE') {
+      this.selectedPaymentCondition = 'IMMEDIATE' as any;
+      this.onPaymentConditionChange();
+    }
+
+    const selectableSubCategories = new Set(this.categories.flatMap((category: any) => category.items.map((item: any) => item.value)));
+    this.itemInputs.clear();
+    reading.lines.forEach((line, index) => {
+      const subCategory = line.subCategory ? (SubCategoryType as any)[line.subCategory] : null;
+      this.itemInputs.push(this.buildItemInput());
+      this.itemInputs.at(index).patchValue({
+        subCategoryType: subCategory && selectableSubCategories.has(subCategory) ? subCategory : null,
+        name: (line.description || '').toUpperCase(),
+        quantity: line.quantity,
+        unit: line.unit in Unit ? line.unit : 'UN',
+        value: line.netValue,
+        iva: this.validIvaRates.includes(line.ivaRate) ? line.ivaRate : 23
+      });
+      this.recalcItemTotal(index);
+    });
+    if (this.itemInputs.length === 0) this.itemInputs.push(this.buildItemInput());
+
+    this.messageService.add({ severity: 'success', summary: 'Fatura lida', detail: 'Confirme os dados e as subcategorias antes de guardar.' });
+  }
+
+  // Fornecedor lido da fatura que ainda não existe: abre o formulário de fornecedor com o NIF e a pesquisa feita
+  createReadSupplier(): void {
+    this.supplierForm.openNew(this.invoiceReading?.supplierNif ?? undefined);
+  }
+
   get quickAddOriginTitle(): string {
     switch (this.quickAddOriginType) {
       case 'externalEntity': return 'Nova Entidade Externa';
@@ -704,6 +813,9 @@ export class CreateExpenseComponent implements OnInit {
 
   onSupplierCreated(supplier: Supplier): void {
     this.selectNewOrigin(supplier.originId);
+    if (this.invoiceReading && !this.invoiceReading.originId && supplier.nif === this.invoiceReading.supplierNif) {
+      this.invoiceReading = { ...this.invoiceReading, originId: supplier.originId };
+    }
   }
 
   private selectNewOrigin(originId: number): void {

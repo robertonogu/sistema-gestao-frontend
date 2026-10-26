@@ -29,6 +29,8 @@ const routes: Routes = [
     },
     { path: 'auth', data: { breadcrumb: 'Auth' }, loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
     { path: 'landing', loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule) },
+    // Página do telemóvel para fotografar uma fatura (aberta pelo QR da Nova Despesa), fora do layout com menu
+    { path: 'capture/:token', loadComponent: () => import('./demo/components/invoice-capture/invoice-capture.component').then(m => m.InvoiceCaptureComponent) },
     { path: 'notfound', loadChildren: () => import('./demo/components/notfound/notfound.module').then(m => m.NotfoundModule) },
     { path: '**', redirectTo: '/notfound' }
 ];

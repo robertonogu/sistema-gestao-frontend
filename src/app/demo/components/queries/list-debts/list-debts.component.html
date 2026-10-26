@@ -43,7 +43,7 @@
                                 <p-columnFilter field="origin" matchMode="in" display="menu"
                                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
                                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                        <p-multiSelect [ngModel]="value" [options]="originOptions" placeholder="Todas"
+                                        <p-multiSelect [ngModel]="value" [options]="originOptions" optionLabel="label" optionValue="value" placeholder="Todas"
                                             [showClear]="true" [filter]="true" appendTo="body" [style]="{ 'min-width': '14rem' }"
                                             display="chip" selectedItemsLabel="{0} origens selecionadas" [maxSelectedLabels]="2"
                                             (onChange)="filter($event.value?.length ? $event.value : null)" (onClear)="filter(null)" />

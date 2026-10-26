@@ -43,11 +43,16 @@ export class SupplierFormDialogComponent {
     private messageService: MessageService
   ) {}
 
-  openNew() {
+  // nif: fornecedor lido de uma fatura; abre já com o NIF e a pesquisa no nif.pt feita
+  openNew(nif?: number) {
     this.supplier = { locations: [{ name: '', address: '', placeId: '' }] };
     this.submitted = false;
     this.autoFilled = { name: '', locationName: '', address: '' };
     this.visible = true;
+    if (nif) {
+      this.supplier.nif = nif;
+      this.lookupNif();
+    }
   }
 
   openEdit(supplier: Supplier) {
