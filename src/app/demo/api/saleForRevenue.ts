@@ -5,4 +5,6 @@ export interface SaleForRevenue {
     constructionId: number;
     constructionName: string;
     pendingValue: number;
+    // Valor sem IVA da venda
+    netValue?: number;
 }

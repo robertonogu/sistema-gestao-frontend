@@ -1,4 +1,5 @@
 import { Location } from '@angular/common';
+import { SaleForRevenue } from 'src/app/demo/api/saleForRevenue';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -55,8 +56,11 @@ export class EditSaleComponent implements OnInit {
         this.selectedClient = sale.clientId;
         this.documentNumber = sale.documentNumber;
         this.selectedConstruction = sale.constructionId ?? undefined;
-        this.netValue = sale.netValue;
-        this.iva = sale.netValue > 0 ? Math.round((sale.iva / sale.netValue) * 100) : 0;
+        // Numa nota de crédito os valores estão negativos; no formulário indicam-se positivos
+        this.creditNote = !!sale.creditNote;
+        this.creditedSaleId = sale.creditedSaleId ?? null;
+        this.netValue = Math.abs(sale.netValue);
+        this.iva = sale.netValue !== 0 ? Math.round((sale.iva / sale.netValue) * 100) : 0;
 
         if (this.selectedClient) {
           this.getConstructions();
@@ -71,6 +75,39 @@ export class EditSaleComponent implements OnInit {
     });
   }
 
+
+  // ---- Nota de crédito ao cliente: valores indicados positivos e guardados negativos ----
+  creditNote: boolean = false;
+  creditedSaleId: number | null = null;
+  creditableSales: (SaleForRevenue & { label: string })[] = [];
+
+  onCreditNoteChange(): void {
+    if (!this.creditNote) this.creditedSaleId = null;
+    this.loadCreditableSales();
+  }
+
+  loadCreditableSales(): void {
+    if (!this.creditNote || !this.selectedClient) {
+      this.creditableSales = [];
+      return;
+    }
+    this.saleService.getCreditableSales(this.selectedClient).subscribe(sales =>
+      this.creditableSales = sales.map(sale => ({
+        ...sale,
+        label: sale.documentNumber
+      })));
+  }
+
+  // A nota de crédito fica com a obra, a taxa de IVA e o valor sem IVA da venda creditada
+  // (o valor pode ser alterado, p.ex. para creditar só uma parte)
+  onCreditedSaleChange(): void {
+    const sale = this.creditableSales.find(item => item.saleId === this.creditedSaleId);
+    if (!sale) return;
+    if (sale.constructionId) this.selectedConstruction = sale.constructionId;
+    if (this.validIvaRates.includes(sale.ivaRate)) this.iva = sale.ivaRate;
+    if (sale.netValue) this.netValue = sale.netValue;
+  }
+
   back() {
     this._location.back();
   }
@@ -79,10 +116,12 @@ export class EditSaleComponent implements OnInit {
     this.constructionService.getConstructionNamesForClient(this.selectedClient).subscribe((constructionNames) => {
       this.constructionNames = constructionNames;
     });
+    this.loadCreditableSales();
   }
 
   saveSale() {
-    this.sale = { date: this.date, clientId: this.selectedClient, documentNumber: this.documentNumber, constructionId: this.selectedConstruction, netValue: this.netValue, iva: this.iva } as SaleCreation;
+    this.sale = { date: this.date, clientId: this.selectedClient, documentNumber: this.documentNumber, constructionId: this.selectedConstruction, netValue: this.netValue, iva: this.iva,
+      creditNote: this.creditNote, creditedSaleId: this.creditNote ? this.creditedSaleId : null } as SaleCreation;
 
     if (this.sale != null) {
       this.saleService.updateSale(this.saleId, this.sale).subscribe({

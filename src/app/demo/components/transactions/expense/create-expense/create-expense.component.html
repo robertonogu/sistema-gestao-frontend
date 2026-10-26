@@ -62,6 +62,7 @@
 						<i class="pi pi-id-card"></i>
 						<p-dropdown
 							[(ngModel)]="selectedDocumentType"
+							(onChange)="onDocumentTypeChange()"
 							[options]="documentTypes | keyvalue"
 							optionLabel="value"
 							optionValue="key"
@@ -91,6 +92,7 @@
 							class="flex-1 min-w-0"
 							[options]="origins"
 							[(ngModel)]="selectedOrigin"
+							(onChange)="onOriginChange()"
 							placeholder="Selecione uma origem"
 							[group]="true"
 							[filter]="true"
@@ -118,6 +120,22 @@
 						<p-menu #quickAddOriginMenu [popup]="true" [model]="quickAddOriginOptions" appendTo="body"></p-menu>
 					</div>
 				</div>
+
+				<div class="field col-12 md:col-6" *ngIf="isCreditNote">
+					<label>Fatura Creditada</label>
+					<p-dropdown
+						[(ngModel)]="selectedCreditedExpense"
+						[options]="creditableExpenses"
+						optionLabel="label"
+						optionValue="expenseId"
+						[filter]="true"
+						filterBy="label"
+						[showClear]="true"
+						[disabled]="!selectedOrigin"
+						[placeholder]="selectedOrigin ? 'Sem fatura (fica como saldo a favor)' : 'Selecione primeiro a origem'"
+						appendTo="body"
+					/>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -128,7 +146,12 @@
 		<div class="card">
 			<h4 class="section-title">Dados de Pagamento</h4>
 
-			<div class="grid p-formgrid p-fluid">
+			<p class="text-600 m-0" *ngIf="isCreditNote">
+				Uma nota de crédito não tem pagamento: abate ao valor em dívida da fatura creditada ou, sem fatura
+				(ou se esta já estiver paga), fica como saldo a favor na conta corrente do fornecedor.
+			</p>
+
+			<div class="grid p-formgrid p-fluid" *ngIf="!isCreditNote">
 				<div class="field col-12 md:col-4">
 					<label>Condições de Pagamento</label>
 					<p-dropdown
@@ -177,16 +200,22 @@
 					</div>
 
 					<div class="field col-12 md:col-4">
-						<label>Conta</label>
+						<label pTooltip="Um credor paga com dinheiro dele: nenhuma conta da empresa é movimentada e a empresa passa a dever-lhe o valor" tooltipPosition="top">Conta / Credor</label>
 						<p-dropdown
-							[(ngModel)]="selectedAccount"
-							[options]="accountNames"
-							optionLabel="name"
-							optionValue="objectId"
-							placeholder="Selecione uma Conta"
-							(onChange)="onAccountChange()"
-							[ngClass]="{ 'ng-dirty ng-invalid': !selectedAccount }"
-						/>
+						[(ngModel)]="selectedPaidFrom"
+						(onChange)="onPaidFromChange()"
+						[options]="paidFromOptions"
+						[group]="true"
+						optionLabel="label"
+						optionValue="value"
+						placeholder="Selecione uma Conta ou Credor"
+						appendTo="body"
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaidFrom }"
+					>
+						<ng-template let-group pTemplate="group">
+							<span class="font-semibold">{{ group.label }}</span>
+						</ng-template>
+					</p-dropdown>
 					</div>
 
 					<div class="field col-12 md:col-4">
@@ -341,7 +370,7 @@
 							<p-inputNumber
 								formControlName="value"
 								mode="decimal"
-								[minFractionDigits]="2" [maxFractionDigits]="3" suffix=" €"
+								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 								locale="en-US" [useGrouping]="false"
 								styleClass="item-col-num"
 								(onInput)="onItemValueChange(j)"
@@ -371,19 +400,19 @@
 							<p-inputNumber
 								formControlName="total"
 								mode="decimal"
-								[minFractionDigits]="2" [maxFractionDigits]="3" suffix=" €"
+								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 								locale="en-US" [useGrouping]="false"
 								styleClass="item-col-num"
 								(onInput)="onItemTotalChange(j)"
 							/>
 						</div>
 
-						<div class="item-col-assoc white-space-nowrap overflow-hidden text-overflow-ellipsis" [pTooltip]="associationLabel(j)" tooltipPosition="top">
+						<div class="item-col-assoc white-space-nowrap overflow-hidden text-overflow-ellipsis" [class.return-label]="isReturnRow(j)" [pTooltip]="associationLabel(j)" tooltipPosition="top">
 							{{ associationLabel(j) }}
 						</div>
 
 						<div class="item-col-actions">
-							<i *ngIf="canOpenLinkDialog(itemInput.value.subCategoryType)"
+							<i *ngIf="canOpenLinkDialog(itemInput.value.subCategoryType) && !isReturnRow(j)"
 							   class="pi assoc-icon"
 							   [ngClass]="rowHasAssociation(j) ? 'pi-check-circle text-green-500' : 'pi-times-circle text-red-500'"
 							   [pTooltip]="rowHasAssociation(j) ? 'Associado' : 'Sem associação'"
@@ -392,7 +421,8 @@
 							   class="pi pi-bolt assoc-icon text-primary"
 							   [pTooltip]="autoPurchaseTooltip(j)"
 							   tooltipPosition="top"></i>
-							<p-button [text]="true" icon="pi pi-link" title="Associar" [disabled]="!canOpenLinkDialog(itemInput.value.subCategoryType)" (click)="openLinkDialog(j)"></p-button>
+							<p-button *ngIf="isReturnRow(j)" [text]="true" icon="pi pi-replay" title="Editar devolução" (click)="openReturnDialog(j)"></p-button>
+							<p-button *ngIf="!isReturnRow(j)" [text]="true" icon="pi pi-link" title="Associar" [disabled]="!canOpenLinkDialog(itemInput.value.subCategoryType)" (click)="openLinkDialog(j)"></p-button>
 							<p-button severity="danger" [text]="true" icon="pi pi-trash" (click)="removeItemInput(j)"></p-button>
 						</div>
 					</div>
@@ -401,6 +431,9 @@
 				<div class="item-foot">
 					<button type="button" class="btn-dashed" (click)="addItemInput()">
 						<i class="pi pi-plus"></i> Adicionar item
+					</button>
+					<button type="button" class="btn-dashed ml-2" (click)="openReturnDialog()" pTooltip="Devolver ao fornecedor material comprado (sai do stock ou volta das obras)" tooltipPosition="top">
+						<i class="pi pi-replay"></i> Adicionar devolução
 					</button>
 				</div>
 			</div>
@@ -560,6 +593,88 @@
 			pButton
 			type="button"
 			(click)="saveLinkDialog()"
+		></button>
+	</ng-template>
+</p-dialog>
+
+<p-dialog
+	header="Devolução ao Fornecedor"
+	[(visible)]="returnDialogVisible"
+	[modal]="true"
+	[dismissableMask]="true"
+	[style]="{ width: '40rem' }"
+	(onHide)="closeReturnDialog()"
+>
+	<div class="p-fluid flex flex-column gap-3">
+		<div class="field">
+			<label>Linha de compra a devolver</label>
+			<p-dropdown
+				[ngModel]="selectedReturnable"
+				(ngModelChange)="onReturnableSelect($event)"
+				[options]="returnableItems"
+				optionLabel="label"
+				[filter]="true"
+				filterBy="label"
+				placeholder="Selecione o material comprado a este fornecedor"
+				emptyMessage="Não há compras de material de stock por devolver a este fornecedor"
+				appendTo="body"
+				[ngClass]="{ 'ng-dirty ng-invalid': returnValidationAttempted && !selectedReturnable }"
+			/>
+		</div>
+
+		<ng-container *ngIf="selectedReturnable as returnable">
+			<small class="text-600">
+				Comprado: {{ returnable.quantity }} · por devolver: {{ returnable.returnableQuantity }} ·
+				custo unitário: {{ fmt(returnable.unitValue) }}
+			</small>
+
+			<div class="field">
+				<label>Quantidade que sai do stock (disponível: {{ returnable.stockQuantity }})</label>
+				<p-inputNumber
+					[(ngModel)]="returnFromStock"
+					[min]="0"
+					[max]="returnable.stockQuantity"
+					[maxFractionDigits]="3"
+					[ngClass]="{ 'ng-dirty ng-invalid': returnValidationAttempted && returnStockInvalid }"
+				/>
+			</div>
+
+			<div class="field" *ngFor="let allocation of returnFromAllocations">
+				<label>Volta da obra: {{ allocation.label }} (alocado: {{ allocation.max }})</label>
+				<p-inputNumber
+					[(ngModel)]="allocation.quantity"
+					[min]="0"
+					[max]="allocation.max"
+					[maxFractionDigits]="3"
+					[ngClass]="{ 'ng-dirty ng-invalid': returnValidationAttempted && returnAllocationInvalid(allocation) }"
+				/>
+			</div>
+
+			<div class="font-semibold">
+				Total a devolver: {{ returnTotalQuantity }} · {{ fmt(returnTotalQuantity * returnable.unitValue) }} s/ IVA
+			</div>
+			<small class="p-error" *ngIf="returnValidationAttempted && returnTotalInvalid">
+				A quantidade total tem de ser maior que 0 e no máximo {{ returnable.returnableQuantity }}.
+			</small>
+		</ng-container>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			class="p-button-rounded p-button-outlined p-button-secondary"
+			icon="pi pi-times"
+			label="Cancelar"
+			pButton
+			type="button"
+			(click)="closeReturnDialog()"
+		></button>
+		<button
+			class="p-button-rounded"
+			icon="pi pi-check"
+			label="Guardar"
+			pButton
+			type="button"
+			(click)="saveReturnDialog()"
 		></button>
 	</ng-template>
 </p-dialog>

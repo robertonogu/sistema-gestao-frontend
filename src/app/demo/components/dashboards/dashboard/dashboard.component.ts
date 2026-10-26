@@ -34,6 +34,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     expensesValue: number = 0;
     debtsValue: number = 0;
     balance: number = 0;
+    // O que a empresa deve aos financiadores (não é dinheiro da empresa)
+    financingDebt: number = 0;
     invoicedValue: number = 0;
     previousYearExpensesValue: number = 0;
     overdueDebtsCount: number = 0;
@@ -100,12 +102,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ];
     }
 
-    // Share of the invoiced value already received (revenues of the year over sales of the year), with one decimal
-    // rounded down so it only shows 100% when everything was received
-    get receivedPercentage(): number | null {
-        return this.invoicedValue > 0 ? Math.floor(this.revenuesValue / this.invoicedValue * 1000) / 10 : null;
-    }
-
     // Expenses change against the previous year, in %
     get expensesVariation(): number | null {
         if (this.previousYearExpensesValue <= 0) return null;
@@ -118,6 +114,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.expensesValue = dashboardData.expensesValue;
             this.debtsValue = dashboardData.debtsValue;
             this.balance = dashboardData.balance;
+            this.financingDebt = dashboardData.financingDebt ?? 0;
             this.invoicedValue = dashboardData.invoicedValue ?? 0;
             this.previousYearExpensesValue = dashboardData.previousYearExpensesValue ?? 0;
             this.overdueDebtsCount = dashboardData.overdueDebtsCount ?? 0;

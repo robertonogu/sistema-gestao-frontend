@@ -1,4 +1,6 @@
 import { Location } from '@angular/common';
+import { FinancerService } from 'src/app/demo/service/company/financerService';
+import { ItemName } from 'src/app/demo/api/itemName';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -42,6 +44,7 @@ export class EditRevenueComponent implements OnInit {
   revenue!: RevenueCreation;
 
   constructor(
+    private financerService: FinancerService,
     private originService: OriginService,
     private accountService: AccountService,
     private saleService: SaleService,
@@ -53,11 +56,32 @@ export class EditRevenueComponent implements OnInit {
     this.validIvaRates = [0, 6, 13, 23];
   }
 
+  // Empréstimo de financiador: a origem só pode ser um financiador e não tem IVA
+  lenderNames: ItemName[] = [];
+
+  get isMemberLoan(): boolean {
+    return (this.selectedRevenueType as unknown as string) === 'MEMBER_LOAN';
+  }
+
+  get originOptions(): Origin[] {
+    if (!this.isMemberLoan) return this.origins;
+    return [{ label: 'Financiadores', items: this.lenderNames.map(lender => ({ label: lender.name, value: lender.id })) } as unknown as Origin];
+  }
+
+  private applyMemberLoanRules() {
+    if (!this.isMemberLoan) return;
+    this.iva = 0;
+    if (this.selectedOrigin && !this.lenderNames.some(lender => lender.id === this.selectedOrigin)) {
+      this.selectedOrigin = undefined as any;
+    }
+  }
+
   get isSalesRevenueType(): boolean {
     return (this.selectedRevenueType as unknown as string) === 'SALES';
   }
 
   ngOnInit(): void {
+    this.financerService.getFinancerNames().subscribe(names => this.lenderNames = names);
     this.revenueId = Number(this.route.snapshot.params['revenueId']);
 
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
@@ -138,6 +162,7 @@ export class EditRevenueComponent implements OnInit {
   }
 
   onRevenueTypeChange() {
+    this.applyMemberLoanRules();
     this.getSalesForClient();
   }
 
@@ -184,6 +209,11 @@ export class EditRevenueComponent implements OnInit {
     const { lines, error } = this.salesSelection.lines();
     if (error) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error });
+      return null;
+    }
+    // Devolução ao cliente (linhas a somar 0 ou menos): o valor total tem de ser igual ao das linhas
+    if (lines.length > 0 && this.salesSelection.total <= 0 && Math.abs((this.totalValue ?? 0) - this.salesSelection.total) > 0.005) {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Numa devolução ao cliente o valor total tem de ser igual ao valor das linhas (' + this.salesSelection.total.toFixed(2) + ' €).' });
       return null;
     }
     if (lines.length > 0 && (this.totalValue ?? 0) + 0.005 < this.salesSelection.total) {

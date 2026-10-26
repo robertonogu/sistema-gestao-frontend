@@ -49,7 +49,7 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
     SubCategoryType.WOOD, SubCategoryType.CONSTRUCTION, SubCategoryType.METALS, SubCategoryType.HARDWARE,
     SubCategoryType.FASTENING_SYSTEMS, SubCategoryType.ADHESIVES_SEALANTS, SubCategoryType.PAINTS_GLUES_VARNISHES,
     SubCategoryType.WATERPROOFING_INSULATION, SubCategoryType.PLUMBING, SubCategoryType.ELECTRICAL_MATERIALS,
-    SubCategoryType.SITE_CONSUMABLES, SubCategoryType.GLASS_MIRRORS, SubCategoryType.CLADDING, SubCategoryType.OTHER_MATERIALS,
+    SubCategoryType.SITE_CONSUMABLES, SubCategoryType.GLASS_MIRRORS, SubCategoryType.CLADDING, SubCategoryType.STONES, SubCategoryType.OTHER_MATERIALS,
     SubCategoryType.REAL_ESTATE, SubCategoryType.INVENTORY_EXPENSES, SubCategoryType.INVENTORY_INVESTMENT
   ],
   [CategoryType.CONSTRUCTIONS]: [SubCategoryType.EXTERNAL_SERVICES],

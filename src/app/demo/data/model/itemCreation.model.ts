@@ -15,4 +15,6 @@ export interface ItemCreation {
     vehicleId?: number;
     toolId?: number;
     equipmentId?: number;
+    // Return of a stock purchase line (negative quantity); costAllocations are then the quantities coming back from each construction item
+    returnedItemId?: number;
 }

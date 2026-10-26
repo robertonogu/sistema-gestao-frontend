@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -17,6 +18,7 @@ import { UppercaseDirective } from 'src/app/demo/directives/uppercase.directive'
 
 @NgModule({
   imports: [
+		CheckboxModule,
     ButtonModule,
     CommonModule,
     CreateSaleRoutingModule,

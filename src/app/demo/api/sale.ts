@@ -10,4 +10,7 @@ export interface Sale {
     clientId: number;
     construction: string | null;
     constructionId: number | null;
+    creditNote?: boolean;
+    creditedSaleId?: number | null;
+    creditedSaleDocumentNumber?: string | null;
 }

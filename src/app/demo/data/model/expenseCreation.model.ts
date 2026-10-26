@@ -18,4 +18,8 @@ export interface ExpenseCreation {
     accountId: number;
     paymentMethod: PaymentMethod;
     itemList: ItemCreation[];
+    // Credit note: invoice it credits
+    creditedExpenseId?: number;
+    // Payment on creation made by a creditor (with their own money) instead of a company account
+    creditorId?: number;
 }

@@ -1,0 +1,110 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                <div class="text-900 text-xl font-semibold">Financiadores</div>
+                <div class="flex gap-2 sm:ml-auto">
+                    <button
+                        class="p-button-rounded p-button-outlined"
+                        (click)="openNew()"
+                        icon="pi pi-plus"
+                        label="Novo"
+                        pButton
+                        type="button"
+                    ></button>
+                </div>
+            </div>
+
+			<p-table
+                [loading]="loading"
+                styleClass="p-datatable-striped"
+                [tableStyle]="{ 'min-width': '40rem' }"
+                [value]="financers"
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nome</th>
+                        <th>NIF</th>
+                        <th>Ações</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-financer>
+                    <tr>
+                        <td>{{ financer.name }}</td>
+                        <td>{{ financer.nif }}</td>
+                        <td class="white-space-nowrap">
+                            <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [text]="true" severity="success" (click)="editFinancer(financer)" />
+                            <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (click)="deleteFinancer(financer)" />
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                    <tr><td colspan="3">Ainda não há financiadores.</td></tr>
+                </ng-template>
+            </p-table>
+
+		</div>
+	</div>
+</div>
+
+<p-dialog
+    [header]="financer.originId ? 'Editar Financiador' : 'Novo Financiador'"
+    [(visible)]="financerDialog"
+    [style]="{ width: '450px' }"
+    [modal]="true"
+    class="p-fluid"
+    (onHide)="hideDialog()"
+>
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label for="name" class="block font-bold mb-4">Nome</label>
+            <input
+                type="text"
+                pInputText
+                id="name"
+                [(ngModel)]="financer.name"
+                required
+                autofocus
+                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !financer.name }"
+            />
+            <small class="ng-dirty ng-invalid" *ngIf="submitted && !financer.name">Nome é obrigatório.</small>
+        </div>
+
+        <div class="field">
+            <label for="nif" class="block font-bold mb-4">NIF</label>
+            <p-inputNumber id="nif" [(ngModel)]="financer.nif" [useGrouping]="false"></p-inputNumber>
+        </div>
+
+        <div class="field">
+            <label for="initialBalance" class="block font-bold mb-4">Saldo Inicial (em dívida a 01/01)</label>
+            <p-inputNumber id="initialBalance" [(ngModel)]="financer.initialBalance" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
+                suffix=" €" locale="pt-PT" [useGrouping]="false" placeholder="0,00 €"></p-inputNumber>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="hideDialog()"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" (click)="saveFinancer()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-toast />
+
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+                <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">{{ message.header }}</span>
+            <p class="mb-0">{{ message.message }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+                <button pButton label="Eliminar" (click)="cd.accept()" class="bg-red-500 border-transparent text-white w-8rem"></button>
+                <button pButton label="Cancelar" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>

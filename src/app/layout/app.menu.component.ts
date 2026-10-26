@@ -213,6 +213,16 @@ export class AppMenuComponent implements OnInit {
                         routerLink: ['/company/externalEntities']
                     },
                     {
+                        label: 'Financiadores',
+                        icon: 'pi pi-fw pi-wallet',
+                        routerLink: ['/company/financers']
+                    },
+                    {
+                        label: 'Credores',
+                        icon: 'pi pi-fw pi-credit-card',
+                        routerLink: ['/company/creditors']
+                    },
+                    {
                         label: 'Contas',
                         icon: 'pi pi-fw pi-lock',
                         routerLink: ['/company/accounts']

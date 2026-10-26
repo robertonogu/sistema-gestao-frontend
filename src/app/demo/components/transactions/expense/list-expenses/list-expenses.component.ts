@@ -29,6 +29,18 @@ import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
       line-height: 1;
     }
     .category-dot + .category-dot { margin-left: 4px; }
+    /* Estado de pagamento: verde = pago, amarelo = parcialmente pago, vermelho = em dívida */
+    .status-dot {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      vertical-align: middle;
+    }
+    .status-dot.status-paid { background: #22C55E; }
+    .status-dot.status-partially_paid { background: #EAB308; }
+    .status-dot.status-in_debt { background: #EF4444; }
+    .status-dot.status-credit { background: #3B82F6; }
   `]
 })
 
@@ -219,6 +231,7 @@ export class ListExpensesComponent implements OnInit {
 
     if (status == PaymentStatus.IN_DEBT) return "danger";
     else if (status == PaymentStatus.PARTIALLY_PAID) return "warning";
+    else if (status == PaymentStatus.CREDIT) return "info";
     else return "success";
   }
 

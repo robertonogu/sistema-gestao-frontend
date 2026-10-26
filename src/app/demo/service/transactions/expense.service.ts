@@ -9,6 +9,7 @@ import { Expense } from '../../api/expense';
 import { ExpenseEdit } from '../../api/expenseEdit';
 import { ExpenseListItem } from '../../api/expenseListItem';
 import { ExpenseItemName } from '../../api/expenseItemName';
+import { CreditableExpense, ReturnableItem } from '../../api/creditNote';
 
 export interface ExpenseFilters {
     documentNumber?: string;
@@ -65,6 +66,18 @@ export class ExpenseService {
         return this.http.get<Expense>(url);
     }
 
+    // Invoices of an origin that a credit note can credit
+    getCreditableExpenses(originId: number) : Observable<CreditableExpense[]> {
+        return this.http.get<CreditableExpense[]>(this.expensesUrl + "/creditable/" + originId);
+    }
+
+    // Stock purchase lines of an origin that can still be returned; when editing, what that expense already returns counts as available
+    getReturnableItems(originId: number, excludeExpenseId?: number) : Observable<ReturnableItem[]> {
+        let url = this.expensesUrl + "/returnableItems/" + originId;
+        if (excludeExpenseId) url += "?excludeExpenseId=" + excludeExpenseId;
+        return this.http.get<ReturnableItem[]>(url);
+    }
+
     getUsedItemNames() : Observable<ExpenseItemName[]> {
         return this.http.get<ExpenseItemName[]>(this.usedItemNamesUrl);
     }
@@ -77,6 +90,11 @@ export class ExpenseService {
     getExpensesFromOrigin(originId: number) : Observable<ExpenseInDebt[]> {
         let url = this.expensesInDebtUrl + "/" + originId;
         return this.http.get<ExpenseInDebt[]>(url);
+    }
+
+    // Documentos da origem com crédito a favor da empresa (debtValue negativo), p.ex. nota de crédito de fatura já paga
+    getExpensesWithCreditFromOrigin(originId: number) : Observable<ExpenseInDebt[]> {
+        return this.http.get<ExpenseInDebt[]>(`${environment.apiUrl}/expensesWithCredit/${originId}`);
     }
 
     createExpense(expense: ExpenseCreation) : Observable<Expense> {

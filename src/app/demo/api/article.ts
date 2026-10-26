@@ -11,4 +11,7 @@ export interface Article {
     quantity: number;
     unitValue: number;
     totalValue: number;
+    // Documento e origem da entrada em stock (vêm do stock à data)
+    documentNumber?: string;
+    origin?: string;
 }

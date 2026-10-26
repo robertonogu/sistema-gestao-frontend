@@ -46,7 +46,7 @@
 					<p-dropdown
 						(onChange)="onOriginChange()"
 						[(ngModel)]="selectedOrigin"
-                        [options]="origins"
+                        [options]="originOptions"
                         placeholder="Selecione uma origem"
                         [group]="true"
                         [filter]="true"
@@ -113,7 +113,7 @@
                         optionLabel="value"
 						optionValue="value"
                         placeholder="Selecione uma Taxa"
-						[disabled]="isSalesRevenueType"
+						[disabled]="isSalesRevenueType || isMemberLoan"
 					>
 						<ng-template let-option pTemplate="item">
 							{{ option.value }}%
@@ -153,6 +153,7 @@
                             Vendas pendentes do cliente
                             <small>
                                 Pendente: {{ salesSelection.totalPending | number: '1.2-2' }} €
+                                <ng-container *ngIf="salesSelection.totalCredit > 0"> · Crédito do cliente: {{ salesSelection.totalCredit | number: '1.2-2' }} €</ng-container>
                                 · Distribuído: {{ salesSelection.total | number: '1.2-2' }} €
                                 <span *ngIf="revenueExcess > 0" class="text-orange-500 font-semibold" pTooltip="Fica como crédito do cliente na conta corrente" tooltipPosition="top">
                                     · Excedente: {{ revenueExcess | number: '1.2-2' }} €
@@ -173,7 +174,12 @@
                     <ng-template pTemplate="body" let-sale let-i="rowIndex">
                         <tr>
                             <td><p-tableCheckbox [value]="sale" /></td>
-                            <td class="font-bold">{{ sale.documentNumber }}</td>
+                            <td class="font-bold">
+                                {{ sale.documentNumber }}
+                                <span *ngIf="salesSelection.isCredit(sale)" class="text-blue-500 text-sm font-normal ml-1"
+                                    pTooltip="Crédito do cliente: use um valor negativo para o descontar nesta receita ou, sozinho, devolver o dinheiro ao cliente"
+                                    tooltipPosition="top">(crédito)</span>
+                            </td>
                             <td>{{ sale.constructionName }}</td>
                             <td>{{ sale.ivaRate }}%</td>
                             <td>{{ sale.pendingValue | number: '1.2-2' }} €</td>
@@ -182,8 +188,8 @@
                                     [disabled]="!salesSelection.isSelected(sale)"
                                     [(ngModel)]="salesSelection.values[i]"
                                     (onBlur)="onSaleValueChange()"
-                                    [min]="0"
-                                    [max]="sale.pendingValue"
+                                    [min]="salesSelection.isCredit(sale) ? sale.pendingValue : 0"
+                                    [max]="salesSelection.isCredit(sale) ? 0 : sale.pendingValue"
                                     mode="decimal"
                                     [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
                                     locale="en-US" [useGrouping]="false"

@@ -27,6 +27,15 @@ export class SaleService {
       return this.http.get<ObjectList & { netValue: number }>(url);
     }
 
+    // Vendas do cliente que uma nota de crédito pode creditar (com o valor ainda por receber)
+
+    getCreditableSales(clientId: number) : Observable<SaleForRevenue[]> {
+
+      return this.http.get<SaleForRevenue[]>(`${environment.apiUrl}/sales/creditable/${clientId}`);
+
+    }
+
+
     getSale(saleId: number) : Observable<Sale> {
       let url = this.saleByIdUrl + saleId;
       return this.http.get<Sale>(url);

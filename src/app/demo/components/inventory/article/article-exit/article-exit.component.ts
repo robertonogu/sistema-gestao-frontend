@@ -21,7 +21,7 @@ export class ArticleExitComponent {
   date: Date = new Date();
   selectedConstruction!: number;
 
-  // Linhas já agrupadas pelo backend por código + valor unitário
+  // Uma linha por artigo em stock (cada linha de fatura tem o seu artigo e documento)
   articles: Article[] = [];
   articleQuantities: (number | null)[] = [];
 

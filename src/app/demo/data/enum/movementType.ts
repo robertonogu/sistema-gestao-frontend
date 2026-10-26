@@ -4,5 +4,7 @@ export enum MovementType {
     PAYMENT = "Pagamento",
     BANK_TRANSFER = "Transferência Bancária",
     FIRST_INTERACTION = "Saldo Inicial",
-    RECEIPT = "Recebimento"
+    RECEIPT = "Recebimento",
+    LOAN_RECEIVED = "Empréstimo de Financiador",
+    LOAN_REPAYMENT = "Devolução a Financiador"
 }

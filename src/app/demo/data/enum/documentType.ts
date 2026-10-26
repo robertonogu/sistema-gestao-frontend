@@ -7,5 +7,6 @@ export enum DocumentType {
     SINGLE_COLLECTION_DOCUMENT = "Documento Único de Cobrança",
     SALARY_RECEIPT = "Recibo de Vencimento",
     COLLECTION_NOTE = "Nota de Cobrança",
-    OPENING_BALANCE = "Saldo Inicial"
+    OPENING_BALANCE = "Saldo Inicial",
+    CREDIT_NOTE = "Nota de Crédito"
 }

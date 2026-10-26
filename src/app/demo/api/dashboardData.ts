@@ -6,6 +6,8 @@ export interface DashboardData {
     expensesValue: number;
     debtsValue: number;
     balance: number;
+    // O que a empresa deve aos financiadores
+    financingDebt?: number;
     revenuesPerMonth: number[];
     expensesPerMonth: number[];
     categoryCosts: CategoryCost[];

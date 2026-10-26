@@ -64,16 +64,22 @@
 				</div>
 
                 <div class="field col-12 md:col-4">
-					<label>Conta</label>
+					<label pTooltip="Um credor paga com dinheiro dele: nenhuma conta da empresa é movimentada e a empresa passa a dever-lhe o valor" tooltipPosition="top">Conta / Credor</label>
 					<p-dropdown
-						[(ngModel)]="selectedAccount"
-						(onChange)="onAccountChange()"
-                        [options]="accountNames"
-                        optionLabel="name"
-						optionValue="objectId"
-                        placeholder="Selecione uma Conta"
-						[ngClass]="{ 'ng-dirty ng-invalid': !selectedAccount }"
-					/>
+						[(ngModel)]="selectedPaidFrom"
+						(onChange)="onPaidFromChange()"
+						[options]="paidFromOptions"
+						[group]="true"
+						optionLabel="label"
+						optionValue="value"
+						placeholder="Selecione uma Conta ou Credor"
+						appendTo="body"
+						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaidFrom }"
+					>
+						<ng-template let-group pTemplate="group">
+							<span class="font-semibold">{{ group.label }}</span>
+						</ng-template>
+					</p-dropdown>
 				</div>
 
 				<div class="field col-12 md:col-4">
@@ -143,7 +149,11 @@
 					<ng-template pTemplate="caption">
 						<div class="flex align-items-center justify-content-between">
 							Faturas em Débito
-							<small>Valor em débito: {{ totalDebt | number: '1.2-2' }} € · A pagar: {{ sumTotalValues | number: '1.2-2' }} €</small>
+							<small>
+								Valor em débito: {{ totalDebt | number: '1.2-2' }} €
+								<ng-container *ngIf="totalCredit > 0"> · Crédito a favor: {{ totalCredit | number: '1.2-2' }} €</ng-container>
+								· {{ sumTotalValues < 0 ? 'A receber (reembolso)' : 'A pagar' }}: {{ (sumTotalValues < 0 ? -sumTotalValues : sumTotalValues) | number: '1.2-2' }} €
+							</small>
 						</div>
 					</ng-template>
 
@@ -164,19 +174,31 @@
 							<td [ngClass]="{'selected border-round border-bottom-none border-primary' : isSelected(expense)}">
 								<p-tableCheckbox [value]="expense" />
 							</td>
-							<td class=font-bold>{{ expense.documentNumber }}</td>
+							<td class=font-bold>
+								{{ expense.documentNumber }}
+								<span *ngIf="isCredit(expense)" class="text-blue-500 text-sm font-normal ml-1"
+									pTooltip="Crédito a favor: use um valor negativo para o descontar neste pagamento ou, sozinho, registar o reembolso do fornecedor"
+									tooltipPosition="top">(crédito)</span>
+							</td>
 							<td>{{ expense.date | date: 'dd/MM/yyyy' }}</td>
 							<td>{{ expense.paymentDeadline | date: 'dd/MM/yyyy' }}</td>
 							<td>{{ expense.totalValue | number: '1.2-2' }} €</td>
-							<td>{{ expense.debtValue | number: '1.2-2' }} €</td>
+							<td class="white-space-nowrap">
+								{{ expense.debtValue | number: '1.2-2' }} €
+								<!-- Pré-visualização: quanto fica em débito depois deste pagamento -->
+								<span *ngIf="isSelected(expense) && expenseValues[i] !== 0" class="text-primary font-semibold ml-2"
+									pTooltip="Fica em débito após este pagamento" tooltipPosition="top">
+									→ {{ (isCredit(expense) ? (expense.debtValue - expenseValues[i] < 0 ? expense.debtValue - expenseValues[i] : 0) : (expense.debtValue - expenseValues[i] > 0 ? expense.debtValue - expenseValues[i] : 0)) | number: '1.2-2' }} €
+								</span>
+							</td>
 							<td>
 								<p-inputNumber
 									[disabled]="!isSelected(expense)"
 									[(ngModel)]="expenseValues[i]"
 									(onBlur)="changeValue()"
-									[min]="0"
-									[max]="expense.debtValue"
-									placeholder="Insira valor a pagar"
+									[min]="isCredit(expense) ? expense.debtValue : 0"
+									[max]="isCredit(expense) ? 0 : expense.debtValue"
+									[placeholder]="isCredit(expense) ? 'Crédito a usar (negativo)' : 'Insira valor a pagar'"
 									mode="decimal"
 									[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 									locale="en-US" [useGrouping]="false"

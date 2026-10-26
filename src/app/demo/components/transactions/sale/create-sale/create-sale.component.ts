@@ -1,4 +1,5 @@
 import { Location } from '@angular/common';
+import { SaleForRevenue } from 'src/app/demo/api/saleForRevenue';
 import { Component } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
@@ -49,12 +50,47 @@ export class CreateSaleComponent {
     });
   }
 
+
+  // ---- Nota de crédito ao cliente: valores indicados positivos e guardados negativos ----
+  creditNote: boolean = false;
+  creditedSaleId: number | null = null;
+  creditableSales: (SaleForRevenue & { label: string })[] = [];
+
+  onCreditNoteChange(): void {
+    if (!this.creditNote) this.creditedSaleId = null;
+    this.loadCreditableSales();
+  }
+
+  loadCreditableSales(): void {
+    if (!this.creditNote || !this.selectedClient) {
+      this.creditableSales = [];
+      return;
+    }
+    this.saleService.getCreditableSales(this.selectedClient).subscribe(sales =>
+      this.creditableSales = sales.map(sale => ({
+        ...sale,
+        label: sale.documentNumber
+      })));
+  }
+
+  // A nota de crédito fica com a obra, a taxa de IVA e o valor sem IVA da venda creditada
+  // (o valor pode ser alterado, p.ex. para creditar só uma parte)
+  onCreditedSaleChange(): void {
+    const sale = this.creditableSales.find(item => item.saleId === this.creditedSaleId);
+    if (!sale) return;
+    if (sale.constructionId) this.selectedConstruction = sale.constructionId;
+    if (this.validIvaRates.includes(sale.ivaRate)) this.iva = sale.ivaRate;
+    if (sale.netValue) this.netValue = sale.netValue;
+  }
+
   back() {
     this._location.back();
   }
 
+  // Numa nota de crédito o total é negativo (abate ao que o cliente deve)
   get totalValue(): number {
-    return (this.netValue || 0) + (this.netValue || 0) * (this.iva || 0) / 100;
+    const total = Math.round(((this.netValue || 0) + (this.netValue || 0) * (this.iva || 0) / 100) * 100) / 100;
+    return this.creditNote ? -Math.abs(total) : total;
   }
 
   openQuickAddClient(): void {
@@ -90,10 +126,12 @@ export class CreateSaleComponent {
     this.constructionService.getConstructionNamesForClient(this.selectedClient).subscribe((constructionNames) => {
       this.constructionNames = constructionNames;
     });
+    this.loadCreditableSales();
   }
 
   newSale() {
-    this.sale = { date: this.date, clientId: this.selectedClient, documentNumber: this.documentNumber, constructionId: this.selectedConstruction, netValue: this.netValue, iva: this.iva } as SaleCreation;
+    this.sale = { date: this.date, clientId: this.selectedClient, documentNumber: this.documentNumber, constructionId: this.selectedConstruction, netValue: this.netValue, iva: this.iva,
+      creditNote: this.creditNote, creditedSaleId: this.creditNote ? this.creditedSaleId : null } as SaleCreation;
 
     if (this.sale != null) {
       this.saleService.createSale(this.sale).subscribe({
@@ -119,5 +157,8 @@ export class CreateSaleComponent {
     this.constructionNames = [];
     this.netValue = 0;
     this.iva = 0;
+    this.creditNote = false;
+    this.creditedSaleId = null;
+    this.creditableSales = [];
   }
 }

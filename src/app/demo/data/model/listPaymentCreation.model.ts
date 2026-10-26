@@ -6,5 +6,7 @@ export interface ListPaymentCreation {
     date: Date;
     paymentMethod: PaymentMethod;
     accountId: number;
+    // Pago por um credor (com dinheiro dele) em vez de uma conta da empresa
+    creditorId?: number;
     paymentCreationDTOList: PaymentCreation[];
 }

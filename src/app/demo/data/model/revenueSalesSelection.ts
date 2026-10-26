@@ -19,7 +19,7 @@ export class RevenueSalesSelection {
     load(sales: SaleForRevenue[], lines: RevenueSaleLine[] = []) {
         this.sales = [...sales].sort((a, b) => a.saleId - b.saleId);
         this.values = this.sales.map(sale => lines.find(line => line.saleId === sale.saleId)?.value ?? 0);
-        this.selected = this.sales.filter((_, i) => this.values[i] > 0);
+        this.selected = this.sales.filter((_, i) => this.values[i] !== 0);
         this.updateTotal();
     }
 
@@ -30,8 +30,21 @@ export class RevenueSalesSelection {
         this.total = 0;
     }
 
+    // Crédito do cliente (pendente negativo): nota de crédito a descontar nesta receita ou a devolver ao cliente
+    isCredit(sale: SaleForRevenue): boolean {
+        return sale.pendingValue < 0;
+    }
+
     get totalPending(): number {
-        return this.round(this.sales.reduce((sum, sale) => sum + sale.pendingValue, 0));
+        return this.round(this.sales.filter(sale => !this.isCredit(sale)).reduce((sum, sale) => sum + sale.pendingValue, 0));
+    }
+
+    get totalCredit(): number {
+        return this.round(-this.sales.filter(sale => this.isCredit(sale)).reduce((sum, sale) => sum + sale.pendingValue, 0));
+    }
+
+    private get creditUsed(): number {
+        return this.round(-this.sales.reduce((sum, sale, i) => sum + (this.isCredit(sale) ? (this.values[i] ?? 0) : 0), 0));
     }
 
     isSelected(sale: SaleForRevenue): boolean {
@@ -53,15 +66,17 @@ export class RevenueSalesSelection {
         this.updateTotal();
     }
 
-    // Reparte o valor pelas vendas pendentes, da mais antiga para a mais recente
+    // Reparte o valor pelas vendas pendentes, da mais antiga para a mais recente; o crédito do cliente já escolhido
+    // (linhas negativas) soma-se ao valor recebido
     distribute(input: number | string | null) {
-        let remaining = Math.min(input == null || input === '' ? 0 : Number(input), this.totalPending);
-        this.values = this.sales.map(sale => {
+        let remaining = Math.min((input == null || input === '' ? 0 : Number(input)) + this.creditUsed, this.totalPending);
+        this.values = this.sales.map((sale, i) => {
+            if (this.isCredit(sale)) return this.values[i] ?? 0;
             const amount = this.round(Math.max(0, Math.min(remaining, sale.pendingValue)));
             remaining = this.round(remaining - amount);
             return amount;
         });
-        this.selected = this.sales.filter((_, i) => this.values[i] > 0);
+        this.selected = this.sales.filter((_, i) => this.values[i] !== 0);
         this.updateTotal();
     }
 
@@ -71,7 +86,7 @@ export class RevenueSalesSelection {
 
     // Taxa de IVA comum às vendas selecionadas (undefined se forem diferentes)
     get commonIvaRate(): number | undefined {
-        const rates = new Set(this.sales.filter((_, i) => this.values[i] > 0).map(sale => sale.ivaRate));
+        const rates = new Set(this.sales.filter((_, i) => this.values[i] !== 0).map(sale => sale.ivaRate));
         return rates.size === 1 ? [...rates][0] : undefined;
     }
 
@@ -80,10 +95,14 @@ export class RevenueSalesSelection {
         const lines: RevenueSaleLine[] = [];
         for (let i = 0; i < this.sales.length; i++) {
             const value = this.values[i] ?? 0;
-            if (value > this.sales[i].pendingValue + 0.005) {
-                return { lines: [], error: 'O valor recebido da venda ' + this.sales[i].documentNumber + ' excede o valor pendente.' };
+            const sale = this.sales[i];
+            if (!this.isCredit(sale) && (value < 0 || value > sale.pendingValue + 0.005)) {
+                return { lines: [], error: 'O valor recebido da venda ' + sale.documentNumber + ' tem de estar entre 0 e o valor pendente.' };
             }
-            if (value > 0) lines.push({ saleId: this.sales[i].saleId, value });
+            if (this.isCredit(sale) && (value > 0 || value < sale.pendingValue - 0.005)) {
+                return { lines: [], error: 'O crédito usado de ' + sale.documentNumber + ' tem de estar entre ' + sale.pendingValue + ' € e 0.' };
+            }
+            if (value !== 0) lines.push({ saleId: sale.saleId, value });
         }
         return { lines };
     }

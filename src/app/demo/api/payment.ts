@@ -28,7 +28,8 @@ export interface PaymentDocumentDetail {
     documentNumber: string | null;
     date: string;
     paymentMethod: string;
-    accountId: number;
+    accountId: number | null;
+    creditorId?: number | null;
     originId: number;
     value: number;
     lines: PaymentDocumentLine[];

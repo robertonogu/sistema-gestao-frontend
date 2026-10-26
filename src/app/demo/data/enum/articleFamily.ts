@@ -12,6 +12,7 @@ export enum ArticleFamily {
     SITE_CONSUMABLES = 'Consumíveis de obra',
     GLASS_MIRRORS = 'Vidros e espelhos',
     CLADDING = 'Revestimentos',
+    STONES = 'Pedras',
     OTHER_MATERIALS = 'Outros materiais',
     REAL_ESTATE = 'Imóveis'
 }

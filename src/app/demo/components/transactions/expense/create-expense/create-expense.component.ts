@@ -7,6 +7,8 @@ import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng
 import { AccountName } from 'src/app/demo/api/accountName';
 import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
+import { CreditableExpense, ReturnableItem } from 'src/app/demo/api/creditNote';
+import { CreditorService } from 'src/app/demo/service/company/creditorService';
 import { ExpenseEdit, ExpenseItemEdit } from 'src/app/demo/api/expenseEdit';
 import { ItemName } from 'src/app/demo/api/itemName';
 import { Origin } from 'src/app/demo/api/origin';
@@ -89,7 +91,7 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
   display: grid;
   /* seleção | nome | categoria | qtd | unidade | valor s/ IVA | IVA | total | associado a | ações
      (colunas flexíveis encolhem até ao mínimo, para caber sem scroll horizontal num ecrã normal) */
-  grid-template-columns: 32px minmax(150px, 1.6fr) minmax(150px, 1.3fr) 92px 150px 108px 112px 108px minmax(90px, 0.6fr) 84px;
+  grid-template-columns: 32px minmax(150px, 1.6fr) minmax(125px, 1.1fr) 92px 150px 108px 137px 108px minmax(90px, 0.6fr) 84px;
   align-items: center;
   column-gap: 6px;
   min-width: fit-content;
@@ -118,6 +120,8 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 }
 
 .item-row:last-child { border-bottom: none; }
+
+.return-label { color: var(--orange-600, #c2410c); font-weight: 500; }
 
 /* As células podem encolher abaixo da largura natural dos campos (senão impunham um mínimo e forçavam scroll) */
 .item-head > *, .item-row > * { min-width: 0; }
@@ -305,6 +309,44 @@ export class CreateExpenseComponent implements OnInit {
 
   editingExpenseId?: number;
 
+  // Pagamento feito por um credor (com dinheiro dele): nenhuma conta da empresa é movimentada
+  paidByCreditor: boolean = false;
+  selectedCreditor: number | null = null;
+  creditorNames: ItemName[] = [];
+
+  // Contas da empresa e credores (pessoas que pagam com dinheiro delas) na mesma lista: 'A<id>' = conta, 'C<id>' = credor
+  paidFromOptions: { label: string; items: { label: string; value: string }[] }[] = [];
+  selectedPaidFrom: string | null = null;
+
+  private buildPaidFromOptions() {
+    this.paidFromOptions = [
+      { label: 'Contas', items: (this.accountNames ?? []).map(account => ({ label: account.name, value: 'A' + account.objectId })) },
+      { label: 'Credores', items: this.creditorNames.map(creditor => ({ label: creditor.name, value: 'C' + creditor.id })) }
+    ].filter(group => group.items.length > 0);
+  }
+
+  onPaidFromChange() {
+    const value = this.selectedPaidFrom ?? '';
+    this.paidByCreditor = value.startsWith('C');
+    this.selectedCreditor = this.paidByCreditor ? Number(value.substring(1)) : null;
+    this.selectedAccount = !this.paidByCreditor && value ? Number(value.substring(1)) : undefined as any;
+    this.onAccountChange();
+  }
+
+  // Nota de crédito: fatura do fornecedor que é creditada (opcional)
+  creditableExpenses: (CreditableExpense & { label: string })[] = [];
+  selectedCreditedExpense: number | null = null;
+
+  // Devolução de material de stock ao fornecedor: escolhe-se a linha de compra e de onde sai o material
+  // (stock e/ou obras a que foi alocado). returnDialogIndex null = nova linha.
+  returnDialogVisible: boolean = false;
+  returnDialogIndex: number | null = null;
+  returnableItems: (ReturnableItem & { label: string })[] = [];
+  selectedReturnable: ReturnableItem | null = null;
+  returnFromStock: number = 0;
+  returnFromAllocations: { budgetItemId: number; label: string; max: number; quantity: number }[] = [];
+  returnValidationAttempted: boolean = false;
+
   // Pagamentos da despesa em edição (cada um é um documento de pagamento, que pode liquidar outras faturas)
   expensePayments: ExpensePayment[] = [];
   loadingEdit: boolean = false;
@@ -319,6 +361,7 @@ export class CreateExpenseComponent implements OnInit {
     private expenseService: ExpenseService,
     private supplierService: SupplierService,
     private paymentService: PaymentService,
+    private creditorService: CreditorService,
     private confirmationService: ConfirmationService,
     private externalEntityService: ExternalEntityService,
     private messageService: MessageService,
@@ -333,7 +376,10 @@ export class CreateExpenseComponent implements OnInit {
 
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;
+      this.buildPaidFromOptions();
     });
+
+    this.creditorService.getCreditorNames().subscribe(names => { this.creditorNames = names; this.buildPaidFromOptions(); });
 
     this.expenseService.getUsedItemNames().subscribe((items) => {
       this.itemNames = items.map(item => item.name);
@@ -384,6 +430,8 @@ export class CreateExpenseComponent implements OnInit {
     this.selectedOrigin = expenseEdit.originId as any;
     this.selectedPaymentCondition = expenseEdit.paymentCondition;
     this.paymentDeadline = expenseEdit.paymentDeadline ? new Date(expenseEdit.paymentDeadline) : undefined as any;
+    this.selectedCreditedExpense = expenseEdit.creditedExpenseId ?? null;
+    this.loadCreditableExpenses();
 
     this.itemInputs.clear();
     for (const item of expenseEdit.itemList) {
@@ -395,7 +443,8 @@ export class CreateExpenseComponent implements OnInit {
   }
 
   private buildItemInputFromEdit(item: ExpenseItemEdit): FormGroup {
-    const costAllocation = item.costAllocations?.[0];
+    const isReturn = !!item.returnedItemId;
+    const costAllocation = isReturn ? undefined : item.costAllocations?.[0];
     const subCategoryType = (SubCategoryType as any)[item.subCategoryType] ?? null;
     const isSelectable = this.isBulkAssociable(subCategoryType);
 
@@ -414,11 +463,173 @@ export class CreateExpenseComponent implements OnInit {
       toolId: [item.toolId ?? null],
       equipmentId: [item.equipmentId ?? null],
       associationName: [item.associationName ?? null],
-      selected: [{ value: false, disabled: !isSelectable }],
+      returnedItemId: [item.returnedItemId ?? null],
+      returnLabel: [item.returnedItemLabel ?? null],
+      returnSources: [isReturn ? item.costAllocations : []],
+      selected: [{ value: false, disabled: !isSelectable || isReturn }],
     });
     this.wireSelectedDisabling(group);
     this.wirePurchaseLinkReset(group);
     return group;
+  }
+
+  get isCreditNote(): boolean {
+    return (this.selectedDocumentType as unknown as string) === 'CREDIT_NOTE';
+  }
+
+  onDocumentTypeChange(): void {
+    if (!this.isCreditNote) {
+      this.selectedCreditedExpense = null;
+      return;
+    }
+    // A nota de crédito não tem pagamento: abate à fatura creditada ou fica como saldo a favor
+    this.isIntegralPayment = false;
+    this.disablePaidValue = false;
+    this.paymentValue = 0;
+    this.loadCreditableExpenses();
+  }
+
+  onOriginChange(): void {
+    this.selectedCreditedExpense = null;
+    this.loadCreditableExpenses();
+  }
+
+  private loadCreditableExpenses(): void {
+    if (!this.isCreditNote || !this.selectedOrigin) {
+      this.creditableExpenses = [];
+      return;
+    }
+    this.expenseService.getCreditableExpenses(this.selectedOrigin).subscribe(expenses =>
+      this.creditableExpenses = expenses.map(expense => ({ ...expense, label: this.creditableExpenseLabel(expense) })));
+  }
+
+  creditableExpenseLabel(expense: CreditableExpense): string {
+    const date = new Date(expense.date).toLocaleDateString('pt-PT');
+    return `${expense.documentNumber} · ${date} · ${this.fmt(expense.totalValue)} (em dívida ${this.fmt(expense.amountDue)})`;
+  }
+
+  isReturnRow(index: number): boolean {
+    return !!this.itemInputs.at(index).value.returnedItemId;
+  }
+
+  openReturnDialog(index: number | null = null): void {
+    if (!this.selectedOrigin) {
+      this.messageService.add({ severity: 'warn', summary: 'Origem obrigatória', detail: 'Selecione primeiro o fornecedor a quem é devolvido o material.' });
+      return;
+    }
+
+    this.returnDialogIndex = index;
+    this.returnValidationAttempted = false;
+    this.selectedReturnable = null;
+    this.returnFromStock = 0;
+    this.returnFromAllocations = [];
+    this.returnableItems = [];
+    this.returnDialogVisible = true;
+
+    this.expenseService.getReturnableItems(this.selectedOrigin, this.editingExpenseId).subscribe(loaded => {
+      const items = loaded.map(item => ({ ...item, label: this.returnableLabel(item) }));
+      this.returnableItems = items;
+      if (index === null) return;
+
+      // Edição de uma devolução: repõe a linha de compra e as quantidades escolhidas
+      const row = this.itemInputs.at(index).value;
+      const returnable = items.find(item => item.expenseItemId === row.returnedItemId) ?? null;
+      if (!returnable) return;
+      this.onReturnableSelect(returnable);
+      const sources: CostAllocationCreation[] = row.returnSources ?? [];
+      this.returnFromAllocations.forEach(allocation => {
+        allocation.quantity = sources.find(source => source.budgetItemId === allocation.budgetItemId)?.quantity ?? 0;
+      });
+      const fromConstructions = sources.reduce((sum, source) => sum + (Number(source.quantity) || 0), 0);
+      this.returnFromStock = Math.max(0, -Number(row.quantity) - fromConstructions);
+    });
+  }
+
+  onReturnableSelect(returnable: ReturnableItem | null): void {
+    this.selectedReturnable = returnable;
+    this.returnFromStock = returnable ? Math.min(returnable.stockQuantity, returnable.returnableQuantity) : 0;
+    this.returnFromAllocations = (returnable?.allocations ?? []).map(allocation => ({
+      budgetItemId: allocation.budgetItemId,
+      label: allocation.constructionName ? `${allocation.constructionName} · ${allocation.budgetItemName}` : allocation.budgetItemName,
+      max: allocation.quantity,
+      quantity: 0,
+    }));
+  }
+
+  returnableLabel(item: ReturnableItem): string {
+    const date = new Date(item.date).toLocaleDateString('pt-PT');
+    return `${item.name} · ${item.documentNumber} (${date}) · ${item.returnableQuantity} por devolver`;
+  }
+
+  get returnTotalQuantity(): number {
+    return (Number(this.returnFromStock) || 0) + this.returnFromAllocations.reduce((sum, allocation) => sum + (Number(allocation.quantity) || 0), 0);
+  }
+
+  get returnStockInvalid(): boolean {
+    return !!this.selectedReturnable && (Number(this.returnFromStock) || 0) > this.selectedReturnable.stockQuantity + 1e-6;
+  }
+
+  returnAllocationInvalid(allocation: { max: number; quantity: number }): boolean {
+    return (Number(allocation.quantity) || 0) > allocation.max + 1e-6;
+  }
+
+  get returnTotalInvalid(): boolean {
+    return !!this.selectedReturnable
+      && (this.returnTotalQuantity <= 0 || this.returnTotalQuantity > this.selectedReturnable.returnableQuantity + 1e-6);
+  }
+
+  saveReturnDialog(): void {
+    this.returnValidationAttempted = true;
+    const returnable = this.selectedReturnable;
+    if (!returnable) {
+      this.messageService.add({ severity: 'warn', summary: 'Compra obrigatória', detail: 'Selecione a linha de compra que é devolvida.' });
+      return;
+    }
+    if (this.returnStockInvalid || this.returnTotalInvalid || this.returnFromAllocations.some(allocation => this.returnAllocationInvalid(allocation))) {
+      this.messageService.add({ severity: 'warn', summary: 'Quantidade inválida', detail: 'Reveja as quantidades a devolver: não podem exceder o stock, o alocado a cada obra nem o que falta devolver.' });
+      return;
+    }
+
+    const quantity = this.returnTotalQuantity;
+    const returnSources: CostAllocationCreation[] = this.returnFromAllocations
+      .filter(allocation => (Number(allocation.quantity) || 0) > 0)
+      .map(allocation => ({ budgetItemId: allocation.budgetItemId, quantity: Number(allocation.quantity) }));
+
+    if (this.returnDialogIndex === null) {
+      this.itemInputs.push(this.buildItemInput());
+      this.returnDialogIndex = this.itemInputs.length - 1;
+    }
+    const index = this.returnDialogIndex;
+    const row = this.itemInputs.at(index) as FormGroup;
+    row.patchValue({
+      subCategoryType: (SubCategoryType as any)[returnable.subCategoryType] ?? null,
+      name: returnable.name,
+      unit: returnable.unit,
+      iva: this.validIvaRates.includes(returnable.iva) ? returnable.iva : 0,
+      quantity: -quantity,
+      value: -Math.round(quantity * returnable.unitValue * 100) / 100,
+      constructionId: null,
+      budgetItemId: null,
+      allocationQuantity: null,
+      vehicleId: null,
+      toolId: null,
+      equipmentId: null,
+      returnedItemId: returnable.expenseItemId,
+      returnLabel: `Devolução de ${returnable.documentNumber}`,
+      returnSources: returnSources,
+      selected: false,
+    });
+    row.get('selected')?.disable({ emitEvent: false });
+    row.get('value')?.enable({ emitEvent: false });
+    row.get('total')?.disable({ emitEvent: false });
+    this.recalcItemTotal(index);
+
+    this.closeReturnDialog();
+  }
+
+  closeReturnDialog(): void {
+    this.returnDialogVisible = false;
+    this.returnDialogIndex = null;
   }
 
   back() {
@@ -696,6 +907,9 @@ export class CreateExpenseComponent implements OnInit {
       vehicleId: [null],
       toolId: [null],
       equipmentId: [null],
+      returnedItemId: [null],
+      returnLabel: [null],
+      returnSources: [[]],
       selected: [{ value: false, disabled: true }],
     });
     this.wireSelectedDisabling(group);
@@ -765,14 +979,19 @@ export class CreateExpenseComponent implements OnInit {
     const grp = this.itemInputs.at(index) as FormGroup;
     const value = Number(grp.value.value) || 0;
     const ivaRate = Number(grp.value.iva) || 0;
-    grp.get('total')?.setValue(value + value * ivaRate / 100, { emitEvent: false });
+    grp.get('total')?.setValue(this.roundCents(value + value * ivaRate / 100), { emitEvent: false });
+  }
+
+  // Valores em euros ao cêntimo, tal como o backend os guarda
+  private roundCents(value: number): number {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
   }
 
   private recalcItemValue(index: number): void {
     const grp = this.itemInputs.at(index) as FormGroup;
     const total = Number(grp.value.total) || 0;
     const ivaRate = Number(grp.value.iva) || 0;
-    grp.get('value')?.setValue(ivaRate ? total / (1 + ivaRate / 100) : total, { emitEvent: false });
+    grp.get('value')?.setValue(this.roundCents(ivaRate ? total / (1 + ivaRate / 100) : total), { emitEvent: false });
   }
 
   onItemValueChange(index: number): void {
@@ -1067,6 +1286,7 @@ export class CreateExpenseComponent implements OnInit {
   associationLabel(index: number): string {
     const row = this.itemInputs.at(index).value;
     const original = this.itemInputs.at(index).get('associationName')?.value ?? null;
+    if (row.returnedItemId) return row.returnLabel ?? 'Devolução';
     if (row.vehicleId) return this.vehicleNames.find(v => v.id === row.vehicleId)?.name ?? original ?? '';
     if (row.equipmentId) return this.equipmentNames.find(e => e.id === row.equipmentId)?.name ?? original ?? '';
     if (row.toolId) return this.toolNames.find(t => t.id === row.toolId)?.name ?? original ?? '';
@@ -1206,15 +1426,15 @@ export class CreateExpenseComponent implements OnInit {
   get netValue(): number {
     const servicesTotal = this.inputs.controls.reduce((sum, c) => sum + (Number(c.value.value) || 0), 0);
     const itemsTotal = this.itemInputs.controls.reduce((sum, _, index) => sum + this.itemNetValue(index), 0);
-    return servicesTotal + itemsTotal;
+    return this.roundCents(servicesTotal + itemsTotal);
   }
 
   get iva(): number {
-    return this.itemInputs.controls.reduce((sum, _, index) => sum + (this.itemTotal(index) - this.itemNetValue(index)), 0);
+    return this.roundCents(this.itemInputs.controls.reduce((sum, _, index) => sum + (this.itemTotal(index) - this.itemNetValue(index)), 0));
   }
 
   get totalValue(): number {
-    return this.netValue + this.iva;
+    return this.roundCents(this.netValue + this.iva);
   }
 
   get paymentValue(): number {
@@ -1235,14 +1455,25 @@ export class CreateExpenseComponent implements OnInit {
       this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Preencha todos os campos obrigatórios dos itens.' });
       return;
     }
+    if (this.isCreditNote && this.totalValue >= 0) {
+      this.messageService.add({ severity: 'warn', summary: 'Valor inválido', detail: 'Uma nota de crédito tem de ter valor total negativo (itens com quantidade ou valor negativo).' });
+      return;
+    }
+    if (!this.isCreditNote && this.totalValue < 0) {
+      this.messageService.add({ severity: 'warn', summary: 'Valor inválido', detail: 'Um documento com valor total negativo tem de ser registado como Nota de Crédito.' });
+      return;
+    }
 
     const itemList: ItemCreation[] = [];
     let item: ItemCreation;
 
     this.itemInputs.controls.forEach((control, index) => {
-      const costAllocations: CostAllocationCreation[] = control.value.budgetItemId
-        ? [{ budgetItemId: control.value.budgetItemId, quantity: control.value.allocationQuantity }]
-        : [];
+      // Numa devolução, as alocações são as quantidades que voltam de cada obra
+      const costAllocations: CostAllocationCreation[] = control.value.returnedItemId
+        ? (control.value.returnSources ?? [])
+        : control.value.budgetItemId
+          ? [{ budgetItemId: control.value.budgetItemId, quantity: control.value.allocationQuantity }]
+          : [];
 
       item = {
         subCategoryType: this.subCategoryKey(control.value.subCategoryType),
@@ -1256,7 +1487,8 @@ export class CreateExpenseComponent implements OnInit {
         constructionId: control.value.budgetItemId ? undefined : (control.value.constructionId ?? undefined),
         vehicleId: control.value.vehicleId,
         toolId: control.value.toolId,
-        equipmentId: control.value.equipmentId
+        equipmentId: control.value.equipmentId,
+        returnedItemId: control.value.returnedItemId ?? undefined
       } as ItemCreation;
       itemList.push(item);
     });
@@ -1264,8 +1496,14 @@ export class CreateExpenseComponent implements OnInit {
     this.expenseCreation = {
       date: this.date, originId: this.selectedOrigin, documentType: this.selectedDocumentType, documentNumber: this.documentNumber,
       paymentCondition: this.selectedPaymentCondition, paymentDeadline: this.paymentDeadline, netValue: this.netValue, iva: this.iva, totalValue: this.totalValue, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
-      accountId: this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList
+      accountId: this.paidByCreditor ? undefined : this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList,
+      creditorId: this.paidByCreditor ? (this.selectedCreditor ?? undefined) : undefined,
+      creditedExpenseId: this.isCreditNote ? (this.selectedCreditedExpense ?? undefined) : undefined
     } as ExpenseCreation;
+
+    if (this.isCreditNote) {
+      this.expenseCreation = { ...this.expenseCreation, isIntegralPayment: false, paymentValue: 0, accountId: undefined as any, paymentMethod: undefined as any };
+    }
 
     if (this.editingExpenseId) {
       this.expenseService.updateExpense(this.editingExpenseId, this.expenseCreation).subscribe({
@@ -1302,6 +1540,11 @@ export class CreateExpenseComponent implements OnInit {
     this.disablePaidValue = false;
     this.selectedAccount = undefined as any;
     this.selectedPaymentMethod = undefined as any;
+    this.selectedCreditedExpense = null;
+    this.creditableExpenses = [];
+    this.paidByCreditor = false;
+    this.selectedCreditor = null;
+    this.selectedPaidFrom = null;
     this.refreshPaymentMethodOptions();
 
     this.inputs.clear();
