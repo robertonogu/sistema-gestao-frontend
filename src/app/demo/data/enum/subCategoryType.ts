@@ -69,6 +69,7 @@ export enum SubCategoryType {
     GRAPHIC_DESIGN = 'Design Gráfico',
     ADVERTISING = 'Publicidade',
     DUES = 'Quotas de Associações',
+    LICENSES_PERMITS = 'Alvarás e Licenças',
     CLIENT_SUPPLIER_MEALS = 'Refeições com Clientes / Fornecedores',
 
     // VEHICLES

@@ -26,7 +26,8 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
     SubCategoryType.OFFICE_SUPPLIES, SubCategoryType.OFFICE_EQUIPMENT_REPAIR,
     SubCategoryType.CLOUD_STORAGE, SubCategoryType.SOFTWARE, SubCategoryType.ACCOUNTING_SERVICES, SubCategoryType.LEGAL_SERVICES,
     SubCategoryType.CONSULTING_SERVICES, SubCategoryType.COMPANY_INSURANCE, SubCategoryType.CLEANING, SubCategoryType.FACILITY_SECURITY,
-    SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.DUES
+    SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.DUES,
+    SubCategoryType.LICENSES_PERMITS
   ],
   [CategoryType.COMMERCIAL]: [
     SubCategoryType.GRAPHIC_DESIGN, SubCategoryType.CLIENT_SUPPLIER_MEALS, SubCategoryType.ADVERTISING
