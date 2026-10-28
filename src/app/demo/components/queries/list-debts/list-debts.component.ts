@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TableFilterEvent } from 'primeng/table';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
-import { OriginType } from 'src/app/demo/api/originType';
+import { ORIGIN_GROUP_ORDER, OriginType, originGroupLabel } from 'src/app/demo/api/originType';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
 
 // Débitos agrupados por origem: uma linha por origem com o total em débito (fechadas por omissão);
@@ -36,16 +36,15 @@ export class ListDebtsComponent {
 
   // Origins that currently have debts (options of the origin filter). Filtered by originId, not by name: the same
   // person can be an employee, a creditor and a financer, and picking one must not bring the other two
-  originOptions: { label: string; value: number; type: OriginType | null }[] = [];
+  // Agrupadas por tipo (Pessoal, Credores…), para distinguir nomes repetidos sem as bolas
+  originOptions: { label: string; items: { label: string; value: number }[] }[] = [];
 
   ngOnInit(): void {
     this.expenseService.getExpensesInDebt(this.currentPage, this.pageSize).subscribe((expensesInDebt) => {
       this.expensesInDebt = expensesInDebt;
       this.debtsByOrigin = this.groupByOrigin(expensesInDebt);
       this.expandedRows = {};
-      this.originOptions = [...this.debtsByOrigin]
-        .sort((a, b) => a.origin.localeCompare(b.origin))
-        .map(group => ({ label: group.origin, value: group.originId, type: group.originType }));
+      this.originOptions = this.buildOriginOptions(this.debtsByOrigin);
       this.updateTotal(this.debtsByOrigin);
     });
   }
@@ -59,7 +58,28 @@ export class ListDebtsComponent {
     this.totalInDebt = rows.reduce((sum, group) => sum + group.totalDebt, 0);
   }
 
-  // Origens com mais dívida primeiro; dentro de cada uma, as faturas pela ordem em que vêm da API
+  groupLabel(type: OriginType | null): string {
+    return originGroupLabel(type);
+  }
+
+  // A origem desta linha é a primeira do seu tipo nas linhas mostradas (com ou sem filtro)
+  startsGroup(rows: DebtsByOrigin[], rowIndex: number): boolean {
+    return rowIndex === 0 || rows[rowIndex - 1]?.originType !== rows[rowIndex]?.originType;
+  }
+
+  private buildOriginOptions(groups: DebtsByOrigin[]) {
+    return ORIGIN_GROUP_ORDER
+      .map(type => ({
+        label: originGroupLabel(type),
+        items: groups.filter(group => group.originType === type)
+          .sort((a, b) => a.origin.localeCompare(b.origin))
+          .map(group => ({ label: group.origin, value: group.originId }))
+      }))
+      .filter(option => option.items.length);
+  }
+
+  // Por tipo (Pessoal, Credores, Financiadores, Fornecedores…) para as linhas de grupo; dentro de cada tipo, as
+  // origens com mais dívida primeiro; dentro de cada origem, as faturas pela ordem em que vêm da API
   private groupByOrigin(expenses: ExpenseInDebt[]): DebtsByOrigin[] {
     const groups = new Map<number, DebtsByOrigin>();
     for (const expense of expenses) {
@@ -71,7 +91,8 @@ export class ListDebtsComponent {
       group.expenses.push(expense);
       group.totalDebt += expense.debtValue;
     }
-    return [...groups.values()].sort((a, b) => b.totalDebt - a.totalDebt);
+    const typeIndex = (group: DebtsByOrigin) => group.originType ? ORIGIN_GROUP_ORDER.indexOf(group.originType) : ORIGIN_GROUP_ORDER.length;
+    return [...groups.values()].sort((a, b) => typeIndex(a) - typeIndex(b) || b.totalDebt - a.totalDebt);
   }
 
   formatDate(date: string | null): string | undefined {

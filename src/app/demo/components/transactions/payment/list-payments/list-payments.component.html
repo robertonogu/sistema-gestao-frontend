@@ -74,8 +74,9 @@
                                             <ng-template let-origin pTemplate="item">
                                                 <div class="flex align-items-center"><app-origin-badge [type]="origin.type" />{{ origin.name }}</div>
                                             </ng-template>
+                                            <!-- Sem nada escolhido o PrimeNG também usa este template, com origin vazio (mostra o placeholder) -->
                                             <ng-template let-origin pTemplate="selectedItem">
-                                                <div class="flex align-items-center"><app-origin-badge [type]="origin.type" />{{ origin.name }}</div>
+                                                <div *ngIf="origin" class="flex align-items-center"><app-origin-badge [type]="origin.type" />{{ origin.name }}</div>
                                             </ng-template>
                                         </p-dropdown>
                                     </ng-template>

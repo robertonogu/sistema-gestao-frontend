@@ -16,7 +16,6 @@ import { ListDebtsRoutingModule } from './list-debts-routing.module';
 import { ListDebtsComponent } from './list-debts.component';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { OriginBadgeComponent } from 'src/app/demo/components/shared/origin-badge/origin-badge.component';
 
 @NgModule({
   imports: [
@@ -35,8 +34,7 @@ import { OriginBadgeComponent } from 'src/app/demo/components/shared/origin-badg
 		ProgressBarModule,
 		ToastModule,
 		ListDebtsRoutingModule,
-		TooltipModule,
-		OriginBadgeComponent
+		TooltipModule
   ],
   declarations: [ListDebtsComponent]
 })

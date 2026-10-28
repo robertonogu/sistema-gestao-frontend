@@ -43,13 +43,10 @@
                                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
                                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                         <p-multiSelect [ngModel]="value" [options]="originOptions" optionLabel="label" optionValue="value" placeholder="Todas"
+                                            [group]="true" optionGroupLabel="label" optionGroupChildren="items"
                                             [showClear]="true" [filter]="true" appendTo="body" [style]="{ 'min-width': '14rem' }"
                                             display="chip" selectedItemsLabel="{0} origens selecionadas" [maxSelectedLabels]="2"
-                                            (onChange)="filter($event.value?.length ? $event.value : null)" (onClear)="filter(null)">
-                                            <ng-template let-option pTemplate="item">
-                                                <div class="flex align-items-center"><app-origin-badge [type]="option.type" />{{ option.label }}</div>
-                                            </ng-template>
-                                        </p-multiSelect>
+                                            (onChange)="filter($event.value?.length ? $event.value : null)" (onClear)="filter(null)" />
                                     </ng-template>
                                 </p-columnFilter>
                             </div>
@@ -59,7 +56,12 @@
                     </tr>
                 </ng-template>
 
-                <ng-template pTemplate="body" let-group let-expanded="expanded">
+                <!-- Título do grupo (Pessoal, Credores…) por cima da primeira origem de cada tipo. Não usa o rowGroupMode do
+                     PrimeNG: com linhas que abrem (rowexpansion) ele deixa de mostrar as linhas e só mostra os grupos -->
+                <ng-template pTemplate="body" let-group let-expanded="expanded" let-rowIndex="rowIndex">
+                    <tr *ngIf="startsGroup(dt.filteredValue ?? debtsByOrigin, rowIndex)">
+                        <td colspan="4" class="surface-100 text-900 font-bold">{{ groupLabel(group.originType) }}</td>
+                    </tr>
                     <tr>
                         <td>
                             <button
@@ -71,7 +73,7 @@
                                 [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
                             ></button>
                         </td>
-                        <td class="font-semibold white-space-nowrap"><app-origin-badge [type]="group.originType" />{{ group.origin }}</td>
+                        <td class="font-semibold">{{ group.origin }}</td>
                         <td>{{ group.expenses.length }}</td>
                         <td class="text-red-600 font-semibold">{{ group.totalDebt | number: '1.2-2' }} €</td>
                     </tr>

@@ -4,6 +4,18 @@
 
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
                 <div class="text-900 text-xl font-semibold">Saldos</div>
+                <div class="flex sm:ml-auto">
+                    <button
+                        class="p-button-rounded"
+                        icon="pi pi-download"
+                        pButton
+                        pTooltip="Exportar PDF"
+                        tooltipPosition="bottom"
+                        type="button"
+                        [disabled]="loading || !balances.length"
+                        (click)="exportPdf()"
+                    ></button>
+                </div>
             </div>
 
 			<!-- Uma linha por tipo (Funcionários, Credores…) com as origens desse tipo por baixo; a ordem vem da API -->
@@ -31,8 +43,8 @@
                 <ng-template pTemplate="body" let-balance>
                     <tr class="cursor-pointer" (click)="openStatement(balance)">
                         <td>{{ balance.name }}</td>
-                        <td class="text-right font-semibold" [ngClass]="balance.balance > 0 ? 'text-green-500' : balance.balance < 0 ? 'text-red-500' : 'text-900'">
-                            {{ balance.balance | number: '1.2-2' }} €
+                        <td class="text-right font-semibold" [ngClass]="balanceColor(balance.balance)">
+                            {{ abs(balance.balance) | number: '1.2-2' }} €
                         </td>
                         <td class="text-right"><i class="pi pi-angle-right text-500"></i></td>
                     </tr>
