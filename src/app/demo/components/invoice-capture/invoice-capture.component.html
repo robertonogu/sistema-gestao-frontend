@@ -9,7 +9,12 @@
             <div *ngSwitchCase="'loading'" class="text-600"><i class="pi pi-spin pi-spinner mr-2"></i>A abrir…</div>
 
             <div *ngSwitchCase="'invalid'" class="text-700">
-                Esta leitura não existe ou já expirou. No computador, feche e volte a abrir "Ler fatura" para gerar um código novo.
+                Não há nenhuma sessão ativa neste telemóvel (dura 12 horas). No computador, abra "Ler fatura" na Nova Despesa e leia o QR code.
+            </div>
+
+            <div *ngSwitchCase="'blocked'" class="text-700">
+                <p class="mt-0">No computador, clique em <b>"Ler fatura"</b> na Nova Despesa para poder enviar a fatura.</p>
+                <div class="text-600 text-sm"><i class="pi pi-spin pi-spinner mr-1"></i>À espera do computador…</div>
             </div>
 
             <ng-container *ngSwitchCase="'ready'">
@@ -30,6 +35,7 @@
                 <ul *ngIf="capture?.result?.warnings?.length" class="text-orange-600 text-sm pl-3 mb-0">
                     <li *ngFor="let warning of capture?.result?.warnings">{{ warning }}</li>
                 </ul>
+                <p class="text-600 text-sm mb-0">Para a próxima fatura, mantenha esta página aberta e clique outra vez em "Ler fatura" no computador (válido durante 12 horas).</p>
             </div>
 
             <ng-container *ngSwitchCase="'error'">

@@ -3,18 +3,16 @@ export enum SubCategoryType {
     // BANK
 
     MAINTENANCE_COMMISSIONS = 'Comissões de Manutenção',
-    IMMEDIATE_TRANSFERS = 'Transferências Imediatas',
     FEES = 'Taxas',
     COMMISSIONS = 'Comissões',
     CREDIT = 'Crédito',
     CARD_COMMISSIONS = 'Comissões de Cartões',
-    OTHER_BANK_COMMISSIONS = 'Outras Comissões Bancárias',
     LOAN_INTEREST = 'Juros de Empréstimos',
     OTHER_INTEREST = 'Outros Juros',
     BANK_GUARANTEES = 'Garantias Bancárias',
     FINANCING_CHARGES = 'Encargos Associados a Financiamentos',
     STAMP_DUTY = 'Imposto do Selo',
-    BANK_OPERATING_COSTS = 'Custos de Funcionamento',
+    BANK_EXPENSES = 'Despesas',
 
     // TAXES
 

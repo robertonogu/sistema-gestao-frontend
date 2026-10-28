@@ -6,6 +6,9 @@ import { InvoiceCapture } from '../../api/invoiceCapture';
 
 // Fotografias maiores são reduzidas no browser antes de enviar (rede móvel); o QR e a IA leem bem a este tamanho
 const MAX_IMAGE_SIDE = 2400;
+// O PC e o telemóvel guardam a sessão de leitura para não ser preciso um QR novo por cada fatura (a API expira-a às 12h)
+const SESSION_KEY = 'invoiceCaptureSession';
+const SESSION_MS = 12 * 60 * 60 * 1000;
 
 @Injectable({
     providedIn: 'root'
@@ -28,6 +31,31 @@ export class InvoiceCaptureService {
         const form = new FormData();
         form.append('file', file, fileName);
         return this.http.post<InvoiceCapture>(`${this.invoiceCapturesUrl}/${token}/file`, form);
+    }
+
+    // "Ler fatura" aberto no PC: a sessão aceita uma nova fatura
+    open(token: string): Observable<InvoiceCapture> {
+        return this.http.post<InvoiceCapture>(`${this.invoiceCapturesUrl}/${token}/open`, {});
+    }
+
+    // "Ler fatura" fechado no PC: o telemóvel deixa de poder enviar
+    close(token: string): Observable<InvoiceCapture> {
+        return this.http.post<InvoiceCapture>(`${this.invoiceCapturesUrl}/${token}/close`, {});
+    }
+
+    storedSessionToken(): string | null {
+        try {
+            const session = JSON.parse(localStorage.getItem(SESSION_KEY) ?? 'null');
+            return session && Date.now() - session.createdAt < SESSION_MS ? session.token : null;
+        } catch {
+            return null;
+        }
+    }
+
+    storeSession(token: string): void {
+        try {
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ token, createdAt: Date.now() }));
+        } catch { }
     }
 
     // Imagem PNG com o QR que abre a página do telemóvel para esta leitura

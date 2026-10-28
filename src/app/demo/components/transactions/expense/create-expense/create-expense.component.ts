@@ -305,12 +305,14 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   @ViewChild(SupplierFormDialogComponent) supplierForm!: SupplierFormDialogComponent;
 
   // ===== Ler fatura: o PC mostra um QR, o telemóvel fotografa e o formulário é preenchido com os dados lidos =====
-  // (só pelo telemóvel: o PC não envia ficheiros)
+  // (ou o PC carrega um PDF / imagem; a sessão com o telemóvel dura 12h, ver InvoiceCaptureService)
   readDialogVisible: boolean = false;
   readCapture: InvoiceCapture | null = null;
   readQrUrl: string | null = null;
   readError: string | null = null;
   private readPollTimer: any = null;
+  // A enviar um ficheiro do PC: ignora o "à espera" que a consulta ainda possa devolver
+  private readUploading: boolean = false;
   // Depois de preenchido: avisos da leitura e NIF do fornecedor que ainda não existe
   invoiceReading: InvoiceReading | null = null;
   quickAddOriginSubmitted: boolean = false;
@@ -693,23 +695,78 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Reaproveita a sessão das últimas 12h e abre-a para uma nova fatura (o telemóvel já ligado pode enviar logo);
+  // se expirou, cria uma nova
   openReadInvoice(): void {
     this.readDialogVisible = true;
     this.readError = null;
     this.readCapture = null;
+    this.readQrUrl = null;
+    const token = this.invoiceCaptureService.storedSessionToken();
+    if (token) {
+      this.invoiceCaptureService.open(token).subscribe({
+        next: (capture) => this.startReadSession(capture),
+        error: () => this.createReadSession()
+      });
+    } else {
+      this.createReadSession();
+    }
+  }
+
+  private createReadSession(): void {
     this.invoiceCaptureService.create().subscribe({
       next: (capture) => {
-        this.readCapture = capture;
-        this.readQrUrl = this.invoiceCaptureService.qrImageUrl(capture.token);
-        this.startReadPolling(capture.token);
+        this.invoiceCaptureService.storeSession(capture.token);
+        this.startReadSession(capture);
       },
       error: () => this.readError = 'Não foi possível iniciar a leitura. Tente de novo.'
+    });
+  }
+
+  private startReadSession(capture: InvoiceCapture): void {
+    // O diálogo pode ter sido fechado antes de a sessão abrir: fecha-a para o telemóvel não enviar
+    if (!this.readDialogVisible) {
+      this.invoiceCaptureService.close(capture.token).subscribe();
+      return;
+    }
+    this.readCapture = capture;
+    this.readQrUrl = this.invoiceCaptureService.qrImageUrl(capture.token);
+    this.startReadPolling(capture.token);
+  }
+
+  // PDF (ou imagem) carregado no próprio PC, para a mesma sessão
+  async onReadFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || !this.readCapture) return;
+
+    const token = this.readCapture.token;
+    this.readError = null;
+    this.readCapture = { ...this.readCapture, status: 'PROCESSING' };
+    this.readUploading = true;
+    const { blob, name } = await this.invoiceCaptureService.prepareFile(file);
+    this.invoiceCaptureService.upload(token, blob, name).subscribe({
+      next: (capture) => {
+        this.readUploading = false;
+        this.onReadCaptureUpdate(capture);
+      },
+      error: (err) => {
+        this.readUploading = false;
+        if (this.readCapture) this.readCapture = { ...this.readCapture, status: 'WAITING' };
+        this.readError = err?.error?.message ?? 'Não foi possível enviar o ficheiro. Tente de novo.';
+      }
     });
   }
 
   closeReadInvoice(): void {
     this.readDialogVisible = false;
     this.stopReadPolling();
+    // O telemóvel só volta a poder enviar quando "Ler fatura" for aberto outra vez
+    if (this.readCapture) {
+      this.invoiceCaptureService.close(this.readCapture.token).subscribe();
+      this.readCapture = null;
+    }
   }
 
   // O telemóvel envia a fotografia para a mesma leitura; o PC vai perguntando o estado até estar pronta
@@ -727,6 +784,7 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   private onReadCaptureUpdate(capture: InvoiceCapture): void {
     if (!this.readDialogVisible) return;
+    if (this.readUploading && capture.status === 'WAITING') return;
     this.readCapture = capture;
     if (capture.status === 'READY' && capture.result) {
       this.closeReadInvoice();

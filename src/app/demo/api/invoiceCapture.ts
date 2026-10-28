@@ -32,4 +32,6 @@ export interface InvoiceCapture {
     status: InvoiceCaptureStatus;
     result: InvoiceReading | null;
     errorMessage: string | null;
+    // O PC tem "Ler fatura" aberto: só assim o telemóvel pode enviar
+    pcWaiting: boolean;
 }

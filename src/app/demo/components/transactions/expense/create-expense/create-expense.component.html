@@ -864,7 +864,16 @@
 			<div class="text-700">Aponte a câmara do telemóvel para este código e fotografe a fatura.</div>
 			<img *ngIf="readQrUrl" [src]="readQrUrl" alt="QR code para o telemóvel" width="220" height="220" class="border-1 surface-border border-round" />
 			<i *ngIf="!readQrUrl && !readError" class="pi pi-spin pi-spinner text-2xl"></i>
+			<div class="text-600 text-sm">Se o telemóvel já leu este código nas últimas 12 horas, a página que lá está aberta já pode enviar a fatura.</div>
 			<div class="text-600 text-sm"><i class="pi pi-spin pi-spinner mr-1"></i>À espera da fotografia…</div>
+
+			<div class="flex align-items-center gap-2 w-full text-500 text-sm">
+				<div class="flex-1 border-top-1 surface-border"></div>ou<div class="flex-1 border-top-1 surface-border"></div>
+			</div>
+			<label class="p-button p-button-outlined" [class.p-disabled]="!readCapture">
+				<i class="pi pi-upload mr-2"></i>Carregar PDF ou imagem
+				<input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" class="hidden" [disabled]="!readCapture" (change)="onReadFileSelected($event)" />
+			</label>
 		</ng-container>
 		<ng-template #reading>
 			<i class="pi pi-spin pi-spinner text-3xl text-primary"></i>
