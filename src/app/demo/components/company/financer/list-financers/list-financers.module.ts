@@ -5,6 +5,7 @@ import { TableModule } from 'primeng/table';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -20,6 +21,7 @@ import { ListFinancersRoutingModule } from './list-financers-routing.module';
     ListFinancersRoutingModule,
     TableModule,
     TooltipModule,
+    TagModule,
     ConfirmDialogModule,
     ToastModule,
     DialogModule,

@@ -387,7 +387,7 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.originService.getOriginsGrouped().subscribe((origins) => {
+    this.originService.getOriginsGrouped(this.onlyActiveOrigins).subscribe((origins) => {
       this.origins = origins;
     });
 
@@ -396,7 +396,7 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
       this.buildPaidFromOptions();
     });
 
-    this.creditorService.getCreditorNames().subscribe(names => { this.creditorNames = names; this.buildPaidFromOptions(); });
+    this.creditorService.getCreditorNames(this.onlyActiveOrigins).subscribe(names => { this.creditorNames = names; this.buildPaidFromOptions(); });
 
     this.expenseService.getUsedItemNames().subscribe((items) => {
       this.itemNames = items.map(item => item.name);
@@ -876,8 +876,14 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Numa despesa nova só se escolhem funcionários, financiadores e credores ativos; ao editar aparecem todos,
+  // para a origem já gravada (mesmo que entretanto inativa) continuar na lista
+  private get onlyActiveOrigins(): boolean {
+    return !Number(this.route.snapshot.params['expenseId']);
+  }
+
   private selectNewOrigin(originId: number): void {
-    this.originService.getOriginsGrouped().subscribe(origins => {
+    this.originService.getOriginsGrouped(this.onlyActiveOrigins).subscribe(origins => {
       this.origins = origins;
       this.selectedOrigin = originId;
     });

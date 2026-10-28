@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Payment } from 'src/app/demo/api/payment';
-import { ItemName } from 'src/app/demo/api/itemName';
+import { OriginName } from 'src/app/demo/api/originType';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
 import { PaymentFilters, PaymentService } from 'src/app/demo/service/transactions/paymentService';
 import { OriginService } from 'src/app/demo/service/company/originService';
@@ -21,7 +21,7 @@ export class ListPaymentsComponent {
   pageSize: number = 20;
 
   PaymentMethod: any = PaymentMethod;
-  originNames: ItemName[] = [];
+  originNames: OriginName[] = [];
   private lastLazyEvent: any = { first: 0, rows: 20 };
 
   constructor(
@@ -44,10 +44,16 @@ export class ListPaymentsComponent {
   }
 
   private buildFilters(filters: any): PaymentFilters {
+    // Data: um dia (só a primeira data escolhida) ou um período
+    const dateRange = this.filterValue(filters, 'date');
+    const dateFrom: Date | undefined = Array.isArray(dateRange) ? dateRange[0] ?? undefined : undefined;
+    const dateTo: Date | undefined = Array.isArray(dateRange) ? dateRange[1] ?? dateFrom : undefined;
     return {
       documentNumber: this.filterValue(filters, 'documentNumber'),
       originId: this.filterValue(filters, 'origin'),
-      paymentMethod: this.filterValue(filters, 'paymentMethod')
+      paymentMethod: this.filterValue(filters, 'paymentMethod'),
+      dateFrom,
+      dateTo
     };
   }
 

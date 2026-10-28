@@ -3,10 +3,7 @@
 		<div class="card">
 
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
-                <div>
-                    <div class="text-900 text-xl font-semibold">Registos por aprovar</div>
-                    <div class="text-600 text-sm">Submetidos pelos funcionários na app. Só contam no Mapa de Tempos e nos custos da obra depois de aprovados.</div>
-                </div>
+                <div class="text-900 text-xl font-semibold">Registos por aprovar</div>
                 <div class="flex gap-2 sm:ml-auto">
                     <button pButton type="button" icon="pi pi-refresh" class="p-button-rounded p-button-outlined"
                             pTooltip="Atualizar" tooltipPosition="bottom" (click)="loadSubmissions()"></button>
@@ -49,10 +46,6 @@
 
                 <ng-template pTemplate="emptymessage">
                     <tr><td colspan="9" class="text-600">Não há registos por aprovar.</td></tr>
-                </ng-template>
-
-                <ng-template pTemplate="summary">
-                    <span *ngIf="submissions.length">{{ submissions.length }} registos por aprovar · {{ totalHours }} h</span>
                 </ng-template>
             </p-table>
 

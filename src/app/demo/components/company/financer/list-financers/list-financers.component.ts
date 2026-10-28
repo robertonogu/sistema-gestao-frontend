@@ -77,6 +77,17 @@ export class ListFinancersComponent implements OnInit {
     });
   }
 
+  // Inativo: deixa de aparecer para escolher na Nova Despesa e no Novo Pagamento
+  updateStatus(financer: Financer) {
+    this.financerService.changeStatus(financer.originId, !financer.active).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Estado do financiador atualizado.' });
+        this.load();
+      },
+      error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível alterar o estado.' })
+    });
+  }
+
   deleteFinancer(financer: Financer) {
     this.confirmationService.confirm({
       header: 'Tem a certeza que pretende eliminar ' + financer.name + '?',

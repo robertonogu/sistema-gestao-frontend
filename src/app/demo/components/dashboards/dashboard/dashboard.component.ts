@@ -34,6 +34,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     expensesValue: number = 0;
     debtsValue: number = 0;
     balance: number = 0;
+    cashBalance: number = 0;
+    bankBalance: number = 0;
+    // Só no primeiro carregamento (ao entrar): mostra o indicador em vez de valores a zero
+    loading: boolean = true;
     invoicedValue: number = 0;
     previousYearExpensesValue: number = 0;
     overdueDebtsCount: number = 0;
@@ -107,11 +111,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     loadDashboardData(): void {
-        this.dashboardService.getDashboardData(this.selectedYear).subscribe((dashboardData) => {
+        this.dashboardService.getDashboardData(this.selectedYear).subscribe({ next: (dashboardData) => {
             this.revenuesValue = dashboardData.revenuesValue;
             this.expensesValue = dashboardData.expensesValue;
             this.debtsValue = dashboardData.debtsValue;
             this.balance = dashboardData.balance;
+            this.cashBalance = dashboardData.cashBalance ?? 0;
+            this.bankBalance = dashboardData.bankBalance ?? 0;
             this.invoicedValue = dashboardData.invoicedValue ?? 0;
             this.previousYearExpensesValue = dashboardData.previousYearExpensesValue ?? 0;
             this.overdueDebtsCount = dashboardData.overdueDebtsCount ?? 0;
@@ -120,7 +126,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.categoryCosts = dashboardData.categoryCosts;
             this.expensesInDebt = dashboardData.expensesInDebt;
             this.initCharts();
-        });
+            this.loading = false;
+        }, error: () => this.loading = false });
     }
 
     async initCharts() {

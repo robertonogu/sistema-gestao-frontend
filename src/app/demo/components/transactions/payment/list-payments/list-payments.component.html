@@ -50,7 +50,18 @@
 
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Data</th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Data
+                                <p-columnFilter field="date" matchMode="equals" display="menu"
+                                    [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-calendar [ngModel]="value" selectionMode="range" dateFormat="dd/mm/yy" [showButtonBar]="true"
+                                            appendTo="body" (ngModelChange)="filter($event)" (onClearClick)="filter(null)" />
+                                    </ng-template>
+                                </p-columnFilter>
+                            </div>
+                        </th>
                         <th>
                             <div class="flex align-items-center">
                                 Origem
@@ -59,7 +70,14 @@
                                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                         <p-dropdown [ngModel]="value" [options]="originNames" optionLabel="name" optionValue="id"
                                             placeholder="Todas" [showClear]="true" [filter]="true" filterBy="name" appendTo="body" [style]="{ 'min-width': '14rem' }"
-                                            (onChange)="filter($event.value)" />
+                                            (onChange)="filter($event.value)">
+                                            <ng-template let-origin pTemplate="item">
+                                                <div class="flex align-items-center"><app-origin-badge [type]="origin.type" />{{ origin.name }}</div>
+                                            </ng-template>
+                                            <ng-template let-origin pTemplate="selectedItem">
+                                                <div class="flex align-items-center"><app-origin-badge [type]="origin.type" />{{ origin.name }}</div>
+                                            </ng-template>
+                                        </p-dropdown>
                                     </ng-template>
                                 </p-columnFilter>
                             </div>
@@ -97,7 +115,7 @@
                 <ng-template pTemplate="body" let-payment>
                     <tr>
                         <td>{{ payment.date | date: 'dd/MM/yyyy' }}</td>
-                        <td>{{ payment.origin }}</td>
+                        <td class="white-space-nowrap"><app-origin-badge [type]="payment.originType" />{{ payment.origin }}</td>
                         <td class="font-semibold">{{ payment.documentNumber }}</td>
                         <td class="text-red-500 font-semibold">- {{ payment.value | number: '1.2-2' }} €</td>
                         <td><span [class]="'payment-badge status-' + payment.paymentMethod.toLowerCase()">{{ PaymentMethod[payment.paymentMethod] }}</span></td>

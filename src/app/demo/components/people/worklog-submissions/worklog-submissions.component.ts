@@ -44,10 +44,6 @@ export class WorkLogSubmissionsComponent implements OnInit {
     this.constructionService.getConstructionNames().subscribe(names => this.constructionNames = names);
   }
 
-  get totalHours(): number {
-    return this.submissions.reduce((total, submission) => total + submission.hours, 0);
-  }
-
   loadSubmissions(): void {
     this.loading = true;
     this.submissionService.getPending().subscribe({

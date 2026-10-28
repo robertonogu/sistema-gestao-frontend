@@ -41,16 +41,21 @@
 
                 <ng-template pTemplate = "header">
                     <tr>
-                        <th style="width: 3.5rem">
-                            <button
-                                type="button"
-                                pButton
-                                pRipple
-                                icon="pi pi-filter"
-                                class="p-button-text p-button-rounded"
-                                pTooltip="Filtrar por estado"
-                                (click)="statusFilterPanel.toggle($event)"
-                            ></button>
+                        <th style="width: 3.5rem"></th>
+                        <th pSortableColumn = "name">Nome <p-sortIcon field = "name"></p-sortIcon></th>
+                        <th>
+                            <div class="flex align-items-center">
+                                Estado
+                                <button
+                                    type="button"
+                                    pButton
+                                    pRipple
+                                    icon="pi pi-filter"
+                                    class="p-button-text p-button-rounded p-button-sm ml-1"
+                                    pTooltip="Filtrar por estado"
+                                    (click)="statusFilterPanel.toggle($event)"
+                                ></button>
+                            </div>
                             <p-overlayPanel #statusFilterPanel appendTo="body">
                                 <div class="flex flex-column gap-2">
                                     <div class="flex align-items-center gap-2">
@@ -74,11 +79,6 @@
                                 </div>
                             </p-overlayPanel>
                         </th>
-                        <th pSortableColumn = "name">Nome <p-sortIcon field = "name"></p-sortIcon></th>
-                        <th>Vencimento Base</th>
-                        <th>Ajudas de Custo</th>
-                        <th>Subsídio de Alimentação</th>
-                        <th>Seguro de Saúde</th>
                         <th>Ações</th>
                     </tr>
                 </ng-template>
@@ -89,10 +89,10 @@
                             <i *ngIf="employee.internal" class="pi pi-star-fill text-yellow-500" pTooltip="Interno"></i>
                         </td>
                         <td>{{ employee.name }}</td>
-                        <td>{{ employee.baseSalary | number: '1.2-2' }} €</td>
-                        <td>{{ employee.allowance | number: '1.2-2' }} €</td>
-                        <td>{{ employee.foodAllowance | number: '1.2-2' }} €</td>
-                        <td>{{ employee.healthInsurance | number: '1.2-2' }} €</td>
+                        <td>
+                            <p-tag [value]="employee.statusEmployee === employeeStatus.ACTIVE ? 'Ativo' : 'Inativo'"
+                                [severity]="employee.statusEmployee === employeeStatus.ACTIVE ? 'success' : 'danger'"></p-tag>
+                        </td>
                         <td>
                             <p-button
                                 pRipple

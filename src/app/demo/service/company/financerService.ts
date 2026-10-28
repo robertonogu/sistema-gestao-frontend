@@ -31,6 +31,10 @@ export class FinancerService {
         return this.http.put<Financer>(this.financersUrl + "/" + financerId, financer, environment.httpOptions);
     }
 
+    changeStatus(financerId: number, isActive: boolean) : Observable<Financer> {
+        return this.http.patch<Financer>(this.financersUrl + "/status/" + financerId + "?isActive=" + isActive, {});
+    }
+
     deleteFinancer(financerId: number) {
         return this.http.delete(this.financersUrl + "/" + financerId);
     }

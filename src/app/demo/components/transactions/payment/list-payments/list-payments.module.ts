@@ -17,6 +17,8 @@ import { ListPaymentsComponent } from './list-payments.component';
 import { ListPaymentsRoutingModule } from './list-payments-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { CalendarModule } from 'primeng/calendar';
+import { OriginBadgeComponent } from 'src/app/demo/components/shared/origin-badge/origin-badge.component';
 
 @NgModule({
   imports: [
@@ -36,7 +38,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 		TagModule,
 		ListPaymentsRoutingModule,
 		TooltipModule,
-		ConfirmDialogModule
+		ConfirmDialogModule,
+		CalendarModule,
+		OriginBadgeComponent
   ],
   declarations: [ListPaymentsComponent]
 })

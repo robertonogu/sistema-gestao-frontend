@@ -126,6 +126,11 @@ export class AppMenuComponent implements OnInit, OnDestroy {
                         routerLink: ['/queries/currentAccounts']
                     },
                     {
+                        label: 'Saldos',
+                        icon: 'pi pi-fw pi-list',
+                        routerLink: ['/queries/balances']
+                    },
+                    {
                         label: 'Débitos',
                         icon: 'pi pi-fw pi-times-circle',
                         routerLink: ['/queries/debts']

@@ -18,10 +18,11 @@
 
 			<p-table #dt
                 stateStorage="session"
-                stateKey="table-debts" 
-                styleClass="p-datatable-striped" 
+                stateKey="table-debts-by-origin"
                 [tableStyle]="{ 'min-width': '50rem' }"
-                [value]="expensesInDebt"
+                [value]="debtsByOrigin"
+                dataKey="originId"
+                [expandedRowKeys]="expandedRows"
                 (onFilter)="onFilter($event)"
             >
 			    <ng-template pTemplate="caption">
@@ -34,69 +35,106 @@
 
                 <ng-template pTemplate="header">
                     <tr>
-                        <th>Data Limite</th>
-                        <th>Documento</th>
-                        <th>Data do Documento</th>
+                        <th style="width: 4rem"></th>
                         <th>
                             <div class="flex align-items-center">
                                 Origem
-                                <p-columnFilter field="origin" matchMode="in" display="menu"
+                                <p-columnFilter field="originId" matchMode="in" display="menu"
                                     [showMatchModes]="false" [showOperator]="false" [showAddButton]="false" [showApplyButton]="false" [showClearButton]="false">
                                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                         <p-multiSelect [ngModel]="value" [options]="originOptions" optionLabel="label" optionValue="value" placeholder="Todas"
                                             [showClear]="true" [filter]="true" appendTo="body" [style]="{ 'min-width': '14rem' }"
                                             display="chip" selectedItemsLabel="{0} origens selecionadas" [maxSelectedLabels]="2"
-                                            (onChange)="filter($event.value?.length ? $event.value : null)" (onClear)="filter(null)" />
+                                            (onChange)="filter($event.value?.length ? $event.value : null)" (onClear)="filter(null)">
+                                            <ng-template let-option pTemplate="item">
+                                                <div class="flex align-items-center"><app-origin-badge [type]="option.type" />{{ option.label }}</div>
+                                            </ng-template>
+                                        </p-multiSelect>
                                     </ng-template>
                                 </p-columnFilter>
                             </div>
                         </th>
-                        <th>Valor</th>
-                        <th>Débito</th>
-                        <th></th>
+                        <th>Faturas</th>
+                        <th>Total em Débito</th>
                     </tr>
                 </ng-template>
 
-                <ng-template pTemplate="body" let-expenseInDebt>
+                <ng-template pTemplate="body" let-group let-expanded="expanded">
                     <tr>
                         <td>
-                            <p-tag 
-                                *ngIf="!isNumber(getDate(expenseInDebt.paymentDeadline)) && expenseInDebt.paymentDeadline != null; else notDate" 
-                                [value]="formatDate(expenseInDebt.paymentDeadline)" 
-                                [severity]="getSeverity(expenseInDebt.paymentDeadline)">
-                            </p-tag>
-                            <ng-template #notDate>
-                                <p-tag 
-                                    [value]="formatDate(expenseInDebt.paymentDeadline)" 
-                                    [severity]="getSeverity(expenseInDebt.paymentDeadline)">
-                                </p-tag><br>
-                                <small class="font-semibold">{{ getDate(expenseInDebt.paymentDeadline) + ' dias em atraso'}}</small>
-                            </ng-template>
-                        </td>
-                        <td>{{ expenseInDebt.documentNumber }}</td>
-                        <td>{{ expenseInDebt.date | date: 'dd/MM/yyyy' }}</td>
-                        <td>{{ expenseInDebt.origin }}</td>
-                        <td>{{ expenseInDebt.totalValue | number: '1.2-2' }} €</td>
-                        <td class="text-red-600 font-semibold">{{ expenseInDebt.debtValue | number: '1.2-2' }} €</td>
-                        <td class="text-right">
                             <button
-                                class="p-button-rounded p-button-text"
-                                (click)="payDebt(expenseInDebt)"
-                                icon="pi pi-wallet"
-                                pButton
-                                pTooltip="Pagar"
-                                tooltipPosition="left"
                                 type="button"
+                                pButton
+                                pRipple
+                                [pRowToggler]="group"
+                                class="p-button-text p-button-rounded p-button-plain"
+                                [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
                             ></button>
+                        </td>
+                        <td class="font-semibold white-space-nowrap"><app-origin-badge [type]="group.originType" />{{ group.origin }}</td>
+                        <td>{{ group.expenses.length }}</td>
+                        <td class="text-red-600 font-semibold">{{ group.totalDebt | number: '1.2-2' }} €</td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="rowexpansion" let-group>
+                    <tr>
+                        <td colspan="4" class="p-0">
+                            <div class="px-3 py-2 surface-ground">
+                                <p-table [value]="group.expenses" styleClass="p-datatable-striped p-datatable-sm">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th>Data Limite</th>
+                                            <th>Documento</th>
+                                            <th>Data do Documento</th>
+                                            <th>Valor</th>
+                                            <th>Débito</th>
+                                            <th></th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-expenseInDebt>
+                                        <tr>
+                                            <td>
+                                                <p-tag
+                                                    *ngIf="!isNumber(getDate(expenseInDebt.paymentDeadline)) && expenseInDebt.paymentDeadline != null; else notDate"
+                                                    [value]="formatDate(expenseInDebt.paymentDeadline)"
+                                                    [severity]="getSeverity(expenseInDebt.paymentDeadline)">
+                                                </p-tag>
+                                                <ng-template #notDate>
+                                                    <p-tag
+                                                        [value]="formatDate(expenseInDebt.paymentDeadline)"
+                                                        [severity]="getSeverity(expenseInDebt.paymentDeadline)">
+                                                    </p-tag><br>
+                                                    <small class="font-semibold">{{ getDate(expenseInDebt.paymentDeadline) + ' dias em atraso'}}</small>
+                                                </ng-template>
+                                            </td>
+                                            <td>{{ expenseInDebt.documentNumber }}</td>
+                                            <td>{{ expenseInDebt.date | date: 'dd/MM/yyyy' }}</td>
+                                            <td>{{ expenseInDebt.totalValue | number: '1.2-2' }} €</td>
+                                            <td class="text-red-600 font-semibold">{{ expenseInDebt.debtValue | number: '1.2-2' }} €</td>
+                                            <td class="text-right">
+                                                <button
+                                                    class="p-button-rounded p-button-text"
+                                                    (click)="payDebt(expenseInDebt)"
+                                                    icon="pi pi-wallet"
+                                                    pButton
+                                                    pTooltip="Pagar"
+                                                    tooltipPosition="left"
+                                                    type="button"
+                                                ></button>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
                         </td>
                     </tr>
                 </ng-template>
 
                 <ng-template pTemplate="footer">
                     <tr>
-                        <td colspan="5">Valor total em débito</td>
+                        <td colspan="3">Valor total em débito</td>
                         <td>{{ totalInDebt | number: '1.2-2' }} €</td>
-                        <td></td>
                     </tr>
                 </ng-template>
                 

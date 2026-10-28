@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Origin } from '../../api/origin';
 import { environment } from 'src/environments/environment';
 import { ItemName } from '../../api/itemName';
+import { OriginName } from '../../api/originType';
 
 @Injectable({
     providedIn: 'root'
@@ -15,8 +16,9 @@ export class OriginService {
 
     constructor(private http: HttpClient) { }
 
-    getOriginsGrouped() : Observable<Origin[]> {
-        return this.http.get<Origin[]>(this.originsGroupedUrl);
+    // activeOnly: sem funcionários, financiadores e credores inativos (para escolher numa despesa/pagamento novo)
+    getOriginsGrouped(activeOnly: boolean = false) : Observable<Origin[]> {
+        return this.http.get<Origin[]>(this.originsGroupedUrl + "?activeOnly=" + activeOnly);
     }
 
     getOriginNames() : Observable<ItemName[]> {
@@ -27,7 +29,8 @@ export class OriginService {
         return this.http.get<ItemName[]>(this.originNamesUrl + "/withExpenses");
     }
 
-    getOriginNamesWithPayments() : Observable<ItemName[]> {
-        return this.http.get<ItemName[]>(this.originNamesUrl + "/withPayments");
+    // Com o tipo de cada origem (bola Fu/Cr/Fi…), para distinguir nomes repetidos
+    getOriginNamesWithPayments() : Observable<OriginName[]> {
+        return this.http.get<OriginName[]>(this.originNamesUrl + "/withPayments");
     }
 }

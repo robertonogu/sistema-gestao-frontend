@@ -77,6 +77,17 @@ export class ListCreditorsComponent implements OnInit {
     });
   }
 
+  // Inativo: deixa de aparecer para escolher na Nova Despesa e no Novo Pagamento
+  updateStatus(creditor: Creditor) {
+    this.creditorService.changeStatus(creditor.originId, !creditor.active).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Estado do credor atualizado.' });
+        this.load();
+      },
+      error: (err) => this.messageService.add({ severity: 'error', summary: 'Erro', detail: err.error?.message ?? 'Não foi possível alterar o estado.' })
+    });
+  }
+
   deleteCreditor(creditor: Creditor) {
     this.confirmationService.confirm({
       header: 'Tem a certeza que pretende eliminar ' + creditor.name + '?',

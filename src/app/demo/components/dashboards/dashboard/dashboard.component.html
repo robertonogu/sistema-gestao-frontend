@@ -1,4 +1,9 @@
-<div class="grid">
+<div *ngIf="loading" class="flex flex-column align-items-center justify-content-center" style="min-height: 60vh">
+    <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2.5rem"></i>
+    <span class="text-600 mt-3">A carregar…</span>
+</div>
+
+<div class="grid" *ngIf="!loading">
     <div class="col-12 md:col-6 xl:col-3">
         <div class="card">
             <span class="font-semibold text-lg">Receitas</span>
@@ -61,6 +66,12 @@
             <span class="font-semibold text-lg">Saldo</span>
             <div class="mt-3">
                 <span class="text-4xl font-bold text-900">{{ balance | number: '1.2-2' }} €</span>
+                <div class="text-600 mt-1">
+                    Caixa: <span class="font-medium text-900">{{ cashBalance | number: '1.2-2' }} €</span>
+                </div>
+                <div class="text-600">
+                    Banco: <span class="font-medium text-900">{{ bankBalance | number: '1.2-2' }} €</span>
+                </div>
             </div>
         </div>
     </div>

@@ -3,10 +3,7 @@
 		<div class="card">
 
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
-                <div>
-                    <div class="text-900 text-xl font-semibold">Utilizadores</div>
-                    <div class="text-600 text-sm">Os funcionários entram na app de registos de trabalho (<span class="font-semibold">/#/app</span>), os administradores no backoffice.</div>
-                </div>
+                <div class="text-900 text-xl font-semibold">Utilizadores</div>
                 <div class="flex gap-2 sm:ml-auto">
                     <button pButton type="button" icon="pi pi-plus" label="Novo" class="p-button-rounded p-button-outlined" (click)="openNew()"></button>
                 </div>
@@ -61,7 +58,7 @@
 
         <div class="field">
             <label class="block font-bold mb-2">Funcionário <span *ngIf="role === 'ADMIN'" class="text-500 font-normal">(opcional)</span></label>
-            <p-dropdown [(ngModel)]="employeeId" [options]="employeeNames" optionLabel="name" optionValue="id" [filter]="true"
+            <p-dropdown [(ngModel)]="employeeId" [options]="employeesWithoutUser" optionLabel="name" optionValue="id" [filter]="true"
                         filterBy="name" [showClear]="role === 'ADMIN'" placeholder="Selecione o funcionário" appendTo="body"
                         (onChange)="onEmployeeChange()"
                         [ngClass]="{ 'ng-invalid ng-dirty': submitted && role === 'EMPLOYEE' && !employeeId }" />
@@ -79,7 +76,6 @@
             <label class="block font-bold mb-2">Palavra-passe</label>
             <input pInputText [(ngModel)]="password" autocomplete="new-password" placeholder="Pelo menos 6 caracteres"
                    [ngClass]="{ 'ng-invalid ng-dirty': submitted && password.length < 6 }" />
-            <small class="text-600">Dê-a ao funcionário; pode alterá-la aqui sempre que for preciso.</small>
         </div>
     </ng-template>
 

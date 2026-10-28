@@ -19,8 +19,9 @@ export class CreditorService {
         return this.http.get<Creditor[]>(this.creditorsUrl);
     }
 
-    getCreditorNames() : Observable<ItemName[]> {
-        return this.http.get<ItemName[]>(this.creditorsUrl + "/names");
+    // activeOnly: sem os credores inativos (para escolher numa despesa/pagamento novo)
+    getCreditorNames(activeOnly: boolean = false) : Observable<ItemName[]> {
+        return this.http.get<ItemName[]>(this.creditorsUrl + "/names?activeOnly=" + activeOnly);
     }
 
     createCreditor(creditor: CreditorCreation) : Observable<Creditor> {
@@ -29,6 +30,10 @@ export class CreditorService {
 
     updateCreditor(creditorId: number, creditor: CreditorCreation) : Observable<Creditor> {
         return this.http.put<Creditor>(this.creditorsUrl + "/" + creditorId, creditor, environment.httpOptions);
+    }
+
+    changeStatus(creditorId: number, isActive: boolean) : Observable<Creditor> {
+        return this.http.patch<Creditor>(this.creditorsUrl + "/status/" + creditorId + "?isActive=" + isActive, {});
     }
 
     deleteCreditor(creditorId: number) {

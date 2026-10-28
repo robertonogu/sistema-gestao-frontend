@@ -15,8 +15,8 @@ import { EmployeeService } from 'src/app/demo/service/people/employee.service';
 export class UsersComponent implements OnInit {
 
   readonly roles: { label: string, value: UserRole }[] = [
-    { label: 'Funcionário (app no telemóvel)', value: 'EMPLOYEE' },
-    { label: 'Administrador (backoffice)', value: 'ADMIN' }
+    { label: 'Funcionário', value: 'EMPLOYEE' },
+    { label: 'Administrador', value: 'ADMIN' }
   ];
 
   loading = true;
@@ -54,6 +54,12 @@ export class UsersComponent implements OnInit {
       },
       error: () => this.loading = false
     });
+  }
+
+  // Um utilizador por funcionário: só aparecem para escolher os que ainda não têm
+  get employeesWithoutUser(): ItemName[] {
+    const withUser = new Set(this.users.map(user => user.employeeId).filter(id => id != null));
+    return this.employeeNames.filter(employee => !withUser.has(employee.id));
   }
 
   roleLabel(role: UserRole): string {

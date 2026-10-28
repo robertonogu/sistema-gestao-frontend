@@ -26,6 +26,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>NIF</th>
+                        <th>Estado</th>
                         <th>Ações</th>
                     </tr>
                 </ng-template>
@@ -34,15 +35,18 @@
                     <tr>
                         <td>{{ creditor.name }}</td>
                         <td>{{ creditor.nif }}</td>
+                        <td><p-tag [value]="creditor.active ? 'Ativo' : 'Inativo'" [severity]="creditor.active ? 'success' : 'danger'"></p-tag></td>
                         <td class="white-space-nowrap">
                             <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [text]="true" severity="success" (click)="editCreditor(creditor)" />
+                            <p-button pRipple [icon]="creditor.active ? 'pi pi-ban' : 'pi pi-check'" class="mr-2" severity="warning" [rounded]="true" [text]="true"
+                                [pTooltip]="creditor.active ? 'Desativar' : 'Ativar'" (click)="updateStatus(creditor)" />
                             <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (click)="deleteCreditor(creditor)" />
                         </td>
                     </tr>
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
-                    <tr><td colspan="3">Ainda não há credores.</td></tr>
+                    <tr><td colspan="4">Ainda não há credores.</td></tr>
                 </ng-template>
             </p-table>
 

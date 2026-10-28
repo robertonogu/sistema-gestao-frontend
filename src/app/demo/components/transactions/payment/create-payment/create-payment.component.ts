@@ -92,13 +92,16 @@ export class CreatePaymentComponent {
   ) { }
 
   ngOnInit(): void {
-    this.creditorService.getCreditorNames().subscribe(names => { this.creditorNames = names; this.buildPaidFromOptions(); });
-    this.originService.getOriginsGrouped().subscribe((origins) => {
-      this.origins = origins;
-    });
-
     const paymentDocumentId = Number(this.route.snapshot.paramMap.get('paymentDocumentId'));
     if (paymentDocumentId) this.editingPaymentId = paymentDocumentId;
+
+    // Num pagamento novo só se escolhem funcionários, financiadores e credores ativos. Ao editar, ou vindo da
+    // listagem de débitos (uma origem inativa pode ainda ter dívidas), aparecem todos, para a origem continuar na lista
+    const onlyActive = !this.editingPaymentId && !Number(this.route.snapshot.queryParamMap.get('originId'));
+    this.creditorService.getCreditorNames(onlyActive).subscribe(names => { this.creditorNames = names; this.buildPaidFromOptions(); });
+    this.originService.getOriginsGrouped(onlyActive).subscribe((origins) => {
+      this.origins = origins;
+    });
 
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
       this.accountNames = accountNames;

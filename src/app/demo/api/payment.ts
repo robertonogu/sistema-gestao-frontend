@@ -1,4 +1,5 @@
 import { PaymentMethod } from "../data/enum/paymentMethod";
+import { OriginType } from "./originType";
 
 // Documento de pagamento na listagem: um pagamento que pode liquidar várias faturas
 export interface Payment {
@@ -6,6 +7,7 @@ export interface Payment {
     date: Date;
     documentNumber: string | null;
     origin: string | null;
+    originType: OriginType | null;
     invoices: string;
     value: number;
     paymentMethod: PaymentMethod;

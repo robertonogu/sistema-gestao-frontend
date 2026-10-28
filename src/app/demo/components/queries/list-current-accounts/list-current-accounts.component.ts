@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CurrentAccountLog } from 'src/app/demo/api/currentAccountLog';
 import { Origin } from 'src/app/demo/api/origin';
 import { PaymentMethod } from 'src/app/demo/data/enum/paymentMethod';
@@ -39,10 +40,15 @@ export class ListCurrentAccountsComponent implements OnInit {
 
   constructor(
     private originService: OriginService,
-    private currentAccountLogService: CurrentAccountLogService
+    private currentAccountLogService: CurrentAccountLogService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    // Vindo da página Saldos: abre logo o extrato dessa origem (a tabela carrega-o ao iniciar)
+    const originId = Number(this.route.snapshot.queryParamMap.get('originId'));
+    if (originId) this.selectedOrigin = originId;
+
     this.originService.getOriginsGrouped().subscribe((origins) => {
       this.origins = origins;
     });
@@ -122,7 +128,7 @@ export class ListCurrentAccountsComponent implements OnInit {
             log.documentNumber ?? '',
             log.paymentMethod ? (this.PaymentMethod[log.paymentMethod] ?? log.paymentMethod) : '',
             log.description ?? '',
-            log.credit !== 0 ? euros(log.credit) : '',
+            log.credit !== 0 || log.debt === 0 ? euros(log.credit) : '',
             log.debt !== 0 ? euros(log.debt) : '',
             euros(log.balance)
           ]),

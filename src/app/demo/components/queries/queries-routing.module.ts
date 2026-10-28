@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
         { path: 'debts', data: { breadcrumb: 'Débitos' }, loadChildren: () => import('./list-debts/list-debts.module').then(m => m.ListDebtsModule) },
         { path: 'accountLogs',  data: { breadcrumb: 'Extrato de Conta' }, loadChildren: () => import('./list-account-logs/list-account.logs.module').then(m => m.ListAccountLogsModule) },
         { path: 'cashAccountLogs',  data: { breadcrumb: 'Extrato Caixa' }, loadChildren: () => import('./list-cash-logs/list-cash-logs.module').then(m => m.ListCashLogsModule) },
+        { path: 'balances',  data: { breadcrumb: 'Saldos' }, loadChildren: () => import('./list-balances/list-balances.module').then(m => m.ListBalancesModule) },
         { path: 'currentAccounts',  data: { breadcrumb: 'Contas Corrente' }, loadChildren: () => import('./list-current-accounts/list-current-accounts.module').then(m => m.ListCurrentAccountsModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],

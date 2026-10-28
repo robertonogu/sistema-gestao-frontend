@@ -26,6 +26,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>NIF</th>
+                        <th>Estado</th>
                         <th>Ações</th>
                     </tr>
                 </ng-template>
@@ -34,15 +35,18 @@
                     <tr>
                         <td>{{ financer.name }}</td>
                         <td>{{ financer.nif }}</td>
+                        <td><p-tag [value]="financer.active ? 'Ativo' : 'Inativo'" [severity]="financer.active ? 'success' : 'danger'"></p-tag></td>
                         <td class="white-space-nowrap">
                             <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [text]="true" severity="success" (click)="editFinancer(financer)" />
+                            <p-button pRipple [icon]="financer.active ? 'pi pi-ban' : 'pi pi-check'" class="mr-2" severity="warning" [rounded]="true" [text]="true"
+                                [pTooltip]="financer.active ? 'Desativar' : 'Ativar'" (click)="updateStatus(financer)" />
                             <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [text]="true" (click)="deleteFinancer(financer)" />
                         </td>
                     </tr>
                 </ng-template>
 
                 <ng-template pTemplate="emptymessage">
-                    <tr><td colspan="3">Ainda não há financiadores.</td></tr>
+                    <tr><td colspan="4">Ainda não há financiadores.</td></tr>
                 </ng-template>
             </p-table>
 

@@ -2,7 +2,18 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { TableFilterEvent } from 'primeng/table';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
+import { OriginType } from 'src/app/demo/api/originType';
 import { ExpenseService } from 'src/app/demo/service/transactions/expense.service';
+
+// Débitos agrupados por origem: uma linha por origem com o total em débito (fechadas por omissão);
+// ao abrir, as faturas em débito dessa origem
+export interface DebtsByOrigin {
+  originId: number;
+  origin: string;
+  originType: OriginType | null;
+  expenses: ExpenseInDebt[];
+  totalDebt: number;
+}
 
 @Component({
   templateUrl: './list-debts.component.html',
@@ -12,6 +23,9 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 export class ListDebtsComponent {
 
   expensesInDebt!: ExpenseInDebt[];
+  debtsByOrigin: DebtsByOrigin[] = [];
+  // Origens abertas (por originId). Reposto ao carregar: as origens começam sempre fechadas
+  expandedRows: { [originId: number]: boolean } = {};
   totalRecords: number = 0;
   pageSize: number = 5;
   currentPage: number = 0;
@@ -20,26 +34,44 @@ export class ListDebtsComponent {
 
   constructor(private expenseService: ExpenseService, private router: Router) {}
 
-  // Origins that currently have debts (options of the origin filter). Objects, not plain strings: the multiselect
-  // search only looks at a field (label), so with plain strings typing a name never matched anything
-  originOptions: { label: string; value: string }[] = [];
+  // Origins that currently have debts (options of the origin filter). Filtered by originId, not by name: the same
+  // person can be an employee, a creditor and a financer, and picking one must not bring the other two
+  originOptions: { label: string; value: number; type: OriginType | null }[] = [];
 
   ngOnInit(): void {
     this.expenseService.getExpensesInDebt(this.currentPage, this.pageSize).subscribe((expensesInDebt) => {
       this.expensesInDebt = expensesInDebt;
-      this.originOptions = [...new Set(expensesInDebt.map(expense => expense.origin).filter(Boolean))].sort()
-        .map(origin => ({ label: origin, value: origin }));
-      this.updateTotal(this.expensesInDebt);
+      this.debtsByOrigin = this.groupByOrigin(expensesInDebt);
+      this.expandedRows = {};
+      this.originOptions = [...this.debtsByOrigin]
+        .sort((a, b) => a.origin.localeCompare(b.origin))
+        .map(group => ({ label: group.origin, value: group.originId, type: group.originType }));
+      this.updateTotal(this.debtsByOrigin);
     });
   }
 
-  // Total in debt of the rows shown: every row when there is no filter, only the filtered ones otherwise
+  // Total in debt of the rows shown: every origin when there is no filter, only the filtered ones otherwise
   onFilter(event: TableFilterEvent) {
-    this.updateTotal((event.filteredValue as ExpenseInDebt[]) ?? this.expensesInDebt);
+    this.updateTotal((event.filteredValue as DebtsByOrigin[]) ?? this.debtsByOrigin);
   }
 
-  private updateTotal(rows: ExpenseInDebt[]) {
-    this.totalInDebt = rows.reduce((sum, expense) => sum + expense.debtValue, 0);
+  private updateTotal(rows: DebtsByOrigin[]) {
+    this.totalInDebt = rows.reduce((sum, group) => sum + group.totalDebt, 0);
+  }
+
+  // Origens com mais dívida primeiro; dentro de cada uma, as faturas pela ordem em que vêm da API
+  private groupByOrigin(expenses: ExpenseInDebt[]): DebtsByOrigin[] {
+    const groups = new Map<number, DebtsByOrigin>();
+    for (const expense of expenses) {
+      let group = groups.get(expense.originId);
+      if (!group) {
+        group = { originId: expense.originId, origin: expense.origin, originType: expense.originType ?? null, expenses: [], totalDebt: 0 };
+        groups.set(expense.originId, group);
+      }
+      group.expenses.push(expense);
+      group.totalDebt += expense.debtValue;
+    }
+    return [...groups.values()].sort((a, b) => b.totalDebt - a.totalDebt);
   }
 
   formatDate(date: string | null): string | undefined {

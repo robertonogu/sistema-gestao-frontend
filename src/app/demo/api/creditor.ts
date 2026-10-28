@@ -5,6 +5,8 @@ export interface Creditor {
     nif: number;
     initialBalance: number | null;
     debt: number;
+    // Inativo: não aparece para escolher na Nova Despesa / Novo Pagamento
+    active: boolean;
 }
 
 export interface CreditorCreation {

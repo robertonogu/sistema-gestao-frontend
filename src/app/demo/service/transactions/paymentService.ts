@@ -5,11 +5,15 @@ import { PaymentList } from '../../api/paymentList';
 import { environment } from 'src/environments/environment';
 import { ListPaymentCreation } from '../../data/model/listPaymentCreation.model';
 import { ExpensePayment, PaymentDocumentDetail } from '../../api/payment';
+import { formatLocalDate } from '../localDate.interceptor';
 
 export interface PaymentFilters {
     documentNumber?: string;
     originId?: number;
     paymentMethod?: string;
+    // Um dia (dateFrom = dateTo) ou um período
+    dateFrom?: Date;
+    dateTo?: Date;
 }
 
 @Injectable({
@@ -28,6 +32,8 @@ export class PaymentService {
         if (filters?.documentNumber) url += "&documentNumber=" + encodeURIComponent(filters.documentNumber);
         if (filters?.originId != null) url += "&originId=" + filters.originId;
         if (filters?.paymentMethod) url += "&paymentMethod=" + filters.paymentMethod;
+        if (filters?.dateFrom) url += "&dateFrom=" + formatLocalDate(filters.dateFrom);
+        if (filters?.dateTo) url += "&dateTo=" + formatLocalDate(filters.dateTo);
 
         return this.http.get<PaymentList>(url);
     }
