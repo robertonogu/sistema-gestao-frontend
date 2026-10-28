@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { AppLayoutComponent } from './layout/app.layout.component';
+import { adminGuard, employeeGuard } from './demo/service/auth/auth.guards';
 
 const routerOptions: ExtraOptions = {
     anchorScrolling: 'enabled'
@@ -8,7 +9,8 @@ const routerOptions: ExtraOptions = {
 
 const routes: Routes = [
     {
-        path: '', component: AppLayoutComponent,
+        // Backoffice: só administradores (sem sessão vai para o login)
+        path: '', component: AppLayoutComponent, canActivate: [adminGuard],
         children: [
             { path: '', loadChildren: () => import('./demo/components/dashboards/dashboards.module').then(m => m.DashboardsModule) },
             { path: 'uikit', data: { breadcrumb: 'UI Kit' }, loadChildren: () => import('./demo/components/uikit/uikit.module').then(m => m.UIkitModule) },
@@ -33,6 +35,8 @@ const routes: Routes = [
     { path: 'capture/:token', loadComponent: () => import('./demo/components/invoice-capture/invoice-capture.component').then(m => m.InvoiceCaptureComponent) },
     // Endereço fixo (para atalho no telemóvel): retoma a sessão das últimas 12h guardada no telemóvel
     { path: 'capture', loadComponent: () => import('./demo/components/invoice-capture/invoice-capture.component').then(m => m.InvoiceCaptureComponent) },
+    // App do funcionário (PWA no telemóvel): registos de trabalho, fora do layout com menu
+    { path: 'app', canActivate: [employeeGuard], loadComponent: () => import('./demo/components/employee-app/employee-app.component').then(m => m.EmployeeAppComponent) },
     { path: 'notfound', loadChildren: () => import('./demo/components/notfound/notfound.module').then(m => m.NotfoundModule) },
     { path: '**', redirectTo: '/notfound' }
 ];

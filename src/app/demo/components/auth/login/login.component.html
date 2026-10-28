@@ -6,30 +6,31 @@
     <path [attr.fill]="dark ? 'var(--primary-500)' : 'var(--primary-100)'" d="M1397.5 154.8c47.2-10.6 93.6-25.3 138.6-43.8c21.7-8.9 43-18.8 63.9-29.5V0H643.4c62.9 41.7 129.7 78.2 202.1 107.4C1020.4 178.1 1214.2 196.1 1397.5 154.8z"/>
 </svg>
 <div class="px-5 min-h-screen flex justify-content-center align-items-center">
-    <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1">
+    <form class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1 w-full md:w-auto" (ngSubmit)="login()">
         <div class="mb-4">
-            <div class="text-900 text-xl font-bold mb-2">Log in</div>
-            <span class="text-600 font-medium">Please enter your details</span>
+            <div class="text-900 text-xl font-bold mb-2">Entrar</div>
+            <span class="text-600 font-medium">Indique o seu utilizador e palavra-passe</span>
+        </div>
+        <div *ngIf="expired && !error" class="text-orange-600 text-sm mb-3">
+            <i class="pi pi-clock mr-1"></i>A sessão terminou. Entre outra vez.
         </div>
         <div class="flex flex-column">
             <span class="p-input-icon-left w-full mb-4">
-                <i class="pi pi-envelope"></i>
-                <input id="email" type="text" pInputText class="w-full md:w-25rem" placeholder="Email">
+                <i class="pi pi-user"></i>
+                <input id="username" name="username" type="text" pInputText class="w-full md:w-25rem" placeholder="Utilizador"
+                       autocomplete="username" autocapitalize="none" [(ngModel)]="username">
             </span>
             <span class="p-input-icon-left w-full mb-4">
                 <i class="pi pi-lock"></i>
-                <input id="password" type="password" pInputText class="w-full md:w-25rem" placeholder="Password">
+                <input id="password" name="password" type="password" pInputText class="w-full md:w-25rem" placeholder="Palavra-passe"
+                       autocomplete="current-password" [(ngModel)]="password">
             </span>
-            <div class="mb-4 flex flex-wrap gap-3">
-                <div>
-                    <p-checkbox name="checkbox" value="val" [(ngModel)]="rememberMe" styleClass="mr-2" [binary]="true"></p-checkbox>
-                    <label for="checkbox" class="text-900 font-medium mr-8">Remember Me</label>
-                </div>
-                <a class="text-600 cursor-pointer hover:text-primary cursor-pointer ml-auto transition-colors transition-duration-300">Reset password</a>
+            <div *ngIf="error" class="text-red-600 text-sm mb-3">
+                <i class="pi pi-exclamation-triangle mr-1"></i>{{ error }}
             </div>
-            <button pButton pRipple label="Log In" class="w-full" [routerLink]="['/']"></button>
+            <button pButton pRipple type="submit" label="Entrar" class="w-full" [loading]="loading"></button>
         </div>
-    </div>
+    </form>
 </div>
 
 <app-config [minimal]="true"></app-config>

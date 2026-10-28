@@ -1,0 +1,119 @@
+<div class="surface-ground min-h-screen flex justify-content-center p-3">
+    <div class="w-full" style="max-width: 32rem">
+
+        <!-- Cabeçalho -->
+        <div class="flex align-items-center gap-2 mb-3">
+            <i class="pi pi-clock text-2xl text-primary"></i>
+            <div class="flex-1 min-w-0">
+                <div class="text-900 text-xl font-semibold">Registos de trabalho</div>
+                <div class="text-600 text-sm white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ authService.session?.name }}</div>
+            </div>
+            <button pButton type="button" icon="pi pi-sign-out" class="p-button-text p-button-secondary p-button-rounded"
+                    aria-label="Sair" (click)="authService.logout()"></button>
+        </div>
+
+        <ng-container [ngSwitch]="view">
+
+            <!-- ===== Lista ===== -->
+            <ng-container *ngSwitchCase="'list'">
+                <button pButton type="button" icon="pi pi-plus" label="Novo registo"
+                        class="p-button-lg w-full justify-content-center mb-3" (click)="newSubmission()"
+                        [disabled]="!constructions.length"></button>
+                <div *ngIf="!loading && !constructions.length" class="text-orange-600 text-sm mb-3">
+                    <i class="pi pi-info-circle mr-1"></i>Ainda não está associado a nenhuma obra em curso. Fale com o escritório.
+                </div>
+
+                <div class="flex align-items-center justify-content-between mb-2">
+                    <span class="text-700 font-semibold">Últimos 30 dias</span>
+                    <span *ngIf="pendingHours" class="text-600 text-sm">{{ pendingHours }} h por aprovar</span>
+                </div>
+
+                <div *ngIf="loading" class="text-600"><i class="pi pi-spin pi-spinner mr-2"></i>A carregar…</div>
+                <div *ngIf="loadError" class="surface-card border-round-xl shadow-1 p-3">
+                    <div class="text-red-600 mb-2"><i class="pi pi-exclamation-triangle mr-1"></i>{{ loadError }}</div>
+                    <button pButton type="button" icon="pi pi-refresh" label="Tentar de novo" class="p-button-outlined p-button-sm" (click)="loadSubmissions()"></button>
+                </div>
+                <div *ngIf="!loading && !loadError && !submissions.length" class="text-600 surface-card border-round-xl shadow-1 p-3">
+                    Ainda não tem registos nos últimos 30 dias.
+                </div>
+
+                <div *ngFor="let submission of submissions" class="surface-card border-round-xl shadow-1 p-3 mb-2">
+                    <div class="flex align-items-start gap-2">
+                        <div class="flex-1 min-w-0">
+                            <div class="text-900 font-semibold">
+                                {{ parseDate(submission.date) | date: 'EEE, dd/MM' : undefined : 'pt' }} · {{ submission.hours }} h
+                            </div>
+                            <div class="text-700 text-sm">{{ submission.constructionName }}</div>
+                            <div class="text-600 text-sm">{{ submission.budgetItemName }} · {{ submission.workOnConstruction ? 'Em obra' : 'Na empresa' }}</div>
+                            <div *ngIf="submission.description" class="text-600 text-sm mt-1 font-italic">{{ submission.description }}</div>
+                        </div>
+                        <p-tag [value]="statusLabels[submission.status].label" [severity]="statusLabels[submission.status].severity"></p-tag>
+                    </div>
+                    <div *ngIf="submission.status === 'REJECTED' && submission.rejectionReason" class="text-red-600 text-sm mt-2">
+                        <i class="pi pi-comment mr-1"></i>{{ submission.rejectionReason }}
+                    </div>
+                    <div *ngIf="submission.status === 'PENDING'" class="flex gap-2 mt-2">
+                        <button pButton type="button" icon="pi pi-pencil" label="Editar" class="p-button-outlined p-button-sm" (click)="editSubmission(submission)"></button>
+                        <button pButton type="button" icon="pi pi-trash" label="Apagar" class="p-button-outlined p-button-danger p-button-sm" (click)="deleteSubmission(submission)"></button>
+                    </div>
+                </div>
+            </ng-container>
+
+            <!-- ===== Formulário ===== -->
+            <div *ngSwitchCase="'form'" class="surface-card border-round-xl shadow-2 p-4 p-fluid">
+                <div class="text-900 text-lg font-semibold mb-3">{{ editingId ? 'Editar registo' : 'Novo registo' }}</div>
+
+                <div class="field">
+                    <label for="date" class="font-semibold">Data</label>
+                    <p-calendar inputId="date" [(ngModel)]="date" dateFormat="dd/mm/yy" [maxDate]="today" [touchUI]="true"
+                                [readonlyInput]="true" [showIcon]="true" [iconDisplay]="'input'"
+                                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !date }"></p-calendar>
+                </div>
+
+                <div class="field">
+                    <label for="hours" class="font-semibold">Horas</label>
+                    <p-inputNumber inputId="hours" [(ngModel)]="hours" mode="decimal" [min]="0.5" [max]="24" [step]="0.5"
+                                   [minFractionDigits]="0" [maxFractionDigits]="2" [showButtons]="true" buttonLayout="horizontal"
+                                   incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" suffix=" h"
+                                   [ngClass]="{ 'ng-invalid ng-dirty': submitted && !hours }"></p-inputNumber>
+                </div>
+
+                <div class="field">
+                    <label for="construction" class="font-semibold">Obra</label>
+                    <p-dropdown inputId="construction" [(ngModel)]="constructionId" [options]="constructions" optionLabel="name"
+                                optionValue="constructionId" placeholder="Escolha a obra" appendTo="body"
+                                (onChange)="onConstructionChange()"
+                                [ngClass]="{ 'ng-invalid ng-dirty': submitted && !constructionId }"></p-dropdown>
+                </div>
+
+                <div class="field">
+                    <label class="font-semibold">Item da obra</label>
+                    <p-treeSelect [(ngModel)]="budgetNode" [options]="budgetTree" placeholder="Escolha o item" appendTo="body"
+                                  containerStyleClass="w-full" [disabled]="!constructionId"
+                                  [ngClass]="{ 'ng-invalid ng-dirty': submitted && !budgetNode }"></p-treeSelect>
+                </div>
+
+                <div class="field flex align-items-center gap-2">
+                    <p-checkbox inputId="workOnConstruction" [(ngModel)]="workOnConstruction" [binary]="true"></p-checkbox>
+                    <label for="workOnConstruction" class="mb-0">Trabalho feito na obra</label>
+                </div>
+
+                <div class="field">
+                    <label for="description" class="font-semibold">Descrição <span class="text-500 font-normal">(opcional)</span></label>
+                    <textarea id="description" pInputTextarea [(ngModel)]="description" rows="3" maxlength="500"
+                              placeholder="O que foi feito"></textarea>
+                </div>
+
+                <div *ngIf="formError" class="text-red-600 text-sm mb-3"><i class="pi pi-exclamation-triangle mr-1"></i>{{ formError }}</div>
+
+                <div class="flex gap-2">
+                    <button pButton type="button" label="Cancelar" class="p-button-outlined p-button-secondary" (click)="cancel()" [disabled]="saving"></button>
+                    <button pButton type="button" icon="pi pi-check" [label]="editingId ? 'Guardar' : 'Enviar registo'" (click)="save()" [loading]="saving"></button>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+<p-confirmDialog acceptLabel="Apagar" rejectLabel="Cancelar" acceptButtonStyleClass="p-button-danger" [style]="{ width: '90vw', maxWidth: '24rem' }"></p-confirmDialog>
+<p-toast position="top-center" [breakpoints]="{ '640px': { width: '92vw' } }"></p-toast>

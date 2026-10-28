@@ -1,0 +1,110 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                <div>
+                    <div class="text-900 text-xl font-semibold">Utilizadores</div>
+                    <div class="text-600 text-sm">Os funcionários entram na app de registos de trabalho (<span class="font-semibold">/#/app</span>), os administradores no backoffice.</div>
+                </div>
+                <div class="flex gap-2 sm:ml-auto">
+                    <button pButton type="button" icon="pi pi-plus" label="Novo" class="p-button-rounded p-button-outlined" (click)="openNew()"></button>
+                </div>
+            </div>
+
+			<p-table [value]="users" [loading]="loading" styleClass="p-datatable-striped" [tableStyle]="{ 'min-width': '50rem' }">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Utilizador</th>
+                        <th>Nome</th>
+                        <th>Perfil</th>
+                        <th>Estado</th>
+                        <th>Criado</th>
+                        <th>Ações</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-user>
+                    <tr [class.text-500]="!user.active">
+                        <td class="font-semibold">{{ user.username }}</td>
+                        <td>{{ user.employeeName ?? '—' }}</td>
+                        <td>{{ roleLabel(user.role) }}</td>
+                        <td>
+                            <p-tag [value]="user.active ? 'Ativo' : 'Inativo'" [severity]="user.active ? 'success' : 'danger'"></p-tag>
+                        </td>
+                        <td>{{ user.createdAt | date: 'dd/MM/yyyy' }}</td>
+                        <td class="white-space-nowrap">
+                            <p-button icon="pi pi-key" [rounded]="true" [text]="true" severity="secondary" pTooltip="Nova palavra-passe"
+                                      (click)="openPassword(user)" />
+                            <p-button [icon]="user.active ? 'pi pi-ban' : 'pi pi-check-circle'" [rounded]="true" [text]="true"
+                                      [severity]="user.active ? 'danger' : 'success'" [pTooltip]="user.active ? 'Desativar' : 'Ativar'"
+                                      [disabled]="user.userId === authService.session?.userId" (click)="toggleActive(user)" />
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                    <tr><td colspan="6" class="text-600">Ainda não há utilizadores.</td></tr>
+                </ng-template>
+            </p-table>
+
+		</div>
+	</div>
+</div>
+
+<p-dialog header="Novo utilizador" [(visible)]="createDialog" [style]="{ width: '450px' }" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div class="field">
+            <label class="block font-bold mb-2">Perfil</label>
+            <p-dropdown [(ngModel)]="role" [options]="roles" optionLabel="label" optionValue="value" appendTo="body" />
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-2">Funcionário <span *ngIf="role === 'ADMIN'" class="text-500 font-normal">(opcional)</span></label>
+            <p-dropdown [(ngModel)]="employeeId" [options]="employeeNames" optionLabel="name" optionValue="id" [filter]="true"
+                        filterBy="name" [showClear]="role === 'ADMIN'" placeholder="Selecione o funcionário" appendTo="body"
+                        (onChange)="onEmployeeChange()"
+                        [ngClass]="{ 'ng-invalid ng-dirty': submitted && role === 'EMPLOYEE' && !employeeId }" />
+            <small class="p-error" *ngIf="submitted && role === 'EMPLOYEE' && !employeeId">Escolha o funcionário.</small>
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-2">Utilizador</label>
+            <input pInputText [(ngModel)]="username" autocomplete="off" autocapitalize="none" placeholder="ex.: joao.silva"
+                   [ngClass]="{ 'ng-invalid ng-dirty': submitted && !username.trim() }" />
+            <small class="p-error" *ngIf="submitted && !username.trim()">Indique o utilizador.</small>
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-2">Palavra-passe</label>
+            <input pInputText [(ngModel)]="password" autocomplete="new-password" placeholder="Pelo menos 6 caracteres"
+                   [ngClass]="{ 'ng-invalid ng-dirty': submitted && password.length < 6 }" />
+            <small class="text-600">Dê-a ao funcionário; pode alterá-la aqui sempre que for preciso.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="createDialog = false"></button>
+        <button pButton pRipple label="Criar" icon="pi pi-check" class="p-button-text" [loading]="saving" (click)="create()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Nova palavra-passe" [(visible)]="passwordDialog" [style]="{ width: '400px' }" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div *ngIf="passwordUser" class="mb-3 text-700">{{ passwordUser.username }}</div>
+        <div class="field">
+            <label class="block font-bold mb-2">Nova palavra-passe</label>
+            <input pInputText [(ngModel)]="newPassword" autocomplete="new-password" placeholder="Pelo menos 6 caracteres"
+                   [ngClass]="{ 'ng-invalid ng-dirty': submitted && newPassword.length < 6 }" />
+            <small class="p-error" *ngIf="submitted && newPassword.length < 6">Pelo menos 6 caracteres.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="passwordDialog = false"></button>
+        <button pButton pRipple label="Guardar" icon="pi pi-check" class="p-button-text" [loading]="saving" (click)="changePassword()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{ width: '400px' }"></p-confirmDialog>
+<p-toast />

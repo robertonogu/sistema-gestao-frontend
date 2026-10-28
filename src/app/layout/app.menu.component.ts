@@ -1,15 +1,47 @@
-import { OnInit } from '@angular/core';
+import { OnDestroy, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subscription, filter } from 'rxjs';
+import { WorkLogSubmissionService } from 'src/app/demo/service/people/workLogSubmission.service';
 
 @Component({
     selector: 'app-menu',
     templateUrl: './app.menu.component.html'
 })
-export class AppMenuComponent implements OnInit {
+export class AppMenuComponent implements OnInit, OnDestroy {
 
     model: any[] = [];
 
+    // Mostra quantos registos dos funcionários estão por aprovar (atualiza a cada mudança de página)
+    pendingSubmissionsItem: any = {
+        label: 'Registos por aprovar',
+        icon: 'pi pi-fw pi-inbox',
+        routerLink: ['/people/worklog-submissions'],
+        badge: null
+    };
+
+    private subscriptions = new Subscription();
+
+    constructor(private router: Router, private workLogSubmissionService: WorkLogSubmissionService) { }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribe();
+    }
+
+    private refreshPendingCount() {
+        this.workLogSubmissionService.countPending().subscribe({
+            next: (count) => this.pendingSubmissionsItem.badge = count > 0 ? count : null,
+            error: () => this.pendingSubmissionsItem.badge = null
+        });
+    }
+
     ngOnInit() {
+        this.refreshPendingCount();
+        this.subscriptions.add(this.router.events
+            .pipe(filter(event => event instanceof NavigationEnd))
+            .subscribe(() => this.refreshPendingCount()));
+        this.subscriptions.add(this.workLogSubmissionService.pendingChanged.subscribe(() => this.refreshPendingCount()));
+
         this.model = [
             {
                 label: 'Dashboard',
@@ -181,6 +213,7 @@ export class AppMenuComponent implements OnInit {
                         icon: 'pi pi-fw pi-times-circle',
                         routerLink: ['/people/worklogs']
                     },
+                    this.pendingSubmissionsItem,
                     {
                         label: 'Mapa de horas',
                         icon: 'pi pi-fw pi-lock',
@@ -190,6 +223,11 @@ export class AppMenuComponent implements OnInit {
                         label: 'Mapa custo por hora',
                         icon: 'pi pi-fw pi-lock',
                         routerLink: ['/auth/access']
+                    },
+                    {
+                        label: 'Utilizadores',
+                        icon: 'pi pi-fw pi-id-card',
+                        routerLink: ['/people/users']
                     }
                 ]
             },

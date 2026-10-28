@@ -8,6 +8,8 @@ import { RouterModule } from '@angular/router';
         { path: 'create-absence', loadChildren: () => import('./absence/create-absence/create-absence.module').then(m => m.CreateAbsenceModule) },
         { path: 'worklogs', data: { breadcrumb: 'Registos de Trabalho'}, loadChildren: () => import('./worklog/list-worklogs/list-worklogs.module').then(m => m.ListWorkLogsModule) },
         { path: 'timemap', loadChildren: () => import('./timemap/timemap/timemap.module').then(m => m.TimeMapModule) },
+        { path: 'worklog-submissions', data: { breadcrumb: 'Registos por aprovar'}, loadChildren: () => import('./worklog-submissions/worklog-submissions.module').then(m => m.WorkLogSubmissionsModule) },
+        { path: 'users', data: { breadcrumb: 'Utilizadores'}, loadChildren: () => import('./users/users.module').then(m => m.UsersModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

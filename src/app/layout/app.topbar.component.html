@@ -15,6 +15,11 @@
                     <input type="text" pInputText placeholder="Search" class="w-12rem sm:w-full">
                 </span>
             </li>
+            <li *ngIf="authService.session$ | async as session" class="ml-3 flex align-items-center gap-2">
+                <span class="hidden md:inline text-700 font-medium">{{ session.name }}</span>
+                <button pButton type="button" icon="pi pi-sign-out" class="p-button-text p-button-secondary p-button-rounded flex-shrink-0"
+                        pTooltip="Sair" tooltipPosition="bottom" (click)="authService.logout()"></button>
+            </li>
             <li class="ml-3">
                 <button pButton type="button" icon="pi pi-cog" class="p-button-text p-button-secondary p-button-rounded flex-shrink-0" (click)="onConfigButtonClick()"></button>
             </li>

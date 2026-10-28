@@ -53,6 +53,7 @@ import {DomHandler} from 'primeng/dom';
     >
         <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
         <span class="layout-menuitem-text">{{ item.label }}</span>
+        <span *ngIf="item.badge" class="ml-auto bg-orange-500 text-white border-round-xl px-2 text-xs font-bold">{{ item.badge }}</span>
         <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
     </a>
 

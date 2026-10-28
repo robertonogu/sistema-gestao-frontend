@@ -1,0 +1,128 @@
+<div class="grid">
+	<div class="col-12">
+		<div class="card">
+
+            <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
+                <div>
+                    <div class="text-900 text-xl font-semibold">Registos por aprovar</div>
+                    <div class="text-600 text-sm">Submetidos pelos funcionários na app. Só contam no Mapa de Tempos e nos custos da obra depois de aprovados.</div>
+                </div>
+                <div class="flex gap-2 sm:ml-auto">
+                    <button pButton type="button" icon="pi pi-refresh" class="p-button-rounded p-button-outlined"
+                            pTooltip="Atualizar" tooltipPosition="bottom" (click)="loadSubmissions()"></button>
+                </div>
+            </div>
+
+			<p-table [value]="submissions" [loading]="loading" styleClass="p-datatable-striped" [tableStyle]="{ 'min-width': '60rem' }">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Data</th>
+                        <th>Funcionário</th>
+                        <th>Horas</th>
+                        <th>Obra</th>
+                        <th>Item</th>
+                        <th>Local</th>
+                        <th>Descrição</th>
+                        <th>Submetido</th>
+                        <th>Ações</th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-submission>
+                    <tr>
+                        <td>{{ parseDate(submission.date) | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ submission.employeeName }}</td>
+                        <td>{{ submission.hours }} h</td>
+                        <td>{{ submission.constructionName }}</td>
+                        <td>{{ submission.budgetItemName }}</td>
+                        <td>{{ submission.workOnConstruction ? 'Obra' : 'Empresa' }}</td>
+                        <td class="text-600">{{ submission.description }}</td>
+                        <td class="text-600">{{ submission.createdAt | date: 'dd/MM HH:mm' }}</td>
+                        <td class="white-space-nowrap">
+                            <p-button icon="pi pi-check" [rounded]="true" [text]="true" severity="success" pTooltip="Aprovar"
+                                      (click)="openApprove(submission)" />
+                            <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" pTooltip="Rejeitar"
+                                      (click)="openReject(submission)" />
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                    <tr><td colspan="9" class="text-600">Não há registos por aprovar.</td></tr>
+                </ng-template>
+
+                <ng-template pTemplate="summary">
+                    <span *ngIf="submissions.length">{{ submissions.length }} registos por aprovar · {{ totalHours }} h</span>
+                </ng-template>
+            </p-table>
+
+		</div>
+	</div>
+</div>
+
+<p-dialog header="Aprovar registo" [(visible)]="approveDialog" [style]="{ width: '450px' }" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div *ngIf="approving" class="mb-3 text-700">
+            <i class="pi pi-user mr-1"></i>{{ approving.employeeName }}
+            <div *ngIf="approving.description" class="text-600 text-sm mt-1 font-italic">{{ approving.description }}</div>
+            <div class="text-600 text-sm mt-1">Pode corrigir os dados antes de aprovar.</div>
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-2">Data</label>
+            <p-calendar [(ngModel)]="date" dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" appendTo="body"
+                        [ngClass]="{ 'ng-invalid ng-dirty': submitted && !date }" />
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-2">Horas</label>
+            <p-inputNumber mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="2" [(ngModel)]="hours"
+                           [ngClass]="{ 'ng-invalid ng-dirty': submitted && !hours }" />
+        </div>
+
+        <div class="field flex align-items-center gap-3">
+            <p-checkbox [(ngModel)]="workOnConstruction" [binary]="true" inputId="approveWorkOnConstruction" />
+            <label for="approveWorkOnConstruction" class="mb-0">Realizado na Obra</label>
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-2">Obra</label>
+            <p-dropdown [(ngModel)]="constructionId" [options]="constructionNames" optionLabel="name" optionValue="constructionId"
+                        placeholder="Selecione uma Obra" appendTo="body" (onChange)="onConstructionChange()"
+                        [ngClass]="{ 'ng-invalid ng-dirty': submitted && !constructionId }" />
+        </div>
+
+        <div class="field">
+            <label class="block font-bold mb-2">Item</label>
+            <p-treeSelect [(ngModel)]="budgetNode" [options]="budgetTree" containerStyleClass="w-full" placeholder="Selecione um Item"
+                          appendTo="body" [ngClass]="{ 'ng-invalid ng-dirty': submitted && !budgetNode }" />
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="approveDialog = false"></button>
+        <button pButton pRipple label="Aprovar" icon="pi pi-check" class="p-button-text" [loading]="saving" (click)="approve()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Rejeitar registo" [(visible)]="rejectDialog" [style]="{ width: '450px' }" [modal]="true" class="p-fluid">
+    <ng-template pTemplate="content">
+        <div *ngIf="rejecting" class="mb-3 text-700">
+            {{ rejecting.employeeName }} · {{ parseDate(rejecting.date) | date: 'dd/MM/yyyy' }} · {{ rejecting.hours }} h · {{ rejecting.constructionName }}
+        </div>
+        <div class="field">
+            <label class="block font-bold mb-2">Motivo</label>
+            <textarea pInputTextarea [(ngModel)]="rejectionReason" rows="3" maxlength="500"
+                      placeholder="O funcionário vê este motivo na app"
+                      [ngClass]="{ 'ng-invalid ng-dirty': submitted && !rejectionReason.trim() }"></textarea>
+            <small class="p-error" *ngIf="submitted && !rejectionReason.trim()">Indique o motivo.</small>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <button pButton pRipple label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="rejectDialog = false"></button>
+        <button pButton pRipple label="Rejeitar" icon="pi pi-times-circle" class="p-button-text p-button-danger" [loading]="saving" (click)="reject()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-toast />
