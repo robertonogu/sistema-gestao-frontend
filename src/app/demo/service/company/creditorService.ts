@@ -14,12 +14,10 @@ export class CreditorService {
 
     constructor(private http: HttpClient) { }
 
-    // Credores com o que a empresa deve a cada um
     getCreditors() : Observable<Creditor[]> {
         return this.http.get<Creditor[]>(this.creditorsUrl);
     }
 
-    // activeOnly: sem os credores inativos (para escolher numa despesa/pagamento novo)
     getCreditorNames(activeOnly: boolean = false) : Observable<ItemName[]> {
         return this.http.get<ItemName[]>(this.creditorsUrl + "/names?activeOnly=" + activeOnly);
     }

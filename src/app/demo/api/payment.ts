@@ -1,7 +1,6 @@
 import { PaymentMethod } from "../data/enum/paymentMethod";
 import { OriginType } from "./originType";
 
-// Documento de pagamento na listagem: um pagamento que pode liquidar várias faturas
 export interface Payment {
     paymentDocumentId: number;
     date: Date;
@@ -14,7 +13,6 @@ export interface Payment {
     account: string;
 }
 
-// Fatura que pode ser paga no documento; debtValue já exclui o que este documento paga
 export interface PaymentDocumentLine {
     expenseId: number;
     documentNumber: string;
@@ -37,7 +35,6 @@ export interface PaymentDocumentDetail {
     lines: PaymentDocumentLine[];
 }
 
-// Pagamento de uma despesa: o documento e quanto dele foi para esta fatura
 export interface ExpensePayment {
     paymentDocumentId: number;
     date: string;

@@ -39,7 +39,6 @@ export class ListArticlesComponent {
     private datePipe: DatePipe
   ) {}
 
-  // Separador ativo, guardado na sessão para voltar ao mesmo separador depois de abrir uma despesa
   activeTab: number = 0;
   private static readonly TAB_STORAGE_KEY = 'articles-active-tab';
 
@@ -126,7 +125,6 @@ export class ListArticlesComponent {
     try {
       sessionStorage.setItem(ListArticlesComponent.TAB_STORAGE_KEY, String(index));
     } catch {
-      // sem armazenamento de sessão: só não se lembra do separador
     }
   }
 }

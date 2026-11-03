@@ -56,16 +56,16 @@ export class EditRevenueComponent implements OnInit {
     this.validIvaRates = [0, 6, 13, 23];
   }
 
-  // Empréstimo de financiador: a origem só pode ser um financiador e não tem IVA
   lenderNames: ItemName[] = [];
 
   get isMemberLoan(): boolean {
     return (this.selectedRevenueType as unknown as string) === 'MEMBER_LOAN';
   }
 
+  private lenderOrigins: Origin[] = [];
+
   get originOptions(): Origin[] {
-    if (!this.isMemberLoan) return this.origins;
-    return [{ label: 'Financiadores', items: this.lenderNames.map(lender => ({ label: lender.name, value: lender.id })) } as unknown as Origin];
+    return this.isMemberLoan ? this.lenderOrigins : this.origins;
   }
 
   private applyMemberLoanRules() {
@@ -81,7 +81,10 @@ export class EditRevenueComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.financerService.getFinancerNames().subscribe(names => this.lenderNames = names);
+    this.financerService.getFinancerNames().subscribe(names => {
+      this.lenderNames = names;
+      this.lenderOrigins = [{ label: 'Financiadores', items: names.map(lender => ({ label: lender.name, value: lender.id })) } as unknown as Origin];
+    });
     this.revenueId = Number(this.route.snapshot.params['revenueId']);
 
     this.accountService.getAccountNamesWithType().subscribe((accountNames) => {
@@ -166,7 +169,6 @@ export class EditRevenueComponent implements OnInit {
     this.getSalesForClient();
   }
 
-  // ---- Vendas liquidadas pela receita (várias, como as faturas num pagamento) ----
   onSaleSelect(sale: SaleForRevenue) {
     this.salesSelection.onSelect(sale);
     this.syncTotalsFromSales();
@@ -187,7 +189,6 @@ export class EditRevenueComponent implements OnInit {
     this.syncTotalsFromSales();
   }
 
-  // O Valor Total, numa receita de vendas com vendas pendentes, é repartido pelas vendas da mais antiga para a mais recente
   onTotalInput(value: number | string | null) {
     if (!this.isSalesRevenueType || this.salesSelection.sales.length === 0) return;
     this.salesSelection.distribute(value);
@@ -199,7 +200,6 @@ export class EditRevenueComponent implements OnInit {
     this.iva = this.salesSelection.commonIvaRate as number;
   }
 
-  // Valor recebido a mais do que o distribuído pelas vendas: fica como crédito do cliente na conta corrente
   get revenueExcess(): number {
     return Math.max(0, Math.round(((this.totalValue ?? 0) - this.salesSelection.total) * 100) / 100);
   }
@@ -211,7 +211,6 @@ export class EditRevenueComponent implements OnInit {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: error });
       return null;
     }
-    // Devolução ao cliente (linhas a somar 0 ou menos): o valor total tem de ser igual ao das linhas
     if (lines.length > 0 && this.salesSelection.total <= 0 && Math.abs((this.totalValue ?? 0) - this.salesSelection.total) > 0.005) {
       this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Numa devolução ao cliente o valor total tem de ser igual ao valor das linhas (' + this.salesSelection.total.toFixed(2) + ' €).' });
       return null;

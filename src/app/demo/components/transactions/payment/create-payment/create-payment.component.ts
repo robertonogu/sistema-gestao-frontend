@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AccountName } from 'src/app/demo/api/accountName';
 import { ExpenseInDebt } from 'src/app/demo/api/expenseInDebt';
@@ -41,7 +41,6 @@ export class CreatePaymentComponent {
   isCashAccountSelected: boolean = false;
   paymentMethodOptions: { key: string; value: string }[] = getPaymentMethodEntries(undefined);
 
-  // Faturas em débito da origem, da mais antiga para a mais recente
   expenses: ExpenseInDebt[] = [];
   expensesSelected: ExpenseInDebt[] = [];
   expenseValues: number[] = [];
@@ -50,17 +49,13 @@ export class CreatePaymentComponent {
   totalToPay: number | null = null;
   saving: boolean = false;
 
-  // Edição de um pagamento existente (documento de pagamento com uma ou mais faturas)
   editingPaymentId?: number;
 
 
-  // Pago por um credor (p.ex. sócio que paga com o cartão dele): não sai dinheiro de nenhuma conta da empresa
-  // e a empresa passa a dever-lhe o valor (empréstimo a pagar)
   paidByCreditor: boolean = false;
   selectedCreditor: number | null = null;
   creditorNames: ItemName[] = [];
 
-  // Contas da empresa e credores (pessoas que pagam com dinheiro delas) na mesma lista: 'A<id>' = conta, 'C<id>' = credor
   paidFromOptions: { label: string; items: { label: string; value: string }[] }[] = [];
   selectedPaidFrom: string | null = null;
 
@@ -95,8 +90,6 @@ export class CreatePaymentComponent {
     const paymentDocumentId = Number(this.route.snapshot.paramMap.get('paymentDocumentId'));
     if (paymentDocumentId) this.editingPaymentId = paymentDocumentId;
 
-    // Num pagamento novo só se escolhem funcionários, financiadores e credores ativos. Ao editar, ou vindo da
-    // listagem de débitos (uma origem inativa pode ainda ter dívidas), aparecem todos, para a origem continuar na lista
     const onlyActive = !this.editingPaymentId && !Number(this.route.snapshot.queryParamMap.get('originId'));
     this.creditorService.getCreditorNames(onlyActive).subscribe(names => { this.creditorNames = names; this.buildPaidFromOptions(); });
     this.originService.getOriginsGrouped(onlyActive).subscribe((origins) => {
@@ -113,7 +106,6 @@ export class CreatePaymentComponent {
 
     if (this.editingPaymentId) return;
 
-    // Vindo da listagem de débitos: origem escolhida e a fatura já selecionada com o valor em débito
     const params = this.route.snapshot.queryParamMap;
     const originId = Number(params.get('originId'));
     if (originId) {
@@ -139,13 +131,12 @@ export class CreatePaymentComponent {
   }
 
   getExpenses(preselectExpenseId?: number) {
-    // Faturas em débito (da mais antiga para a mais recente) e, a seguir, documentos com crédito a favor
     forkJoin([
       this.expenseService.getExpensesFromOrigin(this.selectedOrigin),
       this.expenseService.getExpensesWithCreditFromOrigin(this.selectedOrigin)
     ]).subscribe(([inDebt, withCredit]) => {
       const byDate = (a: ExpenseInDebt, b: ExpenseInDebt) => this.expenseTime(a) - this.expenseTime(b) || a.id - b.id;
-      this.expenses = [...[...inDebt].sort(byDate), ...[...withCredit].sort(byDate)];
+      this.expenses = [...inDebt.sort(byDate), ...withCredit.sort(byDate)];
       this.expensesSelected = [];
       this.expenseValues = this.expenses.map(() => 0);
       this.sumTotalValues = 0;
@@ -160,7 +151,6 @@ export class CreatePaymentComponent {
     });
   }
 
-  // Preenche o formulário com o pagamento a editar: as faturas que ele paga ficam selecionadas com o valor pago
   private loadPayment(payment: PaymentDocumentDetail) {
     this.date = parseLocalDate(payment.date) as Date;
     this.documentNumber = payment.documentNumber ?? (undefined as any);
@@ -196,23 +186,18 @@ export class CreatePaymentComponent {
     return expense.debtValue < 0;
   }
 
-  // Total em dívida (só as faturas em débito)
   get totalDebt(): number {
     return this.round(this.expenses.filter(expense => !this.isCredit(expense)).reduce((acc, expense) => acc + expense.debtValue, 0));
   }
 
-  // Crédito a favor disponível (positivo)
   get totalCredit(): number {
     return this.round(-this.expenses.filter(expense => this.isCredit(expense)).reduce((acc, expense) => acc + expense.debtValue, 0));
   }
 
-  // Crédito usado neste pagamento (positivo)
   private get creditUsed(): number {
     return this.round(-this.expenses.reduce((acc, expense, i) => acc + (this.isCredit(expense) ? (this.expenseValues[i] ?? 0) : 0), 0));
   }
 
-  // Reparte o valor total pelas faturas em débito, da mais antiga para a mais recente. O valor total é o que sai da
-  // conta: o crédito usado (linhas negativas já escolhidas) soma-se ao que é distribuído pelas faturas.
   distributeTotal(input: number | string | null) {
     const value = input == null || input === '' ? null : Number(input);
     this.totalToPay = value;

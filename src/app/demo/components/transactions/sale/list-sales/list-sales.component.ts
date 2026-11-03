@@ -41,7 +41,6 @@ export class ListSalesComponent implements OnInit {
     return meta?.value ?? undefined;
   }
 
-  // O filtro de data é um calendário de intervalo: um dia escolhido filtra esse dia, dois dias filtram o período
   private dateRange(filters: any): { dateFrom?: Date; dateTo?: Date } {
     const range = this.filterValue(filters, 'date');
     if (Array.isArray(range) && range[0]) {

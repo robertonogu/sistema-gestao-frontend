@@ -4,11 +4,10 @@ import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { WorkLogSubmission } from 'src/app/demo/api/workLogSubmission';
 import { ConstructionService } from 'src/app/demo/service/construction/constructionService';
+import { formatHours } from 'src/app/demo/service/hours';
 import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
 import { WorkLogSubmissionService } from 'src/app/demo/service/people/workLogSubmission.service';
 
-// Registos submetidos pelos funcionários na app: aprovar (com correções, se for preciso) cria o registo de
-// trabalho normal; rejeitar pede um motivo, que o funcionário vê na app
 @Component({
   templateUrl: './worklog-submissions.component.html',
   providers: [MessageService]
@@ -19,7 +18,6 @@ export class WorkLogSubmissionsComponent implements OnInit {
   submissions: WorkLogSubmission[] = [];
   constructionNames: ConstructionNames[] = [];
 
-  // ===== Aprovar =====
   approveDialog = false;
   approving: WorkLogSubmission | null = null;
   saving = false;
@@ -31,7 +29,6 @@ export class WorkLogSubmissionsComponent implements OnInit {
   budgetTree: TreeNode[] = [];
   budgetNode?: TreeNode;
 
-  // ===== Rejeitar =====
   rejectDialog = false;
   rejecting: WorkLogSubmission | null = null;
   rejectionReason = '';
@@ -54,6 +51,8 @@ export class WorkLogSubmissionsComponent implements OnInit {
       error: () => this.loading = false
     });
   }
+
+  formatHours = formatHours;
 
   parseDate(value: string): Date | undefined {
     return parseLocalDate(value);

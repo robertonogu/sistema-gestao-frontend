@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// A API trata as datas como dias de calendário (LocalDate, "yyyy-MM-dd"). Sem isto, um Date seria enviado como
-// instante UTC (p.ex. o dia 12 às 00:00 em Lisboa vai como "…-11T23:00:00Z") e chegava à API como o dia anterior.
 @Injectable()
 export class LocalDateInterceptor implements HttpInterceptor {
 
@@ -33,7 +31,6 @@ export function toLocalDates(value: any): any {
   return value;
 }
 
-// Lê uma data "yyyy-MM-dd" da API como dia local (new Date("yyyy-MM-dd") seria meia-noite UTC)
 export function parseLocalDate(value: string | null | undefined): Date | undefined {
   if (!value) return undefined;
   const [year, month, day] = value.substring(0, 10).split('-').map(Number);

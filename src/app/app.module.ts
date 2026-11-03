@@ -15,7 +15,6 @@ import { AuthInterceptor } from './demo/service/auth.interceptor';
     imports: [
         AppRoutingModule,
         AppLayoutModule,
-        // PWA: guarda a app (JS/CSS/ícones) para abrir depressa no telemóvel. Os pedidos à API nunca ficam em cache.
         ServiceWorkerModule.register('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'

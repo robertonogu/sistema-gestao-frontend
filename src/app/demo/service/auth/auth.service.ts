@@ -7,8 +7,6 @@ import { Session } from '../../api/auth';
 
 const STORAGE_KEY = 'alvedaSession';
 
-// Sessão do utilizador (token JWT da API) guardada no browser. O administrador vai para o backoffice;
-// o funcionário para a app do funcionário (#/app).
 @Injectable({
     providedIn: 'root'
 })
@@ -19,7 +17,6 @@ export class AuthService {
 
     constructor(private http: HttpClient, private router: Router) { }
 
-    // null se não houver sessão ou se já tiver expirado
     get session(): Session | null {
         const session = this.sessionSubject.value;
         if (session && new Date(session.expiresAt).getTime() <= Date.now()) {
@@ -43,7 +40,6 @@ export class AuthService {
         this.router.navigate(['/auth/login']);
     }
 
-    // A API recusou o token (expirado, utilizador desativado…): volta ao login e depois à mesma página
     expire(): void {
         if (!this.sessionSubject.value) return;
         this.clear();

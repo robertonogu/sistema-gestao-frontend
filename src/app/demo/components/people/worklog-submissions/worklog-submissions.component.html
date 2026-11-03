@@ -29,7 +29,7 @@
                     <tr>
                         <td>{{ parseDate(submission.date) | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ submission.employeeName }}</td>
-                        <td>{{ submission.hours }} h</td>
+                        <td class="white-space-nowrap">{{ formatHours(submission.hours) }}</td>
                         <td>{{ submission.constructionName }}</td>
                         <td>{{ submission.budgetItemName }}</td>
                         <td>{{ submission.workOnConstruction ? 'Obra' : 'Empresa' }}</td>
@@ -101,7 +101,7 @@
 <p-dialog header="Rejeitar registo" [(visible)]="rejectDialog" [style]="{ width: '450px' }" [modal]="true" class="p-fluid">
     <ng-template pTemplate="content">
         <div *ngIf="rejecting" class="mb-3 text-700">
-            {{ rejecting.employeeName }} · {{ parseDate(rejecting.date) | date: 'dd/MM/yyyy' }} · {{ rejecting.hours }} h · {{ rejecting.constructionName }}
+            {{ rejecting.employeeName }} · {{ parseDate(rejecting.date) | date: 'dd/MM/yyyy' }} · {{ formatHours(rejecting.hours) }} · {{ rejecting.constructionName }}
         </div>
         <div class="field">
             <label class="block font-bold mb-2">Motivo</label>

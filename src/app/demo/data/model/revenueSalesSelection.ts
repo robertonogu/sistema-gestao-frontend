@@ -6,8 +6,6 @@ export interface RevenueSaleLine {
     value: number;
 }
 
-// Vendas do cliente que uma receita pode liquidar (como as faturas num pagamento): seleção, valor por venda
-// e repartição de um valor total pelas vendas da mais antiga para a mais recente.
 export class RevenueSalesSelection {
 
     sales: SaleForRevenue[] = [];
@@ -15,7 +13,6 @@ export class RevenueSalesSelection {
     values: number[] = [];
     total: number = 0;
 
-    // Carrega as vendas pendentes do cliente; em edição, as linhas já existentes ficam selecionadas com o seu valor
     load(sales: SaleForRevenue[], lines: RevenueSaleLine[] = []) {
         this.sales = [...sales].sort((a, b) => a.saleId - b.saleId);
         this.values = this.sales.map(sale => lines.find(line => line.saleId === sale.saleId)?.value ?? 0);
@@ -30,7 +27,6 @@ export class RevenueSalesSelection {
         this.total = 0;
     }
 
-    // Crédito do cliente (pendente negativo): nota de crédito a descontar nesta receita ou a devolver ao cliente
     isCredit(sale: SaleForRevenue): boolean {
         return sale.pendingValue < 0;
     }
@@ -66,8 +62,6 @@ export class RevenueSalesSelection {
         this.updateTotal();
     }
 
-    // Reparte o valor pelas vendas pendentes, da mais antiga para a mais recente; o crédito do cliente já escolhido
-    // (linhas negativas) soma-se ao valor recebido
     distribute(input: number | string | null) {
         let remaining = Math.min((input == null || input === '' ? 0 : Number(input)) + this.creditUsed, this.totalPending);
         this.values = this.sales.map((sale, i) => {
@@ -84,13 +78,11 @@ export class RevenueSalesSelection {
         this.total = this.round(this.values.reduce((sum, value) => sum + (value ?? 0), 0));
     }
 
-    // Taxa de IVA comum às vendas selecionadas (undefined se forem diferentes)
     get commonIvaRate(): number | undefined {
         const rates = new Set(this.sales.filter((_, i) => this.values[i] !== 0).map(sale => sale.ivaRate));
         return rates.size === 1 ? [...rates][0] : undefined;
     }
 
-    // Linhas a enviar à API; devolve uma mensagem de erro se algum valor exceder o pendente
     lines(): { lines: RevenueSaleLine[]; error?: string } {
         const lines: RevenueSaleLine[] = [];
         for (let i = 0; i < this.sales.length; i++) {

@@ -17,7 +17,6 @@ type SummaryScope = 'external' | 'internal';
 
 const HOURS_PER_DAY = 8;
 
-// Same colors as the absence badges in the absences list
 const ABSENCE_COLORS: Record<string, { background: string; color: string }> = {
   VACATION: { background: '#FEEDAF', color: '#8A5340' },
   JUSTIFIED_ABSENCE: { background: '#C8E6C9', color: '#256029' },
@@ -48,7 +47,6 @@ const ABSENCE_COLORS: Record<string, { background: string; color: string }> = {
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    /* Each month is outlined in bold: sides, top of the month header and under its last day */
     :host ::ng-deep .p-datatable.p-datatable-gridlines .p-datatable-table .month-start {
       border-left: 2px solid #495057;
     }
@@ -77,10 +75,8 @@ export class TimeMapComponent implements OnInit {
   years: number[] = [];
 
   holidays: NationalHoliday[] = [];
-  // Absences of the selected employee by ISO date (yyyy-MM-dd)
   absenceDays = new Map<string, AbsenceDay[]>();
 
-  // Vacation balance of the selected employee and year (carried over + this year's entitlement)
   vacationSummary: VacationSummary | null = null;
   vacationDialog: boolean = false;
   editCarriedOverDays: number = 0;
@@ -185,14 +181,11 @@ export class TimeMapComponent implements OnInit {
     return this.absencesOn(day, month).find(a => a.absenceType === 'VACATION');
   }
 
-  // An absence that fills the whole day: vacation, leaves, or any absence registered without hours.
-  // Weekends inside an absence period show as normal weekend days.
   wholeDayAbsence(day: number, month: string): AbsenceDay | undefined {
     if (this.isWeekend(day, month)) return undefined;
     return this.absencesOn(day, month).find(a => a.absenceType === 'VACATION' || !absenceTypeAllowsHours(a.absenceType) || !a.hours);
   }
 
-  // Vacation shows the year it belongs to ("Férias 2025" when owed from the previous year)
   absenceLabel(absence: AbsenceDay): string {
     if (absence.absenceType === 'VACATION') {
       return 'Férias ' + (absence.previousYear ? this.year - 1 : this.year);
@@ -204,9 +197,6 @@ export class TimeMapComponent implements OnInit {
     return ABSENCE_COLORS[absence.absenceType] ?? null;
   }
 
-  // Missing hours explained by a registered absence take that absence type's color (justified green, unjustified red...).
-  // Only colored when the absence covers exactly the missing hours, so a day whose work hours are still
-  // being filled in is not marked.
   absenceHoursStyle(day: number, month: string): { background: string; color: string } | null {
     const missing = this.timeMaps[this.months.indexOf(month)][day - 1]?.absenceHours;
     if (!missing) return null;
@@ -217,7 +207,6 @@ export class TimeMapComponent implements OnInit {
     return hours === missing ? this.absenceStyle(partial[0]) : null;
   }
 
-  // Vacation days in the month: only working days count (weekends and holidays inside a vacation period don't)
   vacationDaysInMonth(monthIndex: number): number {
     let count = 0;
     const month = this.months[monthIndex];
@@ -255,7 +244,6 @@ export class TimeMapComponent implements OnInit {
     });
   }
 
-  // Days with work registered in the month
   workedDaysInMonth(monthIndex: number): number {
     return this.timeMaps[monthIndex].filter(day => (day?.workedHours ?? 0) > 0).length;
   }
@@ -264,7 +252,6 @@ export class TimeMapComponent implements OnInit {
     return this.employeeNames.find(employee => employee.id === this.selectedEmployee)?.name ?? '';
   }
 
-  // Same content as the page: the table (current tab, internal or external), vacation summary and yearly totals
   exportPdf(): void {
     if (this.selectedEmployee == null) return;
 
@@ -298,7 +285,6 @@ export class TimeMapComponent implements OnInit {
     });
   }
 
-  // PDF cells of one day in one month, mirroring the page cells (missing day, holiday, whole-day absence or H.T/H.E/H.F)
   private pdfCells(day: number, month: string, k: number): TimeMapPdfCell[] {
     if (day > this.daysPerMonth[k]) {
       return [{ text: '', colSpan: 3, missingDay: true, firstMissingDay: day === this.daysPerMonth[k] + 1 }];
@@ -366,7 +352,6 @@ export class TimeMapComponent implements OnInit {
 
 }
 
-// Days in each month of the year (February has 29 in leap years)
 function daysPerMonthOf(year: number): number[] {
   return Array.from({ length: 12 }, (_, month) => new Date(year, month + 1, 0).getDate());
 }

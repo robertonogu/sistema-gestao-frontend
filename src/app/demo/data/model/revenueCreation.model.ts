@@ -12,7 +12,6 @@ export class RevenueCreation {
     totalValue: number;
     iva: number;
     saleId: number;
-    // Vendas liquidadas pela receita e valor recebido de cada uma
     sales: RevenueSaleLine[];
 
     constructor(

@@ -29,7 +29,6 @@ import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
       line-height: 1;
     }
     .category-dot + .category-dot { margin-left: 4px; }
-    /* Estado de pagamento: verde = pago, amarelo = parcialmente pago, vermelho = em dívida */
     .status-dot {
       display: inline-block;
       width: 14px;
@@ -160,7 +159,6 @@ export class ListExpensesComponent implements OnInit {
     const exportFilters = this.buildFilters(filters);
     this.expenseService.exportExpenses(exportFilters).subscribe({
       next: (result) => {
-        // Com uma só origem filtrada, o título indica-a
         const originIds: number[] | undefined = exportFilters.originIds as any;
         const originName = originIds?.length === 1 ? this.originNames.find(origin => origin.id === originIds[0])?.name : undefined;
         const dates = result.map((expense: ExpenseListItem) => parseLocalDate(expense.date as any));

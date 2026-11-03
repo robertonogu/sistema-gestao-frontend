@@ -52,7 +52,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   align-items: stretch;
 }
 
-// ===== Foto (encostada à caixa branca) =====
 .obra-photo {
   position: relative;
   width: 130px;
@@ -77,7 +76,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   font-size: 10px;
 }
 
-// ===== Caixa branca (nome, status, morada, progresso, meta) =====
 .obra-card {
   flex: 1;
   background: #ffffff;
@@ -117,7 +115,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   font-size: 13px;
 }
 
-// ===== Progresso =====
 .obra-progress { margin-top: 4px; }
 
 .progress-head {
@@ -144,7 +141,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   transition: width 0.3s;
 }
 
-// ===== Meta lateral =====
 .obra-meta {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -163,11 +159,9 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 .meta-value { color: var(--text); font-size: 13px; font-weight: 600; }
 .meta-value.success { color: var(--success); }
 
-// ===== Helpers =====
 .muted { color: var(--text-3); }
 .mono  { font-family: var(--font-mono); }
 
-// ===== Responsivo =====
 @media (max-width: 900px) {
   .obra-header { flex-direction: column; }
   .obra-card   { grid-template-columns: 1fr; }
@@ -196,14 +190,12 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 .muted { color: var(--text-3); }
 .mono  { font-family: var(--font-mono); }
 
-// ===== Header =====
 .dash-header {
   display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
   h1 { margin: 4px 0 2px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
   .header-actions { display: flex; gap: 8px; align-items: center; }
 }
 
-// ===== KPIs =====
 .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .kpi-grid .card { position: relative; }
 
@@ -225,7 +217,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   i { font-size: 13px; }
 }
 
-// ===== Execução financeira =====
 :host ::ng-deep .exec-card .p-card-body { padding: 16px; }
 .exec-head { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
 .seg-bar {
@@ -239,7 +230,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   .dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 }
 
-// ===== Layout rows =====
 .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .source-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
@@ -251,7 +241,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   &::before { content: ''; width: 3px; height: 14px; background: oklch(0.62 0.13 250); border-radius: 2px; }
 }
 
-// ===== Card titles =====
 .card-title {
   display: flex; gap: 8px; align-items: center;
   font-weight: 600; font-size: 13px; padding: 14px 16px 0;
@@ -264,7 +253,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
 }
 :host ::ng-deep .p-card .p-card-body { padding: 14px 16px; }
 
-// ===== Source columns =====
 .source-head {
   display: flex; justify-content: space-between; align-items: center;
   padding: 14px 16px 4px;
@@ -321,7 +309,6 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   .over { color: var(--danger); }
 }
 
-// ===== Payments =====
 .month-block + .month-block { margin-top: 14px; }
 .month-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
 .pay-row {
@@ -334,9 +321,7 @@ type SourceKey = 'materials' | 'workLog' | 'externalServices';
   &.out .pay-amount { color: var(--danger); }
 }
 
-// ===== Charts =====
 .chart-host { height: 240px; padding: 8px 16px 16px; }
-// Fixed-size (non-responsive) chart: a responsive canvas here gets stuck in a resize loop and freezes the page
 .cost-pie-host { display: flex; justify-content: center; }
 .chart-host.sm { height: 180px; }
   `]
@@ -473,11 +458,6 @@ export class DetailsConstructionComponent implements OnInit {
     this.downloadBlob(buffer, `materiais_obra_${constructionLabel}.xlsx`);
   }
 
-  // Escreve valores célula a célula. Com o ExcelJS o load() do template mantém intactos
-  // largura de colunas, fontes, borders, preenchimentos (incl. cores de tema) e formatos
-  // numéricos; ao atribuir apenas `cell.value` o estilo existente da célula é preservado.
-  // As linhas escritas além das que o template já traz formatadas recebem uma cópia do
-  // estilo da 1.ª linha de dados, para manter a formatação consistente.
   private writeRowsPreservingStyle(worksheet: ExcelJS.Worksheet, rows: (string | number)[][], firstDataRow: number): void {
     const templateRow = worksheet.getRow(firstDataRow);
     const templateStyles: (Partial<ExcelJS.Style> | undefined)[] = (rows[0] ?? []).map((_, colIndex) => {
@@ -515,7 +495,6 @@ export class DetailsConstructionComponent implements OnInit {
     { key: 'externalServices', route: 'externalServices', title: 'Serviços externos', icon: 'pi pi-wrench', color: 'oklch(0.55 0.15 75)',  soft: 'oklch(0.94 0.04 75)'  },
   ];
 
-  // ===== Computados =====
   pctFaturado = computed(() => Math.round((this.constructionDetails.invoicedNetValue / this.constructionDetails.initialBudget) * 100));
   pctPago     = computed(() => Math.round((this.constructionDetails.paymentValue     / this.constructionDetails.initialBudget)  * 100));
 
@@ -540,23 +519,9 @@ export class DetailsConstructionComponent implements OnInit {
   });
 
   paymentsByMonth = computed(() => {
-    /*const map = new Map<string, typeof this.payments>();
-    for (const p of this.payments) {
-      const k = p.data.slice(0, 7);
-      if (!map.has(k)) map.set(k, []);
-      map.get(k)!.push(p);
-    }
-    return Array.from(map.entries()).map(([month, items]) => ({ month, items }));*/
   });
 
-  // ===== Charts =====
   cashflowData = computed(() => ({
-    /*labels: this.cashflow.map(c => c.month),
-    datasets: [
-      { label: 'Faturado', data: this.cashflow.map(c => c.faturado), borderColor: 'oklch(0.65 0.13 250)', backgroundColor: 'oklch(0.92 0.03 250 / 0.6)', tension: 0.35, fill: true },
-      { label: 'Pago',     data: this.cashflow.map(c => c.pago),     borderColor: 'oklch(0.5 0.13 155)',  backgroundColor: 'transparent', tension: 0.35 },
-      { label: 'Custos',   data: this.cashflow.map(c => c.custos),   borderColor: 'oklch(0.62 0.18 25)',  backgroundColor: 'transparent', borderDash: [4, 4], tension: 0.35 },
-    ],*/
   }));
 
   cashflowOptions = {
@@ -568,7 +533,6 @@ export class DetailsConstructionComponent implements OnInit {
     },
   };
 
-  // ===== Helpers usados no template =====
   fmtEUR(n: number): string {
     const abs = Math.abs(n || 0).toLocaleString('pt-PT', { maximumFractionDigits: 0 });
     return abs + ' €';
@@ -603,10 +567,8 @@ export class DetailsConstructionComponent implements OnInit {
     return this.itemsSplit.reduce((s, it) => s + it[key].actual, 0);
   }
 
-  // ===== Gráfico circular: custos por categoria (mesmo estilo do "Despesas por Categoria" do dashboard) =====
   costCategoryData: any;
   costCategoryOptions: any;
-  // Registered only on this chart (not globally), so other charts don't start showing values
   costCategoryPlugins = [ChartDataLabels];
 
   private buildCostCategoryChart(): void {
@@ -635,10 +597,8 @@ export class DetailsConstructionComponent implements OnInit {
 
     this.costCategoryOptions = {
       animation: { duration: 0 },
-      // Room around the pie for the outside labels
       layout: { padding: { top: 40, bottom: 40, left: 130, right: 130 } },
       plugins: {
-        // Category name and percentage just outside each slice (slices with 0 € are left unlabelled)
         datalabels: {
           anchor: 'end',
           align: 'end',
@@ -649,7 +609,6 @@ export class DetailsConstructionComponent implements OnInit {
           display: (context: any) => context.dataset.data[context.dataIndex] > 0,
           formatter: (value: number, context: any) => `${categories[context.dataIndex].label}\n${pct(value)}%`,
         },
-        // The labels around the pie already name each slice
         legend: { display: false },
         tooltip: {
           callbacks: {
@@ -668,8 +627,6 @@ export class DetailsConstructionComponent implements OnInit {
   }
 
   get costBreakdownTotals() {
-    // As linhas com filhos já trazem a soma dos descendentes, por isso o total
-    // são só as raízes (nível 0) para não contar duas vezes.
     return this.costBreakdownRows
       .filter(row => row.level === 0)
       .reduce(

@@ -6,8 +6,6 @@ import { AuthService } from 'src/app/demo/service/auth/auth.service';
 import { UserService } from 'src/app/demo/service/auth/user.service';
 import { EmployeeService } from 'src/app/demo/service/people/employee.service';
 
-// Utilizadores que podem entrar: administradores (backoffice) e funcionários (app de registos de trabalho no telemóvel).
-// Não se apagam: desativam-se (deixam logo de conseguir entrar).
 @Component({
   templateUrl: './users.component.html',
   providers: [ConfirmationService, MessageService]
@@ -22,8 +20,8 @@ export class UsersComponent implements OnInit {
   loading = true;
   users: User[] = [];
   employeeNames: ItemName[] = [];
+  employeesWithoutUser: ItemName[] = [];
 
-  // ===== Novo utilizador =====
   createDialog = false;
   submitted = false;
   saving = false;
@@ -32,7 +30,6 @@ export class UsersComponent implements OnInit {
   username = '';
   password = '';
 
-  // ===== Nova palavra-passe =====
   passwordDialog = false;
   passwordUser: User | null = null;
   newPassword = '';
@@ -42,7 +39,10 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
-    this.employeeService.getEmployeeNames().subscribe(names => this.employeeNames = names);
+    this.employeeService.getEmployeeNames().subscribe(names => {
+      this.employeeNames = names;
+      this.updateEmployeesWithoutUser();
+    });
   }
 
   loadUsers(): void {
@@ -50,16 +50,16 @@ export class UsersComponent implements OnInit {
     this.userService.getUsers().subscribe({
       next: (users) => {
         this.users = users;
+        this.updateEmployeesWithoutUser();
         this.loading = false;
       },
       error: () => this.loading = false
     });
   }
 
-  // Um utilizador por funcionário: só aparecem para escolher os que ainda não têm
-  get employeesWithoutUser(): ItemName[] {
+  private updateEmployeesWithoutUser(): void {
     const withUser = new Set(this.users.map(user => user.employeeId).filter(id => id != null));
-    return this.employeeNames.filter(employee => !withUser.has(employee.id));
+    this.employeesWithoutUser = this.employeeNames.filter(employee => !withUser.has(employee.id));
   }
 
   roleLabel(role: UserRole): string {
@@ -75,7 +75,6 @@ export class UsersComponent implements OnInit {
     this.createDialog = true;
   }
 
-  // Sugere o utilizador a partir do nome do funcionário ("João Silva" → "joao.silva")
   onEmployeeChange(): void {
     if (this.username || !this.employeeId) return;
     const name = this.employeeNames.find(employee => employee.id === this.employeeId)?.name ?? '';

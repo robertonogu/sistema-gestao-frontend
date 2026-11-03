@@ -7,7 +7,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import { Location } from 'src/app/demo/api/location';
 import { GooglePlaceAutocompleteDirective, PlaceSelection } from 'src/app/demo/directives/google-place-autocomplete.directive';
 
-// Editable list of named locations (name + Google address). The first row is the main location.
 @Component({
   selector: 'app-locations-editor',
   standalone: true,

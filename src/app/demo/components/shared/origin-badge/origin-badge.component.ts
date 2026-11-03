@@ -3,8 +3,6 @@ import { Component, Input } from '@angular/core';
 import { TooltipModule } from 'primeng/tooltip';
 import { ORIGIN_TYPES, OriginType } from 'src/app/demo/api/originType';
 
-// Bola com duas letras do tipo da origem (Fu, Fo, Fi, Cr, Cl, EE), a pôr antes do nome; o nome do tipo aparece ao
-// passar o rato. Sem tipo não mostra nada.
 @Component({
   selector: 'app-origin-badge',
   standalone: true,

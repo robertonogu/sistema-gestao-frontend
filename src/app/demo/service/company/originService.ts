@@ -16,7 +16,6 @@ export class OriginService {
 
     constructor(private http: HttpClient) { }
 
-    // activeOnly: sem funcionários, financiadores e credores inativos (para escolher numa despesa/pagamento novo)
     getOriginsGrouped(activeOnly: boolean = false) : Observable<Origin[]> {
         return this.http.get<Origin[]>(this.originsGroupedUrl + "?activeOnly=" + activeOnly);
     }
@@ -29,7 +28,6 @@ export class OriginService {
         return this.http.get<ItemName[]>(this.originNamesUrl + "/withExpenses");
     }
 
-    // Com o tipo de cada origem (bola Fu/Cr/Fi…), para distinguir nomes repetidos
     getOriginNamesWithPayments() : Observable<OriginName[]> {
         return this.http.get<OriginName[]>(this.originNamesUrl + "/withPayments");
     }

@@ -17,16 +17,14 @@ import { BudgetItem } from 'src/app/demo/api/budgetItem';
 import { ConstructionNames } from 'src/app/demo/api/constructionNames';
 import { WorkLogSubmission, WorkLogSubmissionStatus } from 'src/app/demo/api/workLogSubmission';
 import { AuthService } from 'src/app/demo/service/auth/auth.service';
+import { formatHours, fromDecimalHours, toDecimalHours } from 'src/app/demo/service/hours';
 import { parseLocalDate } from 'src/app/demo/service/localDate.interceptor';
 import { WorkLogSubmissionService } from 'src/app/demo/service/people/workLogSubmission.service';
 
 type View = 'list' | 'form';
 
-// Datas em português na lista ("ter., 28/10")
 registerLocaleData(localePt, 'pt');
 
-// App do funcionário (PWA no telemóvel): submete registos de trabalho, que ficam pendentes até o escritório os
-// aprovar, e vê os seus registos dos últimos 30 dias. Enquanto pendentes, pode editá-los ou apagá-los.
 @Component({
   selector: 'app-employee-app',
   standalone: true,
@@ -49,7 +47,6 @@ export class EmployeeAppComponent implements OnInit {
   submissions: WorkLogSubmission[] = [];
   constructions: ConstructionNames[] = [];
 
-  // ===== Formulário =====
   editingId: number | null = null;
   saving = false;
   submitted = false;
@@ -57,6 +54,7 @@ export class EmployeeAppComponent implements OnInit {
   today = new Date();
   date: Date = new Date();
   hours: number | null = 8;
+  minutes: number | null = 0;
   workOnConstruction = true;
   constructionId: number | null = null;
   budgetTree: TreeNode[] = [];
@@ -68,7 +66,6 @@ export class EmployeeAppComponent implements OnInit {
               private primengConfig: PrimeNGConfig) { }
 
   ngOnInit(): void {
-    // Calendário em português (o funcionário só usa esta página, por isso não afeta o backoffice)
     this.primengConfig.setTranslation({
       dayNames: ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'],
       dayNamesShort: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
@@ -83,6 +80,8 @@ export class EmployeeAppComponent implements OnInit {
     this.loadSubmissions();
     this.submissionService.getMyConstructions().subscribe(constructions => this.constructions = constructions);
   }
+
+  formatHours = formatHours;
 
   get pendingHours(): number {
     return this.submissions.filter(s => s.status === 'PENDING').reduce((total, s) => total + s.hours, 0);
@@ -111,9 +110,9 @@ export class EmployeeAppComponent implements OnInit {
     this.editingId = null;
     this.date = new Date();
     this.hours = 8;
+    this.minutes = 0;
     this.workOnConstruction = true;
     this.description = '';
-    // Com uma só obra, já vem escolhida
     this.constructionId = this.constructions.length === 1 ? this.constructions[0].constructionId : null;
     this.budgetNode = null;
     this.budgetTree = [];
@@ -124,7 +123,7 @@ export class EmployeeAppComponent implements OnInit {
   editSubmission(submission: WorkLogSubmission): void {
     this.editingId = submission.workLogSubmissionId;
     this.date = parseLocalDate(submission.date) ?? new Date();
-    this.hours = submission.hours;
+    ({ hours: this.hours, minutes: this.minutes } = fromDecimalHours(submission.hours));
     this.workOnConstruction = submission.workOnConstruction;
     this.description = submission.description ?? '';
     this.constructionId = submission.constructionId;
@@ -136,7 +135,7 @@ export class EmployeeAppComponent implements OnInit {
   deleteSubmission(submission: WorkLogSubmission): void {
     this.confirmationService.confirm({
       header: 'Apagar registo',
-      message: `Apagar o registo de ${submission.hours} h em ${submission.constructionName}?`,
+      message: `Apagar o registo de ${formatHours(submission.hours)} em ${submission.constructionName}?`,
       accept: () => {
         this.submissionService.deleteMySubmission(submission.workLogSubmissionId).subscribe({
           next: () => {
@@ -158,13 +157,18 @@ export class EmployeeAppComponent implements OnInit {
   save(): void {
     this.submitted = true;
     this.formError = null;
-    if (!this.date || !this.hours || !this.constructionId || !this.budgetNode) {
-      this.formError = 'Preencha a data, as horas, a obra e o item.';
+    const totalHours = toDecimalHours(this.hours ?? 0, this.minutes ?? 0);
+    if (!this.date || !totalHours || !this.constructionId || !this.budgetNode) {
+      this.formError = 'Preencha a data, o tempo, a obra e o item.';
+      return;
+    }
+    if (totalHours > 24) {
+      this.formError = 'O tempo não pode passar de 24 horas.';
       return;
     }
     const input = {
       date: this.date,
-      hours: this.hours,
+      hours: totalHours,
       workOnConstruction: this.workOnConstruction,
       constructionId: this.constructionId,
       budgetItemId: this.budgetNode.data,

@@ -44,7 +44,6 @@ export class ListPaymentsComponent {
   }
 
   private buildFilters(filters: any): PaymentFilters {
-    // Data: um dia (só a primeira data escolhida) ou um período
     const dateRange = this.filterValue(filters, 'date');
     const dateFrom: Date | undefined = Array.isArray(dateRange) ? dateRange[0] ?? undefined : undefined;
     const dateTo: Date | undefined = Array.isArray(dateRange) ? dateRange[1] ?? dateFrom : undefined;

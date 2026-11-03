@@ -46,7 +46,6 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
   font-size: 14px;
 }
 
-// Grid columns shared by every row
 .orc-head, .orc-row {
   display: grid;
   grid-template-columns: 20px 32px 1fr 125px 125px 132px 125px 120px 60px 44px;
@@ -94,7 +93,6 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
 .col-num.small { font-size: 11px; }
 .col-actions { display: flex; gap: 4px; justify-content: center; }
 
-// Drag handle (grip) at the start of each row
 .col-grip { padding-left: 6px !important; padding-right: 0 !important; display: flex; align-items: center; }
 .grip {
   display: flex; align-items: center; justify-content: center;
@@ -107,7 +105,6 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
   &:active { cursor: grabbing; }
 }
 
-// Drag & drop feedback
 .drag-block.cdk-drag-preview {
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   background: var(--bg);
@@ -138,7 +135,6 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
   background: var(--border);
 }
 
-// Toggle chevron
 .toggle {
   width: 22px; height: 22px;
   border: none; background: transparent;
@@ -150,7 +146,6 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
   &.expanded { transform: rotate(90deg); }
 }
 
-// Inputs inside cells: invisible until hover/focus (keeps the table calm)
 :host ::ng-deep .orc-row {
   input.p-inputtext,
   .p-inputnumber input,
@@ -181,7 +176,6 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
   .p-dropdown { min-height: 32px; }
 }
 
-// Footer with add-button + totals
 .orc-foot {
   display: flex;
   justify-content: space-between;
@@ -204,7 +198,6 @@ import { VehicleService } from 'src/app/demo/service/inventory/vehicle.service';
   .t-total { font-size: 16px; font-weight: 700; }
 }
 
-// "Add capítulo / sub-item" dashed button
 .btn-dashed {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12px; font-weight: 500;
@@ -226,17 +219,14 @@ export class CreateConstructionComponent {
 
   clientNames!: ItemName[];
 
-  dynamicForm!: FormGroup; // Your main form group
+  dynamicForm!: FormGroup;
 
   name!: string;
-  // Named locations of the construction; the first one is the main location
   locations: PlaceLocation[] = [{ name: '', address: '', placeId: '' }];
   selectedClient!: number;
   adjudicationDate!: Date;
   initialDate!: Date;
   estimatedDays!: number;
-
-  //units = Unit;
 
   construction!: Construction;
 
@@ -271,10 +261,6 @@ export class CreateConstructionComponent {
     this.clientService.getClientNames().subscribe((clientNames) => {
       this.clientNames = clientNames;
     });
-
-    /*this.dynamicForm = this.fb.group({
-      inputs: this.fb.array([])
-    });*/
 
     this.dynamicForm = this.fb.group({
       inputs: this.fb.array([this.buildInput()]),
@@ -331,7 +317,6 @@ export class CreateConstructionComponent {
     return this.getSubInputs(rowIndex).at(subIndex).get('subSubInputs') as FormArray;
   }
 
-  // ===== builders =====
   private buildInput(): FormGroup {
     return this.fb.group({
       name: ['', Validators.required],
@@ -369,7 +354,6 @@ export class CreateConstructionComponent {
     });
   }
 
-  // ===== actions =====
   addInput(): void {
     this.inputs.push(this.buildInput());
     this.cdr.markForCheck();
@@ -413,7 +397,6 @@ export class CreateConstructionComponent {
     this.cdr.markForCheck();
   }
 
-  // ===== "extra" cascades to descendants =====
   private setSubSubExtra(rowIndex: number, subIndex: number, value: boolean): void {
     this.getSubSubInputs(rowIndex, subIndex).controls.forEach(subSubGrp => {
       const ctrl = (subSubGrp as FormGroup).get('isExtra');
@@ -460,7 +443,6 @@ export class CreateConstructionComponent {
     this.cdr.markForCheck();
   }
 
-  // ===== drag & drop reorder (only among siblings of the same parent) =====
   private moveControl(arr: FormArray, from: number, to: number): void {
     if (from === to) return;
     const ctrl = arr.at(from);

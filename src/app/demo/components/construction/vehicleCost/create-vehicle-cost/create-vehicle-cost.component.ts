@@ -87,7 +87,6 @@ export class CreateVehicleCostComponent implements OnInit {
   selectedConstruction!: number;
 
   destinations: Destination[] = [];
-  // Every supplier/construction location; a stop is picked by owner and location name
   destinationLocations: DestinationLocation[] = [];
   destinationToAdd: Destination | null = null;
   destinationOptions: DestinationOption[] = [];
@@ -124,8 +123,6 @@ export class CreateVehicleCostComponent implements OnInit {
     this.refreshDestinationOptions();
   }
 
-  // One option per supplier location (all suppliers) and per location of the selected construction.
-  // The location name is only shown when the supplier/construction has more than one.
   private refreshDestinationOptions(): void {
     const all = this.destinationLocations ?? [];
     const countByOwner = new Map<string, number>();

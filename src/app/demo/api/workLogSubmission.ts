@@ -1,4 +1,3 @@
-// Registo de trabalho submetido por um funcionário na app (ver WorkLogSubmissionController no backend)
 export type WorkLogSubmissionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface WorkLogSubmission {
@@ -20,7 +19,6 @@ export interface WorkLogSubmission {
     reviewedAt: string | null;
 }
 
-// Para submeter, editar ou corrigir ao aprovar (o funcionário vem da sessão, nunca daqui)
 export interface WorkLogSubmissionInput {
     date: Date;
     hours: number;

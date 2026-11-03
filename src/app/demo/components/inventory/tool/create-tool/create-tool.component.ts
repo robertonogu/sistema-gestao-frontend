@@ -29,7 +29,6 @@ export class CreateToolComponent {
 
   origins!: Origin[];
 
-  // Comprada numa despesa: documento e fornecedor vêm da despesa e não se editam aqui
   fromExpense: boolean = false;
 
   tool!: ToolCreation;

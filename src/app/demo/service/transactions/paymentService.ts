@@ -11,7 +11,6 @@ export interface PaymentFilters {
     documentNumber?: string;
     originId?: number;
     paymentMethod?: string;
-    // Um dia (dateFrom = dateTo) ou um período
     dateFrom?: Date;
     dateTo?: Date;
 }

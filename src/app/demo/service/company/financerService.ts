@@ -14,7 +14,6 @@ export class FinancerService {
 
     constructor(private http: HttpClient) { }
 
-    // Financiadores com o que a empresa deve a cada um
     getFinancers() : Observable<Financer[]> {
         return this.http.get<Financer[]>(this.financersUrl);
     }

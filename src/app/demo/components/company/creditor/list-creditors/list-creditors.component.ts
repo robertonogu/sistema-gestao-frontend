@@ -3,8 +3,6 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Creditor, CreditorCreation } from 'src/app/demo/api/creditor';
 import { CreditorService } from 'src/app/demo/service/company/creditorService';
 
-// Credores: pagam despesas da empresa com dinheiro deles (aparecem junto das contas nas despesas e nos pagamentos),
-// com o que a empresa deve a cada um. As devoluções fazem-se nos Pagamentos.
 @Component({
   templateUrl: './list-creditors.component.html',
   providers: [MessageService, ConfirmationService]
@@ -77,7 +75,6 @@ export class ListCreditorsComponent implements OnInit {
     });
   }
 
-  // Inativo: deixa de aparecer para escolher na Nova Despesa e no Novo Pagamento
   updateStatus(creditor: Creditor) {
     this.creditorService.changeStatus(creditor.originId, !creditor.active).subscribe({
       next: () => {

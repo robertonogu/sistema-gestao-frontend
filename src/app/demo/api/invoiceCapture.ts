@@ -1,4 +1,3 @@
-// Leitura de uma fatura por fotografia (ver InvoiceCaptureController no backend)
 export type InvoiceCaptureStatus = 'WAITING' | 'PROCESSING' | 'READY' | 'FAILED';
 
 export interface InvoiceReadingLine {
@@ -7,7 +6,6 @@ export interface InvoiceReadingLine {
     unit: string;
     netValue: number;
     ivaRate: number;
-    // Chave de SubCategoryType (ex.: PLUMBING) ou null se não houver sugestão
     subCategory: string | null;
 }
 
@@ -32,6 +30,5 @@ export interface InvoiceCapture {
     status: InvoiceCaptureStatus;
     result: InvoiceReading | null;
     errorMessage: string | null;
-    // O PC tem "Ler fatura" aberto: só assim o telemóvel pode enviar
     pcWaiting: boolean;
 }

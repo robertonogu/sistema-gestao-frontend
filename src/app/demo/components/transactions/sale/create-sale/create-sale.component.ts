@@ -51,7 +51,6 @@ export class CreateSaleComponent {
   }
 
 
-  // ---- Nota de crédito ao cliente: valores indicados positivos e guardados negativos ----
   creditNote: boolean = false;
   creditedSaleId: number | null = null;
   creditableSales: (SaleForRevenue & { label: string })[] = [];
@@ -73,8 +72,6 @@ export class CreateSaleComponent {
       })));
   }
 
-  // A nota de crédito fica com a obra, a taxa de IVA e o valor sem IVA da venda creditada
-  // (o valor pode ser alterado, p.ex. para creditar só uma parte)
   onCreditedSaleChange(): void {
     const sale = this.creditableSales.find(item => item.saleId === this.creditedSaleId);
     if (!sale) return;
@@ -87,7 +84,6 @@ export class CreateSaleComponent {
     this._location.back();
   }
 
-  // Numa nota de crédito o total é negativo (abate ao que o cliente deve)
   get totalValue(): number {
     const total = Math.round(((this.netValue || 0) + (this.netValue || 0) * (this.iva || 0) / 100) * 100) / 100;
     return this.creditNote ? -Math.abs(total) : total;

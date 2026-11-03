@@ -91,8 +91,6 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .item-head, .item-row {
   display: grid;
-  /* seleção | nome | categoria | qtd | unidade | valor s/ IVA | IVA | total | associado a | ações
-     (colunas flexíveis encolhem até ao mínimo, para caber sem scroll horizontal num ecrã normal) */
   grid-template-columns: 32px minmax(150px, 1.6fr) minmax(125px, 1.1fr) 92px 150px 108px 137px 108px minmax(90px, 0.6fr) 84px;
   align-items: center;
   column-gap: 6px;
@@ -125,7 +123,6 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
 
 .return-label { color: var(--orange-600, #c2410c); font-weight: 500; }
 
-/* As células podem encolher abaixo da largura natural dos campos (senão impunham um mínimo e forçavam scroll) */
 .item-head > *, .item-row > * { min-width: 0; }
 
 .item-col-num { text-align: right; font-family: var(--font-mono); }
@@ -144,7 +141,6 @@ import { ExpenseService } from 'src/app/demo/service/transactions/expense.servic
   .p-button-icon { font-size: 12px; }
 }
 
-// Item name autocomplete fills its whole column (PrimeNG's wrapper otherwise shrinks to its content)
 :host ::ng-deep .item-row p-autocomplete,
 :host ::ng-deep .item-row .p-autocomplete {
   display: flex;
@@ -236,7 +232,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   categories: any[] = [];
   origins: Origin[] = [];
-  // O "Saldo Inicial" é criado a partir da ficha do fornecedor/funcionário/entidade, não no formulário de despesas
   documentTypes = Object.fromEntries(Object.entries(DocumentType).filter(([key]) => key !== 'OPENING_BALANCE'));
   validIvaRates: number[];
   disablePaidValue: boolean = false;
@@ -278,7 +273,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   bulkAssociateBudgetTree: TreeNode[] = [];
   selectedBulkAssociateBudgetNode?: TreeNode;
   bulkAssociateValidationAttempted: boolean = false;
-  // Categoria comum dos itens selecionados: define a que se associam (obra, veículo, equipamento ou ferramenta)
   bulkAssociateCategory: CategoryType | null = null;
   bulkAssociateVehicleId: number | null = null;
   bulkAssociateEquipmentId: number | null = null;
@@ -287,10 +281,8 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   vehicleNames: ItemName[] = [];
   toolNames: ItemName[] = [];
   equipmentNames: ItemName[] = [];
-  // Names of items already used in expenses, and the subcategory (enum key) last used for each
   itemNames: string[] = [];
   filteredItemNames: string[] = [];
-  // Última utilização de cada item (subcategoria, unidade e IVA), por nome em maiúsculas
   private lastUseByItemName = new Map<string, ExpenseItemName>();
 
   quickAddOriginOptions: MenuItem[] = [
@@ -301,19 +293,14 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   quickAddOriginDialogVisible: boolean = false;
   quickAddOriginType: 'externalEntity' | null = null;
 
-  // Novo fornecedor: o mesmo formulário da página de Fornecedores (NIF com pesquisa, saldo inicial, localizações)
   @ViewChild(SupplierFormDialogComponent) supplierForm!: SupplierFormDialogComponent;
 
-  // ===== Ler fatura: o PC mostra um QR, o telemóvel fotografa e o formulário é preenchido com os dados lidos =====
-  // (ou o PC carrega um PDF / imagem; a sessão com o telemóvel dura 12h, ver InvoiceCaptureService)
   readDialogVisible: boolean = false;
   readCapture: InvoiceCapture | null = null;
   readQrUrl: string | null = null;
   readError: string | null = null;
   private readPollTimer: any = null;
-  // A enviar um ficheiro do PC: ignora o "à espera" que a consulta ainda possa devolver
   private readUploading: boolean = false;
-  // Depois de preenchido: avisos da leitura e NIF do fornecedor que ainda não existe
   invoiceReading: InvoiceReading | null = null;
   quickAddOriginSubmitted: boolean = false;
   quickAddOriginName: string | null = null;
@@ -326,12 +313,10 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   editingExpenseId?: number;
 
-  // Pagamento feito por um credor (com dinheiro dele): nenhuma conta da empresa é movimentada
   paidByCreditor: boolean = false;
   selectedCreditor: number | null = null;
   creditorNames: ItemName[] = [];
 
-  // Contas da empresa e credores (pessoas que pagam com dinheiro delas) na mesma lista: 'A<id>' = conta, 'C<id>' = credor
   paidFromOptions: { label: string; items: { label: string; value: string }[] }[] = [];
   selectedPaidFrom: string | null = null;
 
@@ -340,7 +325,10 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
       { label: 'Contas', items: (this.accountNames ?? []).map(account => ({ label: account.name, value: 'A' + account.objectId })) },
       { label: 'Credores', items: this.creditorNames.map(creditor => ({ label: creditor.name, value: 'C' + creditor.id })) }
     ].filter(group => group.items.length > 0);
+    this.refundAccountOptions = this.paidFromOptions.filter(group => group.label === 'Contas');
   }
+
+  refundAccountOptions: { label: string; items: { label: string; value: string }[] }[] = [];
 
   onPaidFromChange() {
     const value = this.selectedPaidFrom ?? '';
@@ -350,12 +338,9 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     this.onAccountChange();
   }
 
-  // Nota de crédito: fatura do fornecedor que é creditada (opcional)
   creditableExpenses: (CreditableExpense & { label: string })[] = [];
   selectedCreditedExpense: number | null = null;
 
-  // Devolução de material de stock ao fornecedor: escolhe-se a linha de compra e de onde sai o material
-  // (stock e/ou obras a que foi alocado). returnDialogIndex null = nova linha.
   returnDialogVisible: boolean = false;
   returnDialogIndex: number | null = null;
   returnableItems: (ReturnableItem & { label: string })[] = [];
@@ -364,7 +349,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   returnFromAllocations: { budgetItemId: number; label: string; max: number; quantity: number }[] = [];
   returnValidationAttempted: boolean = false;
 
-  // Pagamentos da despesa em edição (cada um é um documento de pagamento, que pode liquidar outras faturas)
   expensePayments: ExpensePayment[] = [];
   loadingEdit: boolean = false;
 
@@ -429,11 +413,11 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     const expenseId = Number(this.route.snapshot.params['expenseId']);
     if (expenseId) {
       this.editingExpenseId = expenseId;
-      this.loadExpensePayments();
       this.loadingEdit = true;
       this.expenseService.getExpenseForEdit(expenseId).subscribe({
         next: (expenseEdit) => {
           this.populateFormForEdit(expenseEdit);
+          this.loadExpensePayments();
           this.loadingEdit = false;
         },
         error: () => {
@@ -503,10 +487,12 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
       this.selectedCreditedExpense = null;
       return;
     }
-    // A nota de crédito não tem pagamento: abate à fatura creditada ou fica como saldo a favor
     this.isIntegralPayment = false;
     this.disablePaidValue = false;
     this.paymentValue = 0;
+    this.selectedPaidFrom = null;
+    this.onPaidFromChange();
+    this.selectedPaymentMethod = undefined as any;
     this.loadCreditableExpenses();
   }
 
@@ -552,7 +538,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
       this.returnableItems = items;
       if (index === null) return;
 
-      // Edição de uma devolução: repõe a linha de compra e as quantidades escolhidas
       const row = this.itemInputs.at(index).value;
       const returnable = items.find(item => item.expenseItemId === row.returnedItemId) ?? null;
       if (!returnable) return;
@@ -661,14 +646,20 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return (PaymentMethod as any)[key] ?? key;
   }
 
+  private get paymentExpenseId(): number | undefined {
+    return this.isCreditNote && this.selectedCreditedExpense ? this.selectedCreditedExpense : this.editingExpenseId;
+  }
+
   private loadExpensePayments(): void {
-    if (!this.editingExpenseId) return;
-    this.paymentService.getPaymentsForExpense(this.editingExpenseId).subscribe(payments => this.expensePayments = payments);
+    const expenseId = this.paymentExpenseId;
+    if (!expenseId) return;
+    this.paymentService.getPaymentsForExpense(expenseId).subscribe(payments =>
+      this.expensePayments = this.isCreditNote ? payments.filter(payment => payment.value < 0) : payments);
   }
 
   newExpensePayment(): void {
     this.router.navigate(['/transactions/payments/create-payment'], {
-      queryParams: { originId: this.selectedOrigin, expenseId: this.editingExpenseId }
+      queryParams: { originId: this.selectedOrigin, expenseId: this.paymentExpenseId }
     });
   }
 
@@ -695,8 +686,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Reaproveita a sessão das últimas 12h e abre-a para uma nova fatura (o telemóvel já ligado pode enviar logo);
-  // se expirou, cria uma nova
   openReadInvoice(): void {
     this.readDialogVisible = true;
     this.readError = null;
@@ -724,7 +713,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   }
 
   private startReadSession(capture: InvoiceCapture): void {
-    // O diálogo pode ter sido fechado antes de a sessão abrir: fecha-a para o telemóvel não enviar
     if (!this.readDialogVisible) {
       this.invoiceCaptureService.close(capture.token).subscribe();
       return;
@@ -734,7 +722,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     this.startReadPolling(capture.token);
   }
 
-  // PDF (ou imagem) carregado no próprio PC, para a mesma sessão
   async onReadFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -762,14 +749,12 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   closeReadInvoice(): void {
     this.readDialogVisible = false;
     this.stopReadPolling();
-    // O telemóvel só volta a poder enviar quando "Ler fatura" for aberto outra vez
     if (this.readCapture) {
       this.invoiceCaptureService.close(this.readCapture.token).subscribe();
       this.readCapture = null;
     }
   }
 
-  // O telemóvel envia a fotografia para a mesma leitura; o PC vai perguntando o estado até estar pronta
   private startReadPolling(token: string): void {
     this.stopReadPolling();
     this.readPollTimer = setInterval(() => {
@@ -790,14 +775,12 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
       this.closeReadInvoice();
       this.applyInvoiceReading(capture.result);
     } else if (capture.status === 'FAILED') {
-      // Fica à espera de nova fotografia (o telemóvel pode tentar de novo)
       this.readError = capture.errorMessage ?? 'Não foi possível ler a fatura.';
     } else if (capture.status === 'PROCESSING') {
       this.readError = null;
     }
   }
 
-  // Preenche a despesa com os dados lidos, como se o utilizador os tivesse escrito (os mesmos eventos de alteração)
   private applyInvoiceReading(reading: InvoiceReading): void {
     this.invoiceReading = reading;
 
@@ -812,7 +795,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
       this.selectedOrigin = reading.originId;
       this.onOriginChange();
     }
-    // Fatura-recibo e fatura simplificada são pagas no momento
     if (reading.documentType === 'INVOICE_RECEIPT' || reading.documentType === 'SIMPLIFIED_INVOICE') {
       this.selectedPaymentCondition = 'IMMEDIATE' as any;
       this.onPaymentConditionChange();
@@ -838,7 +820,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     this.messageService.add({ severity: 'success', summary: 'Fatura lida', detail: 'Confirme os dados e as subcategorias antes de guardar.' });
   }
 
-  // Fornecedor lido da fatura que ainda não existe: abre o formulário de fornecedor com o NIF e a pesquisa feita
   createReadSupplier(): void {
     this.supplierForm.openNew(this.invoiceReading?.supplierNif ?? undefined);
   }
@@ -876,8 +857,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Numa despesa nova só se escolhem funcionários, financiadores e credores ativos; ao editar aparecem todos,
-  // para a origem já gravada (mesmo que entretanto inativa) continuar na lista
   private get onlyActiveOrigins(): boolean {
     return !Number(this.route.snapshot.params['expenseId']);
   }
@@ -1095,8 +1074,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return group;
   }
 
-  // Controla o disabled do checkbox "selected" via FormControl.disable()/enable() em vez de um
-  // binding [disabled] no template, que não é fiável quando combinado com formControlName no Angular.
   private wireSelectedDisabling(group: FormGroup): void {
     group.get('subCategoryType')?.valueChanges.subscribe((value) => {
       const selectedControl = group.get('selected');
@@ -1109,9 +1086,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Moving a line into or out of a purchase subcategory drops its links: a purchase gets a new tool/equipment
-  // created by the backend, and a line that stops being a purchase no longer owns the one it had created
-  // (the backend deletes it when saving).
   private wirePurchaseLinkReset(group: FormGroup): void {
     let previous = group.get('subCategoryType')?.value ?? null;
     group.get('subCategoryType')?.valueChanges.subscribe((value) => {
@@ -1129,7 +1103,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== "select all" checkbox in the items header (only rows whose checkbox is enabled, i.e. inventory items) =====
   private get selectableItemControls() {
     return this.itemInputs.controls
       .map(control => control.get('selected'))
@@ -1160,7 +1133,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     grp.get('total')?.setValue(this.roundCents(value + value * ivaRate / 100), { emitEvent: false });
   }
 
-  // Valores em euros ao cêntimo, tal como o backend os guarda
   private roundCents(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100;
   }
@@ -1224,7 +1196,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     this.filteredItemNames = this.itemNames.filter((name) => name.toUpperCase().includes(query));
   }
 
-  // Picking an item already used fills in the subcategory, unit and VAT rate it had the last time
   onItemNameSelect(index: number, event: { value: string }) {
     const lastUse = this.lastUseByItemName.get((event.value ?? '').toUpperCase());
     if (!lastUse) return;
@@ -1271,7 +1242,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return subCategoryType === SubCategoryType.TOOLS_PURCHASE;
   }
 
-  // Aquisições que criam automaticamente um equipamento ao guardar (igual ao backend)
   private readonly equipmentPurchaseSubCategories: SubCategoryType[] = [
     SubCategoryType.EQUIPMENTS_PURCHASE,
     SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,
@@ -1281,7 +1251,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return subCategoryType !== null && this.equipmentPurchaseSubCategories.includes(subCategoryType);
   }
 
-  // Purchases of equipment/tools cannot be associated manually: the backend creates the tool/equipment and links it
   private readonly nonAssociableSubCategories: SubCategoryType[] = [
     SubCategoryType.EQUIPMENTS_PURCHASE,
     SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,
@@ -1459,8 +1428,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Nome do que está associado ao item (coluna "Associado a"): usa as listas carregadas, para refletir
-  // alterações feitas no formulário, e o nome vindo da despesa para associações já inativas
   associationLabel(index: number): string {
     const row = this.itemInputs.at(index).value;
     const original = this.itemInputs.at(index).get('associationName')?.value ?? null;
@@ -1472,12 +1439,12 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  // Categorias cujos itens se podem associar em conjunto (as aquisições ficam de fora: criam o seu próprio equipamento/ferramenta)
   private readonly bulkAssociableCategories: CategoryType[] = [
     CategoryType.INVENTORY, CategoryType.VEHICLES, CategoryType.EQUIPMENTS, CategoryType.TOOLS
   ];
 
   isBulkAssociable(subCategoryType: SubCategoryType | null): boolean {
+    if (subCategoryType === SubCategoryType.MEALS) return true;
     const category = this.categoryOf(subCategoryType);
     return !!category && this.bulkAssociableCategories.includes(category) && !this.isNonAssociable(subCategoryType);
   }
@@ -1496,6 +1463,10 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   }
 
   get bulkAssociatesToConstruction(): boolean {
+    return this.bulkAssociateCategory === CategoryType.INVENTORY || this.bulkAssociateCategory === CategoryType.PEOPLE;
+  }
+
+  get bulkAssociateNeedsBudgetItem(): boolean {
     return this.bulkAssociateCategory === CategoryType.INVENTORY;
   }
 
@@ -1514,7 +1485,7 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   openBulkAssociateDialog() {
     const selected = this.selectedItemControls;
     if (selected.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Nenhum item selecionado', detail: 'Selecione pelo menos um item de Inventário, Veículos, Equipamentos ou Ferramentas para associar.' });
+      this.messageService.add({ severity: 'warn', summary: 'Nenhum item selecionado', detail: 'Selecione pelo menos um item de Inventário, Refeições Suportadas, Veículos, Equipamentos ou Ferramentas para associar.' });
       return;
     }
 
@@ -1551,6 +1522,7 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   onBulkAssociateConstructionChange(constructionId: number) {
     this.selectedBulkAssociateBudgetNode = undefined;
+    if (!this.bulkAssociateNeedsBudgetItem) return;
     this.constructionService.getBudgetItemsForConstruction(constructionId).subscribe(budgetItems => {
       this.bulkAssociateBudgetTree = this.mapBudgetItemsToTreeNodes(budgetItems);
     });
@@ -1559,7 +1531,17 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   saveBulkAssociateDialog() {
     const selected = this.selectedItemControls;
 
-    if (this.bulkAssociatesToConstruction) {
+    if (this.bulkAssociatesToConstruction && !this.bulkAssociateNeedsBudgetItem) {
+      if (!this.bulkAssociateConstructionId) {
+        this.bulkAssociateValidationAttempted = true;
+        this.messageService.add({ severity: 'warn', summary: 'Campo obrigatório', detail: 'Selecione a Obra antes de guardar.' });
+        return;
+      }
+      selected.forEach(control => control.patchValue({
+        constructionId: this.bulkAssociateConstructionId,
+        selected: false
+      }));
+    } else if (this.bulkAssociatesToConstruction) {
       if (!this.bulkAssociateConstructionId || !this.selectedBulkAssociateBudgetNode) {
         this.bulkAssociateValidationAttempted = true;
         this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Selecione a Obra e o Item antes de guardar.' });
@@ -1615,13 +1597,13 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return this.roundCents(this.netValue + this.iva);
   }
 
-  // Só há pagamento (e por isso conta/credor e método obrigatórios) quando há valor pago
   get hasPaymentValue(): boolean {
-    return !this.isCreditNote && this.paymentValue > 0;
+    return this.paymentValue > 0;
   }
 
   get paymentValue(): number {
-    return this.isIntegralPayment ? this.totalValue : this._paymentValue;
+    if (!this.isIntegralPayment) return this._paymentValue;
+    return this.isCreditNote ? -this.totalValue : this.totalValue;
   }
 
   set paymentValue(v: number) {
@@ -1659,7 +1641,6 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     let item: ItemCreation;
 
     this.itemInputs.controls.forEach((control, index) => {
-      // Numa devolução, as alocações são as quantidades que voltam de cada obra
       const costAllocations: CostAllocationCreation[] = control.value.returnedItemId
         ? (control.value.returnSources ?? [])
         : control.value.budgetItemId
@@ -1693,7 +1674,12 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     } as ExpenseCreation;
 
     if (this.isCreditNote) {
-      this.expenseCreation = { ...this.expenseCreation, isIntegralPayment: false, paymentValue: 0, accountId: undefined as any, paymentMethod: undefined as any };
+      const refunded = !this.editingExpenseId && this.paymentValue > 0;
+      this.expenseCreation = {
+        ...this.expenseCreation, isIntegralPayment: false, paymentValue: refunded ? this.paymentValue : 0, creditorId: undefined,
+        accountId: refunded ? this.selectedAccount : undefined as any,
+        paymentMethod: refunded ? this.selectedPaymentMethod : undefined as any
+      };
     }
 
     if (this.editingExpenseId) {

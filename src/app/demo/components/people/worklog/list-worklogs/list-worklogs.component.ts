@@ -30,7 +30,6 @@ export class ListWorkLogsComponent implements OnInit {
   budgetTree: TreeNode[] = [];
   employeeNames!: ItemName[];
 
-  // ===== Filtros =====
   @ViewChild('dt') table?: Table;
   allEmployeeNames: ItemName[] = [];
   filterBudgetTree: TreeNode[] = [];
@@ -82,7 +81,6 @@ export class ListWorkLogsComponent implements OnInit {
     const budgetItemId = this.filterValue(filters, 'budgetItem');
     const employeeId = this.filterValue(filters, 'employee');
 
-    // Obra mudou → recarrega a árvore de itens para o filtro por item
     if (constructionId !== this.filterConstruction) {
       this.filterConstruction = constructionId;
       this.filterBudgetNode = undefined;
@@ -102,7 +100,6 @@ export class ListWorkLogsComponent implements OnInit {
     });
   }
 
-  // ao mudar a obra, limpa o filtro de item (pertence à obra anterior)
   clearItemColumnFilter() {
     this.filterBudgetNode = undefined;
     const meta: any = this.table?.filters?.['budgetItem'];

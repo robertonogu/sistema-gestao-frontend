@@ -176,15 +176,10 @@
 <div class="grid">
 	<div class="col-12">
 		<div class="card">
-			<h4 class="section-title">Dados de Pagamento</h4>
+			<h4 class="section-title">{{ isCreditNote ? 'Reembolsos' : 'Dados de Pagamento' }}</h4>
 
-			<p class="text-600 m-0" *ngIf="isCreditNote">
-				Uma nota de crédito não tem pagamento: abate ao valor em dívida da fatura creditada ou, sem fatura
-				(ou se esta já estiver paga), fica como saldo a favor na conta corrente do fornecedor.
-			</p>
-
-			<div class="grid p-formgrid p-fluid" *ngIf="!isCreditNote">
-				<div class="field col-12 md:col-6">
+			<div class="grid p-formgrid p-fluid">
+				<div class="field col-12 md:col-6" *ngIf="!isCreditNote">
 					<label>Condições de Pagamento</label>
 					<p-dropdown
 						[(ngModel)]="selectedPaymentCondition"
@@ -197,7 +192,7 @@
 					/>
 				</div>
 
-				<div class="field col-12 md:col-6">
+				<div class="field col-12 md:col-6" *ngIf="!isCreditNote">
 					<label>Data Limite Pagamento</label>
 					<p-calendar
 						[(ngModel)]="paymentDeadline"
@@ -211,7 +206,7 @@
 
 				<ng-container *ngIf="!editingExpenseId">
 					<div class="field col-12 md:col-4">
-						<label>Valor Pago</label>
+						<label>{{ isCreditNote ? 'Valor Reembolsado' : 'Valor Pago' }}</label>
 						<p-inputNumber
 							[(ngModel)]="paymentValue"
 							mode="decimal"
@@ -227,22 +222,23 @@
 								[binary]="true"
 								[(ngModel)]="isIntegralPayment"
 							/>
-							<label for="integralPayment" class="m-0">Pagamento Integral</label>
+							<label for="integralPayment" class="m-0">{{ isCreditNote ? 'Reembolso Integral' : 'Pagamento Integral' }}</label>
 						</div>
 					</div>
 
 					<div class="field col-12 md:col-4">
-						<label pTooltip="Um credor paga com dinheiro dele: nenhuma conta da empresa é movimentada e a empresa passa a dever-lhe o valor" tooltipPosition="top">Conta / Credor</label>
+						<label *ngIf="isCreditNote">Conta do Reembolso</label>
+						<label *ngIf="!isCreditNote" pTooltip="Um credor paga com dinheiro dele: nenhuma conta da empresa é movimentada e a empresa passa a dever-lhe o valor" tooltipPosition="top">Conta / Credor</label>
 						<p-dropdown
 						[(ngModel)]="selectedPaidFrom"
 						(onChange)="onPaidFromChange()"
-						[options]="paidFromOptions"
+						[options]="isCreditNote ? refundAccountOptions : paidFromOptions"
 						[group]="true"
 						optionLabel="label"
 						optionValue="value"
-						placeholder="Selecione uma Conta ou Credor"
+						[placeholder]="isCreditNote ? 'Selecione uma Conta' : 'Selecione uma Conta ou Credor'"
 						appendTo="body"
-						[ngClass]="{ 'ng-dirty ng-invalid': hasPaymentValue && !selectedPaidFrom }"
+						[ngClass]="{ 'ng-dirty ng-invalid': (hasPaymentValue && !selectedPaidFrom) }"
 					>
 						<ng-template let-group pTemplate="group">
 							<span class="font-semibold">{{ group.label }}</span>
@@ -264,11 +260,10 @@
 					</div>
 				</ng-container>
 
-				<!-- Em edição: os pagamentos são documentos próprios, geridos aqui ou na listagem de pagamentos -->
 				<div class="col-12" *ngIf="editingExpenseId">
 					<div class="flex align-items-center justify-content-between mb-2">
-						<span class="font-semibold">Pagamentos</span>
-						<button pButton type="button" icon="pi pi-plus" label="Novo Pagamento" class="p-button-rounded p-button-outlined p-button-sm w-auto" (click)="newExpensePayment()"></button>
+						<span class="font-semibold">{{ isCreditNote ? 'Reembolsos recebidos' : 'Pagamentos' }}</span>
+						<button pButton type="button" icon="pi pi-plus" [label]="isCreditNote ? 'Novo Reembolso' : 'Novo Pagamento'" class="p-button-rounded p-button-outlined p-button-sm w-auto" (click)="newExpensePayment()"></button>
 					</div>
 					<p-table [value]="expensePayments" styleClass="p-datatable-sm p-datatable-striped">
 						<ng-template pTemplate="header">
@@ -297,7 +292,7 @@
 							</tr>
 						</ng-template>
 						<ng-template pTemplate="emptymessage">
-							<tr><td colspan="7">Esta despesa ainda não tem pagamentos.</td></tr>
+							<tr><td colspan="7">{{ isCreditNote ? 'Esta nota de crédito ainda não tem reembolsos.' : 'Esta despesa ainda não tem pagamentos.' }}</td></tr>
 						</ng-template>
 					</p-table>
 				</div>
@@ -783,7 +778,7 @@
 			/>
 		</div>
 
-		<div class="field">
+		<div class="field" *ngIf="bulkAssociateNeedsBudgetItem">
 			<label>Item</label>
 			<p-treeSelect
 				[(ngModel)]="selectedBulkAssociateBudgetNode"

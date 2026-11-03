@@ -21,7 +21,6 @@ export interface ExpenseItemEdit {
     constructionId?: number;
     costAllocations: CostAllocationEdit[];
     associationName?: string | null;
-    // Return line: purchase line returned; costAllocations are then the quantities that came back from each construction item
     returnedItemId?: number | null;
     returnedItemLabel?: string | null;
 }

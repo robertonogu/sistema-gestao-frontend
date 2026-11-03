@@ -1,6 +1,4 @@
-<!-- ========== Header ========== -->
 <header class="obra-header">
-    <!-- ===== Foto (fora da caixa branca) ===== -->
     <div class="obra-photo">
       <img *ngIf="constructionDetails.imageUrl; else fotoPlaceholder"
            [src]="constructionDetails.imageUrl"
@@ -10,7 +8,6 @@
       </ng-template>
     </div>
 
-    <!-- ===== Caixa branca ===== -->
     <div class="obra-card">
       <div class="obra-main">
         <div class="obra-id">
@@ -24,7 +21,6 @@
           {{ constructionDetails.client }} · {{ constructionDetails.address }}
         </div>
 
-        <!-- ===== Progresso temporal ===== -->
         <div class="obra-progress">
           <div class="progress-head">
             <span>Progresso temporal · {{ constructionDetails.daysElapsed }}/{{ constructionDetails.totalDays }} dias</span>
@@ -37,7 +33,6 @@
         </div>
       </div>
 
-      <!-- ===== Meta lateral (datas + valores) ===== -->
       <div class="obra-meta">
         <div class="meta-row">
           <span class="meta-label">Adjudicação</span>
@@ -59,7 +54,6 @@
     </div>
   </header>
 
-  <!-- ========== KPIs ========== -->
   <section class="kpi-grid">
     <div *ngFor="let k of kpis()" class="card mb-0" [style.border-top]="'3px solid ' + k.accent">
       <a *ngIf="k.label === 'Orçamento'"
@@ -77,7 +71,6 @@
     </div>
   </section>
 
-  <!-- ========== Execução financeira ========== -->
   <p-card styleClass="exec-card">
     <div class="exec-head">
       <strong>Execução financeira</strong>
@@ -102,39 +95,6 @@
     </div>
   </p-card>
 
-  <!-- ========== Pagamentos + Cashflow ========== -->
-  <!--<section class="row-2">
-    <p-card>
-      <ng-template pTemplate="header">
-        <div class="card-title"><i class="pi pi-calendar"></i> Calendário de pagamentos</div>
-      </ng-template>
-
-      <div *ngFor="let g of paymentsByMonth()" class="month-block">
-        <div class="month-label mono">{{ g.month }}</div>
-        <div *ngFor="let p of g.items"
-             class="pay-row"
-             [class.in]="p.valor > 0"
-             [class.out]="p.valor < 0">
-          <div class="pay-date mono">{{ p.data | date:'dd MMM' }}</div>
-          <div class="pay-label">{{ p.label }}</div>
-          <div class="pay-amount mono">
-            {{ p.valor > 0 ? '+' : '' }}{{ fmtEUR(p.valor) }}
-          </div>
-        </div>
-      </div>
-    </p-card>
-
-    <p-card>
-      <ng-template pTemplate="header">
-        <div class="card-title"><i class="pi pi-chart-line"></i> Cashflow mensal</div>
-      </ng-template>
-      <div class="chart-host">
-        <p-chart type="line" [data]="cashflowData()" [options]="cashflowOptions"></p-chart>
-      </div>
-    </p-card>
-  </section>-->
-
-  <!-- ========== Distribuição de custos por categoria ========== -->
   <h3 class="section-title">Distribuição de custos</h3>
 
   <p-card>
@@ -146,7 +106,6 @@
     </ng-template>
   </p-card>
 
-  <!-- ========== Custos por budget item (com indiretos rateados) ========== -->
   <h3 class="section-title">Custos por budget item</h3>
 
   <p-card>
@@ -194,7 +153,6 @@
     </p-table>
   </p-card>
 
-  <!-- ========== Custos por item · 3 colunas por fonte ========== -->
   <h3 class="section-title">Custos por item</h3>
 
   <section class="source-grid">

@@ -3,8 +3,6 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Financer, FinancerCreation } from 'src/app/demo/api/financer';
 import { FinancerService } from 'src/app/demo/service/company/financerService';
 
-// Financiadores: emprestam dinheiro à empresa (receita "Empréstimo de Financiador"), com o que a empresa deve a cada um.
-// As devoluções fazem-se nos Pagamentos.
 @Component({
   templateUrl: './list-financers.component.html',
   providers: [MessageService, ConfirmationService]
@@ -77,7 +75,6 @@ export class ListFinancersComponent implements OnInit {
     });
   }
 
-  // Inativo: deixa de aparecer para escolher na Nova Despesa e no Novo Pagamento
   updateStatus(financer: Financer) {
     this.financerService.changeStatus(financer.originId, !financer.active).subscribe({
       next: () => {

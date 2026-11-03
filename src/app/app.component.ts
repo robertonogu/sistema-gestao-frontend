@@ -13,7 +13,6 @@ export class AppComponent implements OnInit {
     ngOnInit(): void {
         this.primengConfig.ripple = true;
 
-        // PWA: com uma versão nova publicada, pergunta antes de recarregar (pode haver um formulário a meio)
         if (this.swUpdate.isEnabled) {
             this.swUpdate.versionUpdates
                 .pipe(filter((event): event is VersionReadyEvent => event.type === 'VERSION_READY'))

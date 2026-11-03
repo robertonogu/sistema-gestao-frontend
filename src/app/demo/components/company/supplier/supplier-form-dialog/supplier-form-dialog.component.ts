@@ -15,8 +15,6 @@ import { SupplierCreation } from 'src/app/demo/data/model/supplierCreation.model
 import { GooglePlaceLookupService } from 'src/app/demo/service/common/googlePlaceLookup.service';
 import { SupplierService } from 'src/app/demo/service/company/supplierService';
 
-// Create/edit supplier dialog shared by the suppliers page and the expense form, so both create suppliers the same way.
-// Messages go to the host's MessageService (the host page shows the toast).
 @Component({
   selector: 'app-supplier-form-dialog',
   standalone: true,
@@ -32,9 +30,7 @@ export class SupplierFormDialogComponent {
   submitted: boolean = false;
   supplier: Partial<Supplier> = {};
 
-  // nif.pt lookup (create only)
   nifLoading: boolean = false;
-  // Values the last lookup wrote; a field still holding one of them was not edited and may be replaced
   private autoFilled = { name: '', locationName: '', address: '' };
 
   constructor(
@@ -43,7 +39,6 @@ export class SupplierFormDialogComponent {
     private messageService: MessageService
   ) {}
 
-  // nif: fornecedor lido de uma fatura; abre já com o NIF e a pesquisa no nif.pt feita
   openNew(nif?: number) {
     this.supplier = { locations: [{ name: '', address: '', placeId: '' }] };
     this.submitted = false;
@@ -66,7 +61,6 @@ export class SupplierFormDialogComponent {
     this.submitted = false;
   }
 
-  // Only runs on the search button, so each nif.pt request is deliberate
   lookupNif() {
     const nif = this.supplier.nif;
     if (this.supplier.originId || this.nifLoading || !nif) return;
@@ -87,7 +81,6 @@ export class SupplierFormDialogComponent {
     });
   }
 
-  // Fills fields that are empty or still hold the previous lookup's values, so nothing the user typed is overwritten
   private applyNifLookup(result: NifLookup) {
     if (!this.supplier.locations?.length) {
       this.supplier.locations = [{ name: '', address: '', placeId: '' }];
@@ -100,7 +93,6 @@ export class SupplierFormDialogComponent {
       : '';
     const locationName = fullAddress ? (result.city ?? '') : '';
 
-    // A NIF without data still clears what the previous NIF filled in
     if (canReplace(this.supplier.name, this.autoFilled.name)) {
       this.supplier.name = (result.found ? result.name : null) ?? '';
       this.autoFilled.name = this.supplier.name;
@@ -122,7 +114,6 @@ export class SupplierFormDialogComponent {
     }
     if (!replaceAddress || !fullAddress) return;
 
-    // Routes need a Google placeId; without one the user must pick the address from the autocomplete list
     const warnNotFound = () => this.messageService.add({ severity: 'warn', summary: 'Morada', detail: 'Morada não encontrada no Google. Selecione-a na lista de sugestões para poder calcular distâncias.' });
     this.placeLookup.findPlace(fullAddress + ', Portugal').then((place) => {
       if (main.address !== fullAddress) return;
@@ -158,7 +149,6 @@ export class SupplierFormDialogComponent {
   }
 }
 
-// Portuguese NIF: 9 digits, the last one is a mod 11 check digit
 function isValidNif(nif: number): boolean {
   const digits = String(nif);
   if (!/^\d{9}$/.test(digits)) return false;

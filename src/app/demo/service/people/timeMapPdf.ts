@@ -1,9 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable, { CellInput, RowInput } from 'jspdf-autotable';
 
-// PDF do mapa de horas: A4 horizontal, título ao centro, funcionário à esquerda e ano à direita; por baixo a mesma
-// tabela da página (dias x meses com H.T/H.E/H.F) e, no fim, o resumo de férias à esquerda e os totais do ano à direita.
-
 export type Rgb = [number, number, number];
 
 export interface TimeMapPdfCell {
@@ -12,9 +9,7 @@ export interface TimeMapPdfCell {
     fill?: Rgb;
     color?: Rgb;
     bold?: boolean;
-    // Day that doesn't exist in the month (e.g. 30 February): no lines inside, only the outline of the real days
     missingDay?: boolean;
-    // First missing day of the month keeps the line under the last real day
     firstMissingDay?: boolean;
 }
 
@@ -36,9 +31,7 @@ export interface TimeMapPdf {
     year: number;
     months: string[];
     daysPerMonth: number[];
-    // One row per day (1..31): the 12 months, each either 3 cells (H.T, H.E, H.F) or a single cell spanning 3
     rows: TimeMapPdfCell[][];
-    // Monthly totals under the table: label + one value per month
     footRows: { label: string; values: (string | number)[] }[];
     vacation: TimeMapPdfVacation | null;
     totals: { label: string; value: string | number }[];
@@ -48,7 +41,6 @@ export interface TimeMapPdf {
 const MARGIN = 10;
 const DAY_COLUMN_WIDTH = 16;
 const LINE = 0.1;
-// Month outline (sides, top of the month header and under its last day)
 const MONTH_LINE = 0.5;
 
 export function exportTimeMapPdf(data: TimeMapPdf): void {
@@ -80,7 +72,6 @@ export function exportTimeMapPdf(data: TimeMapPdf): void {
         ...cells.map(cell => toCellInput(cell)),
     ]);
 
-    // Months whose last day row is a missing day stay open at the bottom (no line between the empty block and the totals)
     const openMonths = monthsMissingLastDay(data.rows[data.rows.length - 1] ?? []);
     const foot: RowInput[] = data.footRows.map((row, rowIndex) => [
         row.label,
@@ -109,7 +100,6 @@ export function exportTimeMapPdf(data: TimeMapPdf): void {
         showFoot: 'lastPage',
         didParseCell: (hook) => {
             const column = hook.column.index - 1;
-            // The bold month outline covers the header and the days, not the totals
             if (column < 0 || hook.section === 'foot') return;
             const sides = toSides(hook.cell.styles.lineWidth);
             if (column % 3 === 0) sides.left = MONTH_LINE;
@@ -134,7 +124,6 @@ export function exportTimeMapPdf(data: TimeMapPdf): void {
     doc.save(data.fileName + '.pdf');
 }
 
-// Month indexes (0-11) whose cell in the given day row is a missing day
 function monthsMissingLastDay(cells: TimeMapPdfCell[]): Set<number> {
     const months = new Set<number>();
     let column = 0;
@@ -157,7 +146,6 @@ function toCellInput(cell: TimeMapPdfCell): CellInput {
     return { content: cell.text, colSpan: cell.colSpan ?? 1, styles };
 }
 
-// Vacation summary on the left half, yearly totals on the right half
 function drawSummary(doc: jsPDF, data: TimeMapPdf, y: number, pageWidth: number): void {
     const halfWidth = (pageWidth - 2 * MARGIN - 10) / 2;
     const rightX = MARGIN + halfWidth + 10;

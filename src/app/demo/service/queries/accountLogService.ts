@@ -31,7 +31,6 @@ export class AccountLogService {
         return this.http.get<ObjectList>(url);
     }
 
-    // Every log matching the filters, without pagination (PDF/Excel export)
     exportAccountLogs(accountId: number, filters?: AccountLogFilters) : Observable<AccountLog[]> {
         const url = this.accountLogsUrl + accountId + "/export?" + this.filterParams(filters).substring(1);
         return this.http.get<AccountLog[]>(url);

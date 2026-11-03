@@ -32,7 +32,6 @@ export class ListCurrentAccountsComponent implements OnInit {
   private filters: CurrentAccountLogFilters = {};
   exporting: boolean = false;
 
-  // Período por omissão: o ano corrente (um filtro guardado na sessão sobrepõe-se a este)
   private readonly currentYear = new Date().getFullYear();
   defaultFilters: any = {
     date: [{ value: [new Date(this.currentYear, 0, 1), new Date(this.currentYear, 11, 31)], matchMode: 'equals', operator: 'and' }]
@@ -45,7 +44,6 @@ export class ListCurrentAccountsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Vindo da página Saldos: abre logo o extrato dessa origem (a tabela carrega-o ao iniciar)
     const originId = Number(this.route.snapshot.queryParamMap.get('originId'));
     if (originId) this.selectedOrigin = originId;
 
@@ -59,7 +57,6 @@ export class ListCurrentAccountsComponent implements OnInit {
     return meta?.value ?? undefined;
   }
 
-  // O filtro de data é um calendário de intervalo: um dia escolhido filtra esse dia, dois dias filtram o período
   private buildFilters(filters: any): CurrentAccountLogFilters {
     const dateRange = this.filterValue(filters, 'date');
     if (Array.isArray(dateRange) && dateRange[0]) {
@@ -90,7 +87,6 @@ export class ListCurrentAccountsComponent implements OnInit {
     this.currentAccountLogService.getCurrentAccountLogs(this.currentPage, this.pageSize, this.selectedOrigin, this.filters).subscribe((currentAccountLogs) => {
       this.currentAccountLogs = currentAccountLogs.objectList;
       this.totalRecords = currentAccountLogs.totalElements;
-      // Totais e saldo de todos os registos filtrados (não só desta página)
       this.totalCredit = currentAccountLogs.totalCredit;
       this.totalDebt = currentAccountLogs.totalDebt;
       this.balance = currentAccountLogs.balance;
@@ -106,7 +102,6 @@ export class ListCurrentAccountsComponent implements OnInit {
     return '';
   }
 
-  // Extrato em PDF de todos os registos filtrados, com os totais no fim
   exportPdf() {
     if (this.selectedOrigin == null) return;
     this.exporting = true;

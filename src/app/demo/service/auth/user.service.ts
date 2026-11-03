@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User, UserCreation } from '../../api/auth';
 
-// Utilizadores (página Pessoal > Utilizadores, só administradores)
 @Injectable({
     providedIn: 'root'
 })

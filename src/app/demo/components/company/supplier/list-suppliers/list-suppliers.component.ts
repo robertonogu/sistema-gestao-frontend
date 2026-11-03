@@ -22,7 +22,6 @@ export class ListSuppliersComponent implements OnDestroy {
   @ViewChild(SupplierFormDialogComponent) supplierForm!: SupplierFormDialogComponent;
   @ViewChild('dt') table!: Table;
 
-  // Pesquisa por nome: só pede à API quando se pára de escrever
   searchName: string = '';
   private searchChanges = new Subject<string>();
   private searchSubscription: Subscription;
@@ -44,7 +43,6 @@ export class ListSuppliersComponent implements OnDestroy {
     this.searchChanges.next(value.trim());
   }
 
-  // Novos resultados começam na primeira página
   private goToFirstPage() {
     this.table.first = 0;
     this.nextPage({ first: 0, rows: this.pageSize });

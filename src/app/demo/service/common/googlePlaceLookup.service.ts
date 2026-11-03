@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { PlaceSelection } from '../../directives/google-place-autocomplete.directive';
 import { GoogleMapsLoaderService } from './googleMapsLoader.service';
 
-// Resolves a free-text address (e.g. from nif.pt) into a Google place, so it gets a placeId like an autocomplete pick
 @Injectable({ providedIn: 'root' })
 export class GooglePlaceLookupService {
 

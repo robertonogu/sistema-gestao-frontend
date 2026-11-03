@@ -1,8 +1,6 @@
 import { CategoryType } from './enum/categoryType';
 import { SubCategoryType } from './enum/subCategoryType';
 
-// Categorias de despesa e as subcategorias que cada uma tem, pela ordem em que aparecem.
-// Fonte única: usada no formulário de despesas e na página "Categorias de Despesa".
 export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
   [CategoryType.BANK]: [
     SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS,
@@ -57,7 +55,6 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
   [CategoryType.CONSTRUCTIONS]: [SubCategoryType.EXTERNAL_SERVICES],
 };
 
-// Aquisições que criam automaticamente um equipamento / uma ferramenta ao guardar a despesa
 export const EQUIPMENT_PURCHASE_SUBCATEGORIES: SubCategoryType[] = [
   SubCategoryType.EQUIPMENTS_PURCHASE,
   SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,

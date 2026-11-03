@@ -23,13 +23,12 @@ export class ListAbsencesComponent implements OnInit {
 
   AbsenceType: any = AbsenceType;
 
-  // ===== Dialog de registo =====
   absenceDialog = false;
   submitted = false;
   employeeNames: ItemName[] = [];
   absenceTypes = AbsenceType;
   selectedEmployee: number | null = null;
-  selectedAbsenceType: string | null = null; // AbsenceType key (e.g. VACATION)
+  selectedAbsenceType: string | null = null;
   dateRange: Date[] = [];
   hours: number | null = null;
   previousYear: boolean = false;
@@ -68,12 +67,10 @@ export class ListAbsencesComponent implements OnInit {
     return !r[1] || r[0].toDateString() === r[1].toDateString();
   }
 
-  // Hours only make sense for a single day and for types that are not whole-day leaves
   get hoursEnabled(): boolean {
     return this.isSingleDay && absenceTypeAllowsHours(this.selectedAbsenceType);
   }
 
-  // Year the vacation being registered is taken from: the previous one when the box is ticked
   get vacationYearOptionLabel(): string {
     const year = this.dateRange?.[0]?.getFullYear() ?? new Date().getFullYear();
     return 'Férias do ano anterior (' + (year - 1) + ')';
@@ -159,7 +156,6 @@ export class ListAbsencesComponent implements OnInit {
   }
 }
 
-// "yyyy-MM-dd" from the API as a local date (new Date(string) would read it as UTC midnight)
 function toLocalDate(value: Date | string): Date {
   const [year, month, day] = String(value).substring(0, 10).split('-').map(Number);
   return new Date(year, month - 1, day);

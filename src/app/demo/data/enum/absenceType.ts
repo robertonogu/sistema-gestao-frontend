@@ -10,7 +10,6 @@ export enum AbsenceType {
     WORK_ACCIDENT = "Acidente de Trabalho"
 }
 
-// Leaves always cover whole days, so they carry no hours (a work accident may happen mid-day)
 const TYPES_WITHOUT_HOURS = ['SICK_LEAVE', 'UNPAID_LEAVE', 'BEREAVEMENT', 'MARRIAGE', 'CHILDBIRTH'];
 
 export function absenceTypeAllowsHours(type: string | null | undefined): boolean {

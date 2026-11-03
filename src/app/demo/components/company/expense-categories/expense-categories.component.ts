@@ -15,7 +15,6 @@ interface CategoryView {
   subCategories: SubCategoryView[];
 }
 
-// Consulta das categorias e subcategorias de despesa (as mesmas do formulário de despesas)
 @Component({
   templateUrl: './expense-categories.component.html'
 })
@@ -32,7 +31,6 @@ export class ExpenseCategoriesComponent {
     return this.categories.reduce((sum, category) => sum + category.subCategories.length, 0);
   }
 
-  // Categorias filtradas pela pesquisa: mostra a categoria inteira se o nome dela coincidir, senão só as subcategorias que coincidem
   get filteredCategories(): CategoryView[] {
     const query = this.normalize(this.search);
     if (!query) return this.categories;
@@ -50,7 +48,6 @@ export class ExpenseCategoriesComponent {
       label: subCategory,
       createsEquipment: EQUIPMENT_PURCHASE_SUBCATEGORIES.includes(subCategory),
       createsTool: TOOL_PURCHASE_SUBCATEGORIES.includes(subCategory),
-      // As linhas destas subcategorias criam artigos em stock (há uma família de artigos com o mesmo nome)
       goesToStock: Object.keys(ArticleFamily).includes(key)
     };
   }

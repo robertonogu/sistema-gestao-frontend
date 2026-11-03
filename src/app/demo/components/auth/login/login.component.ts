@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { AuthService } from 'src/app/demo/service/auth/auth.service';
 
-// Login: o administrador vai para o backoffice (ou para a página onde estava), o funcionário para a app (#/app)
 @Component({
     templateUrl: './login.component.html',
 })
@@ -38,7 +37,6 @@ export class LoginComponent implements OnInit {
             next: (session) => {
                 this.loading = false;
                 const returnUrl: string | undefined = this.route.snapshot.queryParams['returnUrl'];
-                // O endereço de onde veio só serve se for da área deste perfil
                 const fitsRole = returnUrl && returnUrl.startsWith('/app') === (session.role === 'EMPLOYEE');
                 this.router.navigateByUrl(fitsRole ? returnUrl : this.authService.homeRoute());
             },

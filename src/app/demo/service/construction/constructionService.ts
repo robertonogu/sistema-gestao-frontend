@@ -99,8 +99,6 @@ export class ConstructionService {
         return this.http.patch<Construction>(url, null, { params });
     }
 
-    // ===== Detalhes por budget item =====
-
     getMaterialDetails(budgetItemId: number, pageNo: number, pageSize: number) : Observable<ObjectList> {
         return this.http.get<ObjectList>(`${this.budgetItemsUrl}${budgetItemId}/materialDetails?pageNo=${pageNo}&pageSize=${pageSize}`);
     }
@@ -123,8 +121,6 @@ export class ConstructionService {
     getWorkLogSubItems(budgetItemId: number) : Observable<ItemName[]> {
         return this.http.get<ItemName[]>(`${this.budgetItemsUrl}${budgetItemId}/workLogSubItems`);
     }
-
-    // ===== Detalhes ao nível da obra =====
 
     getConstructionMaterialDetails(constructionId: number, pageNo: number, pageSize: number) : Observable<ObjectList> {
         return this.http.get<ObjectList>(`${this.constructionsUrl}/${constructionId}/materialDetails?pageNo=${pageNo}&pageSize=${pageSize}`);

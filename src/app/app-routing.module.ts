@@ -9,7 +9,6 @@ const routerOptions: ExtraOptions = {
 
 const routes: Routes = [
     {
-        // Backoffice: só administradores (sem sessão vai para o login)
         path: '', component: AppLayoutComponent, canActivate: [adminGuard],
         children: [
             { path: '', loadChildren: () => import('./demo/components/dashboards/dashboards.module').then(m => m.DashboardsModule) },
@@ -31,11 +30,8 @@ const routes: Routes = [
     },
     { path: 'auth', data: { breadcrumb: 'Auth' }, loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },
     { path: 'landing', loadChildren: () => import('./demo/components/landing/landing.module').then(m => m.LandingModule) },
-    // Página do telemóvel para fotografar uma fatura (aberta pelo QR da Nova Despesa), fora do layout com menu
     { path: 'capture/:token', loadComponent: () => import('./demo/components/invoice-capture/invoice-capture.component').then(m => m.InvoiceCaptureComponent) },
-    // Endereço fixo (para atalho no telemóvel): retoma a sessão das últimas 12h guardada no telemóvel
     { path: 'capture', loadComponent: () => import('./demo/components/invoice-capture/invoice-capture.component').then(m => m.InvoiceCaptureComponent) },
-    // App do funcionário (PWA no telemóvel): registos de trabalho, fora do layout com menu
     { path: 'app', canActivate: [employeeGuard], loadComponent: () => import('./demo/components/employee-app/employee-app.component').then(m => m.EmployeeAppComponent) },
     { path: 'notfound', loadChildren: () => import('./demo/components/notfound/notfound.module').then(m => m.NotfoundModule) },
     { path: '**', redirectTo: '/notfound' }

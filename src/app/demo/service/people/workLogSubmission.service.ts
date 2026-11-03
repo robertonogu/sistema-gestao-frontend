@@ -6,7 +6,6 @@ import { BudgetItem } from '../../api/budgetItem';
 import { ConstructionNames } from '../../api/constructionNames';
 import { WorkLogSubmission, WorkLogSubmissionInput } from '../../api/workLogSubmission';
 
-// Registos de trabalho dos funcionários: /me/… na app do funcionário, /workLogSubmissions/… no backoffice
 @Injectable({
     providedIn: 'root'
 })
@@ -15,12 +14,9 @@ export class WorkLogSubmissionService {
     private meUrl = `${environment.apiUrl}/me`;
     private submissionsUrl = `${environment.apiUrl}/workLogSubmissions`;
 
-    // Aprovou/rejeitou: o menu atualiza o número de registos por aprovar
     readonly pendingChanged = new Subject<void>();
 
     constructor(private http: HttpClient) { }
-
-    // ===== App do funcionário =====
 
     getMyConstructions(): Observable<ConstructionNames[]> {
         return this.http.get<ConstructionNames[]>(`${this.meUrl}/constructions`);
@@ -45,8 +41,6 @@ export class WorkLogSubmissionService {
     deleteMySubmission(submissionId: number) {
         return this.http.delete(`${this.meUrl}/workLogSubmissions/${submissionId}`);
     }
-
-    // ===== Backoffice =====
 
     getPending(): Observable<WorkLogSubmission[]> {
         return this.http.get<WorkLogSubmission[]>(`${this.submissionsUrl}/pending`);

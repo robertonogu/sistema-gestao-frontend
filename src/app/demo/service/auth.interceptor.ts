@@ -4,9 +4,6 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth/auth.service';
 
-// Junta o token da sessão a todos os pedidos à API. Se a API responder 401 (sessão expirada ou utilizador
-// desativado), termina a sessão e volta ao login. O AuthService é obtido só no pedido: injetá-lo no construtor
-// criaria um ciclo (o AuthService usa o HttpClient, que usa este interceptor).
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 

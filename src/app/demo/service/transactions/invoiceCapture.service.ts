@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { InvoiceCapture } from '../../api/invoiceCapture';
 
-// Fotografias maiores são reduzidas no browser antes de enviar (rede móvel); o QR e a IA leem bem a este tamanho
 const MAX_IMAGE_SIDE = 2400;
-// O PC e o telemóvel guardam a sessão de leitura para não ser preciso um QR novo por cada fatura (a API expira-a às 12h)
 const SESSION_KEY = 'invoiceCaptureSession';
 const SESSION_MS = 12 * 60 * 60 * 1000;
 
@@ -33,12 +31,10 @@ export class InvoiceCaptureService {
         return this.http.post<InvoiceCapture>(`${this.invoiceCapturesUrl}/${token}/file`, form);
     }
 
-    // "Ler fatura" aberto no PC: a sessão aceita uma nova fatura
     open(token: string): Observable<InvoiceCapture> {
         return this.http.post<InvoiceCapture>(`${this.invoiceCapturesUrl}/${token}/open`, {});
     }
 
-    // "Ler fatura" fechado no PC: o telemóvel deixa de poder enviar
     close(token: string): Observable<InvoiceCapture> {
         return this.http.post<InvoiceCapture>(`${this.invoiceCapturesUrl}/${token}/close`, {});
     }
@@ -58,7 +54,6 @@ export class InvoiceCaptureService {
         } catch { }
     }
 
-    // Imagem PNG com o QR que abre a página do telemóvel para esta leitura
     qrImageUrl(token: string): string {
         return `${this.invoiceCapturesUrl}/qr?url=${encodeURIComponent(this.capturePageUrl(token))}`;
     }
@@ -67,7 +62,6 @@ export class InvoiceCaptureService {
         return `${window.location.origin}${window.location.pathname}#/capture/${token}`;
     }
 
-    // PDFs seguem como estão; imagens grandes são reduzidas e enviadas em JPEG
     async prepareFile(file: File): Promise<{ blob: Blob, name: string }> {
         if (file.type === 'application/pdf' || !file.type.startsWith('image/')) return { blob: file, name: file.name };
 

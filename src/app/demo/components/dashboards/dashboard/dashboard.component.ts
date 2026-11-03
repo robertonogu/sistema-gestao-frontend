@@ -36,7 +36,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     balance: number = 0;
     cashBalance: number = 0;
     bankBalance: number = 0;
-    // Só no primeiro carregamento (ao entrar): mostra o indicador em vez de valores a zero
     loading: boolean = true;
     invoicedValue: number = 0;
     previousYearExpensesValue: number = 0;
@@ -104,7 +103,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         ];
     }
 
-    // Expenses change against the previous year, in %
     get expensesVariation(): number | null {
         if (this.previousYearExpensesValue <= 0) return null;
         return Math.round((this.expensesValue - this.previousYearExpensesValue) / this.previousYearExpensesValue * 100);

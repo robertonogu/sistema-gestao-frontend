@@ -1,7 +1,5 @@
 export enum SubCategoryType {
 
-    // BANK
-
     MAINTENANCE_COMMISSIONS = 'Comissões de Manutenção',
     FEES = 'Taxas',
     COMMISSIONS = 'Comissões',
@@ -14,8 +12,6 @@ export enum SubCategoryType {
     STAMP_DUTY = 'Imposto do Selo',
     BANK_EXPENSES = 'Despesas',
 
-    // TAXES
-
     IVA = 'IVA',
     IRC = 'IRC',
     IES = 'IES',
@@ -25,8 +21,6 @@ export enum SubCategoryType {
     LATE_PAYMENT_INTEREST = 'Juros de Mora',
     LEGAL_COSTS = 'Custas Processuais',
     OTHER_TAXES = 'Outras Taxas',
-
-    // PEOPLE
 
     SALARIES = 'Salários',
     SOCIAL_SECURITY_CONTRIBUTIONS = 'Contribuições Segurança Social',
@@ -43,8 +37,6 @@ export enum SubCategoryType {
     OCCUPATIONAL_HEALTH = 'Medicina no Trabalho',
     EMPLOYEE_TRAVEL = 'Deslocações dos Trabalhadores',
     OTHER_PEOPLE_EXPENSES = 'Outras Despesas',
-
-    // OPERATION
 
     FACILITY_RENT = 'Rendas de Instalações',
     ELECTRICITY = 'Eletricidade',
@@ -70,8 +62,6 @@ export enum SubCategoryType {
     LICENSES_PERMITS = 'Alvarás e Licenças',
     CLIENT_SUPPLIER_MEALS = 'Refeições com Clientes / Fornecedores',
 
-    // VEHICLES
-
     INSURANCE_VEHICLES = 'Seguro',
     IUC = 'IUC',
     FUEL = 'Abastecimento',
@@ -83,23 +73,17 @@ export enum SubCategoryType {
     VEHICLE_LEASING = 'Leasing / Financiamento de Veículos',
     VEHICLE_RENTAL = 'Aluguer de Veículos',
 
-    // EQUIPMENTS
-
     EQUIPMENTS_PURCHASE = 'Aquisição de Equipamentos',
     EQUIPMENTS_MAINTENANCE = 'Manutenção de Equipamentos',
     EQUIPMENT_CONSUMABLES = 'Consumíveis para Equipamentos',
     EQUIPMENT_RENTAL = 'Aluguer de Equipamentos',
     EQUIPMENT_FUEL = 'Combustível para Equipamentos',
 
-    // TOOLS
-
     TOOLS_PURCHASE = 'Aquisição ferramentas manuais',
     ELECTRIC_TOOLS_PURCHASE = 'Aquisição de ferramentas elétricas',
     MANUAL_TOOLS_CONSUMABLES = 'Consumíveis para ferramentas manuais',
     ELECTRIC_TOOLS_CONSUMABLES = 'Consumíveis para ferramentas elétricas',
     TOOLS_MAINTENANCE = 'Manutenção de ferramentas elétricas',
-
-    // INVENTORY
 
     WOOD = 'Madeiras',
     CONSTRUCTION = 'Materiais de construção',
@@ -119,8 +103,6 @@ export enum SubCategoryType {
     REAL_ESTATE = 'Imóveis',
     INVENTORY_EXPENSES = 'Despesas com inventário',
     INVENTORY_INVESTMENT = 'Investimento com inventário',
-
-    // CONSTRUCTION
 
     EXTERNAL_SERVICES = 'Serviços Externos'
 }

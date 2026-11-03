@@ -48,7 +48,6 @@ export class ListAccountLogsComponent {
   }
 
   private buildFilters(filters: any): AccountLogFilters {
-    // The date filter is a range calendar: one picked day filters that day, two days filter the period
     const dateRange = this.filterValue(filters, 'date');
     let dateFrom: Date | undefined;
     let dateTo: Date | undefined;
@@ -85,7 +84,6 @@ export class ListAccountLogsComponent {
       this.accountLogs = accountLogs.objectList;
       this.totalRecords = accountLogs.totalElements;
 
-      // The list comes newest-first, so the first row on page 0 holds the balance at the end of the filtered period.
       if (this.currentPage === 0) {
         this.balance = this.accountLogs.length > 0 ? this.accountLogs[0].balance : 0;
       }

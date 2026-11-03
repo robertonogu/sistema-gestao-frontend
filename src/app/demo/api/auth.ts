@@ -1,4 +1,3 @@
-// Login e utilizadores (ver AuthController / UserController no backend)
 export type UserRole = 'ADMIN' | 'EMPLOYEE';
 
 export interface Session {

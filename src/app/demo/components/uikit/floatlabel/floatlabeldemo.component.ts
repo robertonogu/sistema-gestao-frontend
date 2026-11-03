@@ -53,8 +53,6 @@ export class FloatLabelDemoComponent implements OnInit {
     }
 
     searchCountry(event: any) {
-        // in a real application, make a request to a remote url with the query and
-        // return filtered results, for demo we filter at client side
         const filtered: any[] = [];
         const query = event.query;
         // tslint:disable-next-line:prefer-for-of

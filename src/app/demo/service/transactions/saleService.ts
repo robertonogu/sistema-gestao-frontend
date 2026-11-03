@@ -27,8 +27,6 @@ export class SaleService {
       return this.http.get<ObjectList & { netValue: number }>(url);
     }
 
-    // Vendas do cliente que uma nota de crédito pode creditar (com o valor ainda por receber)
-
     getCreditableSales(clientId: number) : Observable<SaleForRevenue[]> {
 
       return this.http.get<SaleForRevenue[]>(`${environment.apiUrl}/sales/creditable/${clientId}`);
@@ -70,11 +68,9 @@ export class SaleService {
     private handleError(error: HttpErrorResponse) {
       let errorMessage = 'An unknown error occurred!';
       if (error.error instanceof ErrorEvent) {
-        // Client-side or network error
         console.log(error.error.message)
         errorMessage = `Error: ${error.error.message}`;
       } else {
-        // Backend error
         console.log(error.message)
         if (error.status === 409) {
           errorMessage = 'Document number already exists';

@@ -7,11 +7,6 @@ import { InvoiceCaptureService } from 'src/app/demo/service/transactions/invoice
 
 type PageState = 'loading' | 'blocked' | 'ready' | 'sending' | 'done' | 'error' | 'invalid';
 
-// Página do telemóvel aberta pelo QR mostrado no PC (Nova Despesa > Ler fatura): fotografa a fatura e envia-a.
-// O PC está a consultar a mesma leitura e preenche a despesa assim que os dados ficam prontos.
-// A leitura é uma sessão de 12h, mas só aceita uma fatura por cada vez que o PC abre "Ler fatura":
-// entretanto a página fica bloqueada e vai consultando o estado até o PC voltar a abrir.
-// A sessão fica guardada no telemóvel: fechada a página, #/capture (ou o mesmo link) retoma-a sem novo QR.
 @Component({
   selector: 'app-invoice-capture',
   standalone: true,
@@ -30,7 +25,6 @@ export class InvoiceCaptureComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute, private invoiceCaptureService: InvoiceCaptureService) { }
 
   ngOnInit(): void {
-    // Lido pelo QR: guarda a sessão no telemóvel; sem código no endereço, retoma a guardada (se ainda tiver 12h)
     const tokenFromQr = this.route.snapshot.params['token'];
     if (tokenFromQr) this.invoiceCaptureService.storeSession(tokenFromQr);
     const token = tokenFromQr ?? this.invoiceCaptureService.storedSessionToken();
@@ -53,7 +47,6 @@ export class InvoiceCaptureComponent implements OnInit, OnDestroy {
     this.invoiceCaptureService.get(this.token).subscribe({
       next: (capture) => this.applyPcState(capture),
       error: (err) => {
-        // Sem rede não é motivo para dar a sessão como expirada
         if (err?.status === 0) return;
         this.state = 'invalid';
         if (this.pollTimer) clearInterval(this.pollTimer);
@@ -61,7 +54,6 @@ export class InvoiceCaptureComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Desbloqueia quando o PC abre "Ler fatura" e bloqueia quando o fecha (o ecrã de fatura lida fica até reabrir)
   private applyPcState(capture: InvoiceCapture): void {
     if (this.state === 'sending' || this.state === 'invalid') return;
     if (capture.pcWaiting) {

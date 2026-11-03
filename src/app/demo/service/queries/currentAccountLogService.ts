@@ -5,7 +5,6 @@ import { CurrentAccountLog } from '../../api/currentAccountLog';
 import { environment } from 'src/environments/environment';
 import { OriginType } from '../../api/originType';
 
-// Página da conta corrente com os totais de todos os registos filtrados
 export interface CurrentAccountLogPage {
     objectList: CurrentAccountLog[];
     totalElements: number;
@@ -14,7 +13,6 @@ export interface CurrentAccountLogPage {
     balance: number;
 }
 
-// Uma origem na página Saldos: o saldo da conta corrente (crédito - débito)
 export interface OriginBalance {
     originId: number;
     name: string;
@@ -36,7 +34,6 @@ export class CurrentAccountLogService {
 
     constructor(private http: HttpClient) { }
 
-    // Saldo da conta corrente de todas as origens (funcionários, credores, financiadores, fornecedores…)
     getBalances() : Observable<OriginBalance[]> {
         return this.http.get<OriginBalance[]>(`${environment.apiUrl}/currentAccountBalances`);
     }
@@ -46,7 +43,6 @@ export class CurrentAccountLogService {
         return this.http.get<CurrentAccountLogPage>(url);
     }
 
-    // Todos os registos filtrados (do mais antigo para o mais recente), para exportar
     exportCurrentAccountLogs(originId: number, filters?: CurrentAccountLogFilters) : Observable<{ objectList: CurrentAccountLog[] }> {
         const url = `${environment.apiUrl}/currentAccountLogsExport/` + originId + "?" + this.filterParams(filters).substring(1);
         return this.http.get<{ objectList: CurrentAccountLog[] }>(url);

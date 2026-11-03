@@ -1,8 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
 
-// PDF de listagens/extratos: A4 vertical, tudo a preto sobre branco, título a negrito à esquerda e período à
-// direita; tabela sem linhas exceto a linha preta por baixo do cabeçalho (cabeçalho e totais a negrito).
 export interface StatementPdf {
     title: string;
     period?: string;
@@ -37,11 +35,9 @@ export function exportStatementPdf(data: StatementPdf): void {
         startY: 20,
         margin: { left: MARGIN, right: MARGIN },
         theme: 'plain',
-        // Letra 9; 0,8 mm de margem vertical por célula (≈ 4,8 mm por linha)
         styles: { fontSize: 9, textColor: 0, fillColor: 255, cellPadding: { top: 0.8, bottom: 0.8, left: 1.2, right: 1.2 } },
         headStyles: { fontStyle: 'bold', textColor: 0, fillColor: 255, lineColor: 0, lineWidth: { bottom: 0.3 },
             cellPadding: { top: 1, bottom: 1, left: 1.2, right: 1.2 } },
-        // Totais por baixo das colunas, separados por uma linha preta
         footStyles: { fontStyle: 'bold', textColor: 0, fillColor: 255, lineColor: 0, lineWidth: { top: 0.3 },
             cellPadding: { top: 1, bottom: 1, left: 1.2, right: 1.2 } },
         columnStyles,
@@ -49,7 +45,6 @@ export function exportStatementPdf(data: StatementPdf): void {
         body: data.body,
         foot: data.foot,
         showFoot: 'lastPage',
-        // Cabeçalhos e totais das colunas alinhadas à direita também ficam à direita (por baixo dos valores)
         didParseCell: (hook) => {
             if ((hook.section === 'head' || hook.section === 'foot') && data.rightAlignedColumns?.includes(hook.column.index)) {
                 hook.cell.styles.halign = 'right';
@@ -60,7 +55,6 @@ export function exportStatementPdf(data: StatementPdf): void {
     doc.save(data.fileName + '.pdf');
 }
 
-// "dd/mm/aaaa a dd/mm/aaaa" entre a data mais antiga e a mais recente dos registos exportados
 export function periodLabel(dates: (Date | undefined | null)[]): string | undefined {
     const valid = dates.filter((date): date is Date => !!date && !isNaN(date.getTime()));
     if (valid.length === 0) return undefined;
