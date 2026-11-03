@@ -646,20 +646,14 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return (PaymentMethod as any)[key] ?? key;
   }
 
-  private get paymentExpenseId(): number | undefined {
-    return this.isCreditNote && this.selectedCreditedExpense ? this.selectedCreditedExpense : this.editingExpenseId;
-  }
-
   private loadExpensePayments(): void {
-    const expenseId = this.paymentExpenseId;
-    if (!expenseId) return;
-    this.paymentService.getPaymentsForExpense(expenseId).subscribe(payments =>
-      this.expensePayments = this.isCreditNote ? payments.filter(payment => payment.value < 0) : payments);
+    if (!this.editingExpenseId) return;
+    this.paymentService.getPaymentsForExpense(this.editingExpenseId).subscribe(payments => this.expensePayments = payments);
   }
 
   newExpensePayment(): void {
     this.router.navigate(['/transactions/payments/create-payment'], {
-      queryParams: { originId: this.selectedOrigin, expenseId: this.paymentExpenseId }
+      queryParams: { originId: this.selectedOrigin, expenseId: this.editingExpenseId }
     });
   }
 

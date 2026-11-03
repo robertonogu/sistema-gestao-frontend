@@ -154,7 +154,7 @@
 				</div>
 
 				<div class="field col-12 md:col-6" *ngIf="isCreditNote">
-					<label>Fatura Creditada</label>
+					<label>Referência de Pagamento</label>
 					<p-dropdown
 						[(ngModel)]="selectedCreditedExpense"
 						[options]="creditableExpenses"
@@ -164,7 +164,7 @@
 						filterBy="label"
 						[showClear]="true"
 						[disabled]="!selectedOrigin"
-						[placeholder]="selectedOrigin ? 'Sem fatura (fica como saldo a favor)' : 'Selecione primeiro a origem'"
+						[placeholder]="selectedOrigin ? 'Sem referência' : 'Selecione primeiro a origem'"
 						appendTo="body"
 					/>
 				</div>
