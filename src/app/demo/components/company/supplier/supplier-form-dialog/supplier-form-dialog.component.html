@@ -3,7 +3,7 @@
     [(visible)]="visible"
     [style]="{ width: '680px' }"
     [modal]="true"
-    class="p-fluid"
+    styleClass="p-fluid"
     appendTo="body"
     (onHide)="hide()"
 >
@@ -11,7 +11,7 @@
         <div class="field">
             <label for="supplierNif" class="block font-bold mb-4">NIF</label>
             <div class="flex gap-2">
-                <p-inputNumber id="supplierNif" class="flex-1" [(ngModel)]="supplier.nif" [ngModelOptions]="{ standalone: true }" [useGrouping]="false"></p-inputNumber>
+                <p-inputNumber id="supplierNif" class="flex-1" styleClass="w-full" inputStyleClass="w-full" [(ngModel)]="supplier.nif" [ngModelOptions]="{ standalone: true }" [useGrouping]="false"></p-inputNumber>
                 <button *ngIf="!supplier.originId" pButton type="button" class="p-button-outlined"
                     [icon]="nifLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search'" [disabled]="nifLoading"
                     pTooltip="Preencher dados a partir do NIF" tooltipPosition="top" (click)="lookupNif()"></button>
@@ -22,6 +22,7 @@
             <input
                 type="text"
                 pInputText
+                class="w-full"
                 id="supplierName"
                 [(ngModel)]="supplier.name"
                 [ngModelOptions]="{ standalone: true }"
@@ -34,7 +35,7 @@
 
         <div class="field">
             <label for="supplierInitialBalance" class="block font-bold mb-4">Saldo Inicial</label>
-            <p-inputNumber id="supplierInitialBalance" [(ngModel)]="supplier.initialBalance" [ngModelOptions]="{ standalone: true }" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
+            <p-inputNumber id="supplierInitialBalance" styleClass="w-full" inputStyleClass="w-full" [(ngModel)]="supplier.initialBalance" [ngModelOptions]="{ standalone: true }" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="2"
                 suffix=" €" locale="pt-PT" [useGrouping]="false" placeholder="0,00 €"></p-inputNumber>
         </div>
 

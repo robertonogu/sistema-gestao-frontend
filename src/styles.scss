@@ -22,3 +22,46 @@ $gutter: 1rem; //for primeflex grid system
 .pac-container {
   z-index: 10000 !important;
 }
+
+.p-dialog .p-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+
+  .p-button {
+    margin: 0;
+    min-width: 7.5rem;
+    justify-content: center;
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 0.6rem 1.25rem;
+    transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+
+    &.p-button-text:not(.p-button-danger) {
+      background: transparent;
+      color: var(--text-color-secondary);
+      border: 1px solid var(--surface-border);
+
+      &:enabled:hover {
+        background: var(--surface-hover);
+        color: var(--text-color);
+      }
+    }
+
+    &.p-button-text:not(.p-button-danger):not(:first-child):last-child,
+    &.p-button-rounded:not(.p-button-outlined):last-child {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: var(--primary-color-text);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+
+      &:enabled:hover {
+        background: var(--primary-color);
+        color: var(--primary-color-text);
+        filter: brightness(1.08);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+      }
+    }
+  }
+}
