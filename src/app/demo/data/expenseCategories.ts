@@ -24,8 +24,11 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
     SubCategoryType.OFFICE_SUPPLIES, SubCategoryType.OFFICE_EQUIPMENT_REPAIR,
     SubCategoryType.CLOUD_STORAGE, SubCategoryType.SOFTWARE, SubCategoryType.ACCOUNTING_SERVICES, SubCategoryType.LEGAL_SERVICES,
     SubCategoryType.CONSULTING_SERVICES, SubCategoryType.COMPANY_INSURANCE, SubCategoryType.CLEANING, SubCategoryType.FACILITY_SECURITY,
-    SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.DUES,
-    SubCategoryType.LICENSES_PERMITS
+    SubCategoryType.DUES, SubCategoryType.LICENSES_PERMITS
+  ],
+  [CategoryType.FACILITIES]: [
+    SubCategoryType.FACILITY_MAINTENANCE, SubCategoryType.PROJECTS, SubCategoryType.GARDEN,
+    SubCategoryType.INVESTMENTS
   ],
   [CategoryType.COMMERCIAL]: [
     SubCategoryType.GRAPHIC_DESIGN, SubCategoryType.CLIENT_SUPPLIER_MEALS, SubCategoryType.ADVERTISING
@@ -49,6 +52,7 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
     SubCategoryType.WOOD, SubCategoryType.CONSTRUCTION, SubCategoryType.METALS, SubCategoryType.HARDWARE,
     SubCategoryType.FASTENING_SYSTEMS, SubCategoryType.ADHESIVES_SEALANTS, SubCategoryType.PAINTS_GLUES_VARNISHES,
     SubCategoryType.WATERPROOFING_INSULATION, SubCategoryType.PLUMBING, SubCategoryType.ELECTRICAL_MATERIALS,
+    SubCategoryType.HEATING, SubCategoryType.VENTILATION,
     SubCategoryType.SITE_CONSUMABLES, SubCategoryType.GLASS_MIRRORS, SubCategoryType.CLADDING, SubCategoryType.STONES, SubCategoryType.OTHER_MATERIALS,
     SubCategoryType.REAL_ESTATE, SubCategoryType.INVENTORY_EXPENSES, SubCategoryType.INVENTORY_INVESTMENT
   ],

@@ -41,7 +41,7 @@ export class AuthService {
     }
 
     expire(): void {
-        if (!this.sessionSubject.value) return;
+        if (this.router.url.startsWith('/auth')) return;
         this.clear();
         this.router.navigate(['/auth/login'], { queryParams: { returnUrl: this.router.url, expired: 1 } });
     }

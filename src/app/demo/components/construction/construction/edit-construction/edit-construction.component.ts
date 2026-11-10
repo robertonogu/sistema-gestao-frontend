@@ -585,8 +585,10 @@ export class EditConstructionComponent implements OnInit {
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Obra atualizada com sucesso.' });
       },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Existem campos por preencher.' });
+      error: (err) => {
+        console.error('Erro ao atualizar obra:', err);
+        const detail = err?.error?.message || 'Existem campos por preencher.';
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail });
       }
     });
   }

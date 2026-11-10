@@ -247,6 +247,8 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   paymentDeadline!: Date;
   isIntegralPayment: boolean = false;
   private _paymentValue: number = 0;
+  roundingFavorable: number = 0;
+  roundingUnfavorable: number = 0;
   selectedAccount!: number;
   selectedPaymentMethod!: PaymentMethod;
 
@@ -1591,6 +1593,20 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     return this.roundCents(this.netValue + this.iva);
   }
 
+  get cashOut(): number {
+    return this.roundCents(this.paymentValue - (this.roundingFavorable ?? 0) + (this.roundingUnfavorable ?? 0));
+  }
+
+  onRoundingFavorableChange(value: number | string | null) {
+    this.roundingFavorable = value == null || value === '' ? 0 : Number(value);
+    if (this.roundingFavorable > 0) this.roundingUnfavorable = 0;
+  }
+
+  onRoundingUnfavorableChange(value: number | string | null) {
+    this.roundingUnfavorable = value == null || value === '' ? 0 : Number(value);
+    if (this.roundingUnfavorable > 0) this.roundingFavorable = 0;
+  }
+
   get hasPaymentValue(): boolean {
     return this.paymentValue > 0;
   }
@@ -1664,13 +1680,15 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
       paymentCondition: this.selectedPaymentCondition, paymentDeadline: this.paymentDeadline, netValue: this.netValue, iva: this.iva, totalValue: this.totalValue, isIntegralPayment: this.isIntegralPayment, paymentValue: this.paymentValue,
       accountId: this.paidByCreditor ? undefined : this.selectedAccount, paymentMethod: this.selectedPaymentMethod, itemList: itemList,
       creditorId: this.paidByCreditor ? (this.selectedCreditor ?? undefined) : undefined,
+      roundingFavorable: this.hasPaymentValue ? this.roundingFavorable : 0,
+      roundingUnfavorable: this.hasPaymentValue ? this.roundingUnfavorable : 0,
       creditedExpenseId: this.isCreditNote ? (this.selectedCreditedExpense ?? undefined) : undefined
     } as ExpenseCreation;
 
     if (this.isCreditNote) {
       const refunded = !this.editingExpenseId && this.paymentValue > 0;
       this.expenseCreation = {
-        ...this.expenseCreation, isIntegralPayment: false, paymentValue: refunded ? this.paymentValue : 0, creditorId: undefined,
+        ...this.expenseCreation, roundingFavorable: 0, roundingUnfavorable: 0, isIntegralPayment: false, paymentValue: refunded ? this.paymentValue : 0, creditorId: undefined,
         accountId: refunded ? this.selectedAccount : undefined as any,
         paymentMethod: refunded ? this.selectedPaymentMethod : undefined as any
       };
@@ -1708,6 +1726,8 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     this.paymentDeadline = undefined as any;
     this.isIntegralPayment = false;
     this.paymentValue = 0;
+    this.roundingFavorable = 0;
+    this.roundingUnfavorable = 0;
     this.disablePaidValue = false;
     this.selectedAccount = undefined as any;
     this.selectedPaymentMethod = undefined as any;

@@ -12,18 +12,18 @@ export interface AccountLogExport {
     logs: AccountLog[];
 }
 
-const HEADERS = ['Data', 'Tipo de Movimento', 'Origem', 'Número de Documento', 'Crédito', 'Débito', 'Saldo'];
+const HEADERS = ['Data', 'Tipo', 'Origem', 'Documento', 'Crédito', 'Débito', 'Saldo'];
+
+function movementLabel(movementType: string): string {
+    return (MovementType as any)[movementType] ?? movementType;
+}
 
 function formatDate(date?: Date | string | null): string {
     return date ? new Date(date).toLocaleDateString('pt-PT') : '';
 }
 
 function formatEUR(value: number): string {
-    return value.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
-}
-
-function movementLabel(movementType: string): string {
-    return (MovementType as any)[movementType] ?? movementType;
+    return value.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
 
 export function periodLabel(dateFrom?: Date, dateTo?: Date): string {
@@ -40,12 +40,12 @@ function totals(logs: AccountLog[]) {
 }
 
 export function exportAccountLogsPdf(data: AccountLogExport): void {
-    const doc = new jsPDF({ orientation: 'landscape' });
+    const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
     const { credit, debt, finalBalance } = totals(data.logs);
 
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.text(data.title, 14, 15);
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.text(periodLabel(data.dateFrom, data.dateTo), 14, 21);
 
     autoTable(doc, {
@@ -61,8 +61,17 @@ export function exportAccountLogsPdf(data: AccountLogExport): void {
             formatEUR(log.balance),
         ]),
         foot: [['', '', '', 'Totais', formatEUR(credit), formatEUR(debt), formatEUR(finalBalance)]],
-        columnStyles: { 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' } },
-        styles: { fontSize: 9 },
+        columnStyles: {
+            0: { cellWidth: 17, overflow: 'ellipsize' },
+            1: { cellWidth: 22, overflow: 'ellipsize' },
+            2: { cellWidth: 46, overflow: 'ellipsize' },
+            3: { cellWidth: 31, overflow: 'ellipsize' },
+            4: { cellWidth: 22, halign: 'right' },
+            5: { cellWidth: 22, halign: 'right' },
+            6: { cellWidth: 22, halign: 'right' },
+        },
+        headStyles: { halign: 'center' },
+        styles: { fontSize: 7.5, cellPadding: 1.5 },
     });
 
     doc.save(`${data.fileName}.pdf`);
@@ -79,6 +88,7 @@ export async function exportAccountLogsExcel(data: AccountLogExport): Promise<vo
 
     const header = sheet.addRow(HEADERS);
     header.font = { bold: true };
+    header.alignment = { horizontal: 'center', vertical: 'middle' };
     header.eachCell(cell => {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6E8EC' } };
         cell.border = { bottom: { style: 'thin' } };
@@ -101,7 +111,7 @@ export async function exportAccountLogsExcel(data: AccountLogExport): Promise<vo
 
     sheet.getColumn(1).numFmt = 'dd/mm/yyyy';
     [5, 6, 7].forEach(col => sheet.getColumn(col).numFmt = '#,##0.00 €');
-    [12, 24, 36, 22, 14, 14, 14].forEach((width, i) => sheet.getColumn(i + 1).width = width);
+    [12, 16, 44, 24, 18, 18, 18].forEach((width, i) => sheet.getColumn(i + 1).width = width);
 
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

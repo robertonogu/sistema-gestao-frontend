@@ -212,7 +212,7 @@
 							mode="decimal"
 							inputId="currency-germany"
 							[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-							locale="en-US" [useGrouping]="false"
+							locale="pt-PT" [useGrouping]="false"
 							[disabled]="disablePaidValue"
 						/>
 						<div class="flex align-items-center gap-2 mt-2">
@@ -258,6 +258,37 @@
 							[ngClass]="{ 'ng-dirty ng-invalid': hasPaymentValue && !selectedPaymentMethod }"
 						/>
 					</div>
+
+					<ng-container *ngIf="!isCreditNote && hasPaymentValue">
+						<div class="field col-12 md:col-4">
+							<label>Arredondamento Favorável</label>
+							<p-inputNumber
+								[ngModel]="roundingFavorable"
+								(onInput)="onRoundingFavorableChange($event.value)"
+								[min]="0"
+								mode="decimal"
+								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
+								locale="pt-PT" [useGrouping]="false"
+							/>
+						</div>
+
+						<div class="field col-12 md:col-4">
+							<label>Arredondamento Desfavorável</label>
+							<p-inputNumber
+								[ngModel]="roundingUnfavorable"
+								(onInput)="onRoundingUnfavorableChange($event.value)"
+								[min]="0"
+								mode="decimal"
+								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
+								locale="pt-PT" [useGrouping]="false"
+							/>
+						</div>
+
+						<div class="field col-12 md:col-4" *ngIf="roundingFavorable > 0 || roundingUnfavorable > 0">
+							<label>Valor que sai da conta</label>
+							<div class="font-bold text-xl">{{ cashOut | number: '1.2-2' }} €</div>
+						</div>
+					</ng-container>
 				</ng-container>
 
 				<div class="col-12" *ngIf="editingExpenseId">
@@ -398,7 +429,7 @@
 								formControlName="value"
 								mode="decimal"
 								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-								locale="en-US" [useGrouping]="false"
+								locale="pt-PT" [useGrouping]="false"
 								styleClass="item-col-num"
 								(onInput)="onItemValueChange(j)"
 							/>
@@ -428,7 +459,7 @@
 								formControlName="total"
 								mode="decimal"
 								[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-								locale="en-US" [useGrouping]="false"
+								locale="pt-PT" [useGrouping]="false"
 								styleClass="item-col-num"
 								(onInput)="onItemTotalChange(j)"
 							/>

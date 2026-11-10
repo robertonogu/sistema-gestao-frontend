@@ -123,16 +123,23 @@
 					<label>Valor Total a Pagar</label>
 					<p-inputNumber
 						[ngModel]="totalToPay"
-						(onInput)="distributeTotal($event.value)"
+						(onInput)="onTotalChange($event.value)"
 						[disabled]="expenses.length === 0"
 						[min]="0"
 						mode="decimal"
 						[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-						locale="en-US" [useGrouping]="false"
+						locale="pt-PT" [useGrouping]="false"
 					/>
-					<small *ngIf="(totalToPay ?? 0) > totalDebt" class="text-orange-500">
-						Excede o valor em débito; só serão pagos {{ totalDebt | number: '1.2-2' }} €.
-					</small>
+				</div>
+
+				<div class="field col-12 md:col-4" *ngIf="roundingFavorable > 0">
+					<label>Arredondamento Favorável</label>
+					<div class="font-bold text-xl">{{ roundingFavorable | number: '1.2-2' }} €</div>
+				</div>
+
+				<div class="field col-12 md:col-4" *ngIf="roundingUnfavorable > 0">
+					<label>Arredondamento Desfavorável</label>
+					<div class="font-bold text-xl">{{ roundingUnfavorable | number: '1.2-2' }} €</div>
 				</div>
 
 				<p-table
@@ -200,7 +207,7 @@
 									[placeholder]="isCredit(expense) ? 'Crédito a usar (negativo)' : 'Insira valor a pagar'"
 									mode="decimal"
 									[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-									locale="en-US" [useGrouping]="false"
+									locale="pt-PT" [useGrouping]="false"
 								/>
 							</td>
 						</tr>

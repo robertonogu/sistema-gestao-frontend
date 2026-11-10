@@ -20,4 +20,6 @@ export interface ExpenseCreation {
     itemList: ItemCreation[];
     creditedExpenseId?: number;
     creditorId?: number;
+    roundingFavorable?: number;
+    roundingUnfavorable?: number;
 }

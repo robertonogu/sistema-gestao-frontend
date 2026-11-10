@@ -17,7 +17,7 @@ export class AuthInterceptor implements HttpInterceptor {
     const authorized = token ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : request;
     return next.handle(authorized).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && token) authService.expire();
+        if (error.status === 401 && !request.url.includes('/auth/login')) authService.expire();
         return throwError(() => error);
       })
     );

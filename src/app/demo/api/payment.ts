@@ -32,6 +32,8 @@ export interface PaymentDocumentDetail {
     creditorId?: number | null;
     originId: number;
     value: number;
+    roundingFavorable: number;
+    roundingUnfavorable: number;
     lines: PaymentDocumentLine[];
 }
 

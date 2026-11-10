@@ -7,5 +7,7 @@ export interface ListPaymentCreation {
     paymentMethod: PaymentMethod;
     accountId: number;
     creditorId?: number;
+    roundingFavorable?: number;
+    roundingUnfavorable?: number;
     paymentCreationDTOList: PaymentCreation[];
 }

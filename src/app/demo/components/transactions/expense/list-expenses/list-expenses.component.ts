@@ -65,6 +65,7 @@ export class ListExpensesComponent implements OnInit {
     TAXES:         { label: 'Impostos',     color: '#ef4444' },
     PEOPLE:        { label: 'Pessoal',      color: '#22c55e' },
     OPERATION:     { label: 'Funcionamento',     color: '#8b5cf6' },
+    FACILITIES:    { label: 'Instalações',  color: '#06b6d4' },
     COMMERCIAL:    { label: 'Comercial',    color: '#ec4899' },
     VEHICLES:      { label: 'Veículos',     color: '#f59e0b' },
     EQUIPMENTS:    { label: 'Equipamentos', color: '#14b8a6' },

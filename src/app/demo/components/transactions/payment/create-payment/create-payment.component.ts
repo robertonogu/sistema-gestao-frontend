@@ -46,7 +46,10 @@ export class CreatePaymentComponent {
   expenseValues: number[] = [];
 
   sumTotalValues: number = 0;
+  roundingFavorable: number = 0;
+  roundingUnfavorable: number = 0;
   totalToPay: number | null = null;
+  totalManual: boolean = false;
   saving: boolean = false;
 
   editingPaymentId?: number;
@@ -141,6 +144,9 @@ export class CreatePaymentComponent {
       this.expenseValues = this.expenses.map(() => 0);
       this.sumTotalValues = 0;
       this.totalToPay = null;
+      this.totalManual = false;
+      this.roundingFavorable = 0;
+      this.roundingUnfavorable = 0;
 
       const preselected = this.expenses.find(expense => expense.id === preselectExpenseId);
       if (preselected) {
@@ -161,6 +167,8 @@ export class CreatePaymentComponent {
     this.onAccountChange();
     this.selectedPaymentMethod = payment.paymentMethod as unknown as PaymentMethod;
     this.selectedOrigin = payment.originId;
+    const loadedFavorable = payment.roundingFavorable ?? 0;
+    const loadedUnfavorable = payment.roundingUnfavorable ?? 0;
 
     this.expenses = payment.lines.map(line => ({
       id: line.expenseId,
@@ -175,6 +183,11 @@ export class CreatePaymentComponent {
     this.expenseValues = payment.lines.map(line => line.paidValue);
     this.expensesSelected = this.expenses.filter((_, i) => this.expenseValues[i] !== 0);
     this.updateSum();
+    if (loadedFavorable > 0 || loadedUnfavorable > 0) {
+      this.totalManual = true;
+      this.totalToPay = this.round(this.sumTotalValues - loadedFavorable + loadedUnfavorable);
+      this.recalcRounding();
+    }
   }
 
   private expenseTime(expense: ExpenseInDebt): number {
@@ -194,26 +207,17 @@ export class CreatePaymentComponent {
     return this.round(-this.expenses.filter(expense => this.isCredit(expense)).reduce((acc, expense) => acc + expense.debtValue, 0));
   }
 
-  private get creditUsed(): number {
-    return this.round(-this.expenses.reduce((acc, expense, i) => acc + (this.isCredit(expense) ? (this.expenseValues[i] ?? 0) : 0), 0));
+  onTotalChange(input: number | string | null) {
+    if (input == null || input === '') {
+      this.totalManual = false;
+      this.updateSum();
+      return;
+    }
+    this.totalManual = true;
+    this.totalToPay = Number(input);
+    this.recalcRounding();
   }
 
-  distributeTotal(input: number | string | null) {
-    const value = input == null || input === '' ? null : Number(input);
-    this.totalToPay = value;
-    let remaining = Math.min((value ?? 0) + this.creditUsed, this.totalDebt);
-
-    this.expenseValues = this.expenses.map((expense, i) => {
-      if (this.isCredit(expense)) return this.expenseValues[i] ?? 0;
-      const amount = this.round(Math.max(0, Math.min(remaining, expense.debtValue)));
-      remaining = this.round(remaining - amount);
-      return amount;
-    });
-
-    this.expensesSelected = this.expenses.filter((_, i) => this.expenseValues[i] !== 0);
-    this.updateSum(false);
-
-  }
 
   selectAll(event: any) {
     this.expenseValues = this.expenses.map((expense) => event.checked ? expense.debtValue : 0);
@@ -240,9 +244,21 @@ export class CreatePaymentComponent {
     this.updateSum();
   }
 
-  private updateSum(syncTotal: boolean = true) {
+  private updateSum() {
     this.sumTotalValues = this.round(this.expenseValues.reduce((acc, value) => acc + (value ?? 0), 0));
-    if (syncTotal) this.totalToPay = this.sumTotalValues;
+    if (!this.totalManual) this.totalToPay = this.sumTotalValues;
+    this.recalcRounding();
+  }
+
+  private recalcRounding() {
+    if (!this.expenseValues.some(value => (value ?? 0) !== 0)) {
+      this.roundingFavorable = 0;
+      this.roundingUnfavorable = 0;
+      return;
+    }
+    const difference = this.round((this.totalToPay ?? this.sumTotalValues) - this.sumTotalValues);
+    this.roundingFavorable = difference < 0 ? -difference : 0;
+    this.roundingUnfavorable = difference > 0 ? difference : 0;
   }
 
   private round(value: number): number {
@@ -281,7 +297,8 @@ export class CreatePaymentComponent {
     const listPayments: ListPaymentCreation = {
       documentNumber: this.documentNumber, date: this.date, paymentMethod: this.selectedPaymentMethod,
       accountId: this.paidByCreditor ? 0 : this.selectedAccount, creditorId: this.paidByCreditor ? (this.selectedCreditor ?? 0) : 0,
-      paymentCreationDTOList: paymentCreationDTOList
+      paymentCreationDTOList: paymentCreationDTOList,
+      roundingFavorable: this.roundingFavorable ?? 0, roundingUnfavorable: this.roundingUnfavorable ?? 0
     };
 
     this.saving = true;
@@ -346,5 +363,8 @@ export class CreatePaymentComponent {
     this.expenseValues = [];
     this.sumTotalValues = 0;
     this.totalToPay = null;
+    this.totalManual = false;
+    this.roundingFavorable = 0;
+    this.roundingUnfavorable = 0;
   }
 }
