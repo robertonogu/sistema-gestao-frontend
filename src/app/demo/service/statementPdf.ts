@@ -32,13 +32,19 @@ export async function exportStatementPdf(data: StatementPdf): Promise<void> {
         titleY += 7;
     }
     doc.setFont(font, 'bold');
-    doc.setFontSize(data.company ? 14 : 11);
+    doc.setFontSize(data.company ? 12 : 11);
     doc.text(data.title, MARGIN, titleY);
 
     if (data.period) {
         doc.setFont(font, 'normal');
-        doc.setFontSize(10);
-        doc.text(data.period, pageWidth - MARGIN, titleY, { align: 'right' });
+        if (data.company) {
+            doc.setFontSize(9);
+            titleY += 5.5;
+            doc.text(data.period, MARGIN, titleY);
+        } else {
+            doc.setFontSize(10);
+            doc.text(data.period, pageWidth - MARGIN, titleY, { align: 'right' });
+        }
     }
 
     const columnStyles: { [key: number]: any } = {};

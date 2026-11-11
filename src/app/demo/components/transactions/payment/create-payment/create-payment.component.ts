@@ -50,6 +50,7 @@ export class CreatePaymentComponent {
   roundingUnfavorable: number = 0;
   totalToPay: number | null = null;
   totalManual: boolean = false;
+  postToCurrentAccount: boolean = false;
   saving: boolean = false;
 
   editingPaymentId?: number;
@@ -147,6 +148,7 @@ export class CreatePaymentComponent {
       this.totalManual = false;
       this.roundingFavorable = 0;
       this.roundingUnfavorable = 0;
+      this.postToCurrentAccount = false;
 
       const preselected = this.expenses.find(expense => expense.id === preselectExpenseId);
       if (preselected) {
@@ -182,8 +184,17 @@ export class CreatePaymentComponent {
     }));
     this.expenseValues = payment.lines.map(line => line.paidValue);
     this.expensesSelected = this.expenses.filter((_, i) => this.expenseValues[i] !== 0);
+    this.postToCurrentAccount = !!payment.postedToCurrentAccount;
     this.updateSum();
-    if (loadedFavorable > 0 || loadedUnfavorable > 0) {
+    if (this.postToCurrentAccount) {
+      const paidTotal = this.sumTotalValues;
+      this.expenseValues = this.expenseValues.map((value, i) => this.expenses[i].debtValue > 0 ? Math.min(value, this.expenses[i].debtValue) : value);
+      this.updateSum();
+      this.totalManual = true;
+      this.totalToPay = paidTotal;
+      this.recalcRounding();
+    }
+    if (!this.postToCurrentAccount && (loadedFavorable > 0 || loadedUnfavorable > 0)) {
       this.totalManual = true;
       this.totalToPay = this.round(this.sumTotalValues - loadedFavorable + loadedUnfavorable);
       this.recalcRounding();
@@ -252,13 +263,34 @@ export class CreatePaymentComponent {
 
   private recalcRounding() {
     if (!this.expenseValues.some(value => (value ?? 0) !== 0)) {
+      this.postToCurrentAccount = false;
       this.roundingFavorable = 0;
       this.roundingUnfavorable = 0;
       return;
     }
     const difference = this.round((this.totalToPay ?? this.sumTotalValues) - this.sumTotalValues);
+    if (difference <= 0) this.postToCurrentAccount = false;
+    if (this.postToCurrentAccount && difference > 0) {
+      this.roundingFavorable = 0;
+      this.roundingUnfavorable = 0;
+      return;
+    }
     this.roundingFavorable = difference < 0 ? -difference : 0;
     this.roundingUnfavorable = difference > 0 ? difference : 0;
+  }
+
+  get canPostToCurrentAccount(): boolean {
+    return this.postToCurrentAccount || this.roundingUnfavorable > 0;
+  }
+
+
+  get extraToCurrentAccount(): number {
+    if (!this.postToCurrentAccount) return 0;
+    return Math.max(this.round((this.totalToPay ?? this.sumTotalValues) - this.sumTotalValues), 0);
+  }
+
+  onPostToCurrentAccountChange() {
+    this.recalcRounding();
   }
 
   private round(value: number): number {
@@ -272,11 +304,19 @@ export class CreatePaymentComponent {
       return;
     }
 
+    const extra = this.extraToCurrentAccount;
+    let extraIndex = -1;
+    if (extra > 0) {
+      for (let i = this.expenses.length - 1; i >= 0; i--) {
+        if (!this.isCredit(this.expenses[i]) && (this.expenseValues[i] ?? 0) > 0) { extraIndex = i; break; }
+      }
+    }
+
     const paymentCreationDTOList: PaymentCreation[] = [];
     for (let i = 0; i < this.expenses.length; i++) {
-      const value = this.expenseValues[i] ?? 0;
+      const value = this.round((this.expenseValues[i] ?? 0) + (i === extraIndex ? extra : 0));
       const expense = this.expenses[i];
-      if (!this.isCredit(expense) && (value < 0 || value > expense.debtValue + 0.005)) {
+      if (!this.isCredit(expense) && i !== extraIndex && (value < 0 || value > expense.debtValue + 0.005)) {
         this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'O valor a pagar da fatura ' + expense.documentNumber + ' tem de estar entre 0 e o valor em débito.' });
         return;
       }
@@ -298,7 +338,8 @@ export class CreatePaymentComponent {
       documentNumber: this.documentNumber, date: this.date, paymentMethod: this.selectedPaymentMethod,
       accountId: this.paidByCreditor ? 0 : this.selectedAccount, creditorId: this.paidByCreditor ? (this.selectedCreditor ?? 0) : 0,
       paymentCreationDTOList: paymentCreationDTOList,
-      roundingFavorable: this.roundingFavorable ?? 0, roundingUnfavorable: this.roundingUnfavorable ?? 0
+      roundingFavorable: this.roundingFavorable ?? 0, roundingUnfavorable: this.roundingUnfavorable ?? 0,
+      postedToCurrentAccount: extraIndex >= 0
     };
 
     this.saving = true;
@@ -366,5 +407,6 @@ export class CreatePaymentComponent {
     this.totalManual = false;
     this.roundingFavorable = 0;
     this.roundingUnfavorable = 0;
+    this.postToCurrentAccount = false;
   }
 }

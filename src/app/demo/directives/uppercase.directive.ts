@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, Optional, Self } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, Optional, Self } from '@angular/core';
 import { NgControl } from '@angular/forms';
 
 @Directive({
@@ -6,6 +6,8 @@ import { NgControl } from '@angular/forms';
   standalone: true,
 })
 export class UppercaseDirective {
+
+  @Input() appUppercase: string = '';
 
   constructor(
     @Optional() @Self() private ngControl: NgControl,
@@ -15,6 +17,10 @@ export class UppercaseDirective {
   @HostListener('input', ['$event'])
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
+    if (this.appUppercase === 'digits' && !/\d/.test(input.value)) {
+      return;
+    }
+
     const upper = input.value.toUpperCase();
 
     if (input.value === upper) {

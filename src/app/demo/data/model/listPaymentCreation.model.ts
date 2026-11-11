@@ -9,5 +9,6 @@ export interface ListPaymentCreation {
     creditorId?: number;
     roundingFavorable?: number;
     roundingUnfavorable?: number;
+    postedToCurrentAccount?: boolean;
     paymentCreationDTOList: PaymentCreation[];
 }

@@ -34,6 +34,7 @@ export interface PaymentDocumentDetail {
     value: number;
     roundingFavorable: number;
     roundingUnfavorable: number;
+    postedToCurrentAccount?: boolean;
     lines: PaymentDocumentLine[];
 }
 

@@ -34,17 +34,22 @@ export function periodLabel(dateFrom?: Date, dateTo?: Date): string {
     return `De ${formatDate(dateFrom)} a ${formatDate(dateTo)}`;
 }
 
+function chronological(logs: AccountLog[]): AccountLog[] {
+    return [...logs].reverse();
+}
+
 function totals(logs: AccountLog[]) {
     const credit = logs.reduce((sum, log) => sum + (log.credit || 0), 0);
     const debt = logs.reduce((sum, log) => sum + (log.debt || 0), 0);
-    const finalBalance = logs.length > 0 ? logs[0].balance : 0;
+    const finalBalance = logs.length > 0 ? logs[logs.length - 1].balance : 0;
     return { credit, debt, finalBalance };
 }
 
 export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void> {
     const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
     const font = await registerPdfFont(doc);
-    const { credit, debt, finalBalance } = totals(data.logs);
+    const logs = chronological(data.logs);
+    const { credit, debt, finalBalance } = totals(logs);
 
     doc.setTextColor(0, 0, 0);
     doc.setFont(font, 'normal');
@@ -70,7 +75,7 @@ export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void
     autoTable(doc, {
         startY,
         head: [HEADERS],
-        body: data.logs.map(log => [
+        body: logs.map(log => [
             formatDate(log.date),
             movementLabel(log.movementType),
             log.origin ?? '',
@@ -112,7 +117,8 @@ export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void
 export async function exportAccountLogsExcel(data: AccountLogExport): Promise<void> {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Movimentos');
-    const { credit, debt, finalBalance } = totals(data.logs);
+    const logs = chronological(data.logs);
+    const { credit, debt, finalBalance } = totals(logs);
 
     sheet.addRow([data.title]).font = { bold: true, size: 14 };
     sheet.addRow([periodLabel(data.dateFrom, data.dateTo)]);
@@ -126,7 +132,7 @@ export async function exportAccountLogsExcel(data: AccountLogExport): Promise<vo
         cell.border = { bottom: { style: 'thin' } };
     });
 
-    data.logs.forEach(log => {
+    logs.forEach(log => {
         sheet.addRow([
             log.date ? new Date(log.date) : null,
             movementLabel(log.movementType),

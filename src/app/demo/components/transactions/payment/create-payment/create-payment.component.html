@@ -58,7 +58,7 @@
 							[(ngModel)]="documentNumber"
 							type="text"
 							pInputText
-							appUppercase
+							appUppercase="digits"
 						/>
 					</span>
 				</div>
@@ -130,6 +130,15 @@
 						[minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
 						locale="en-US" [useGrouping]="false"
 					/>
+				</div>
+
+				<div class="field col-12 md:col-4" *ngIf="canPostToCurrentAccount">
+					<label>&nbsp;</label>
+					<div class="flex align-items-center gap-2" style="height: 2.5rem">
+						<p-checkbox [(ngModel)]="postToCurrentAccount" [binary]="true" inputId="postToCurrentAccount"
+							(onChange)="onPostToCurrentAccountChange()" />
+						<label for="postToCurrentAccount" class="mb-0">Lançar em conta corrente</label>
+					</div>
 				</div>
 
 				<div class="field col-12 md:col-4" *ngIf="roundingFavorable > 0">

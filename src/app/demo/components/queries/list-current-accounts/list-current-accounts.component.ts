@@ -94,6 +94,24 @@ export class ListCurrentAccountsComponent implements OnInit {
     });
   }
 
+  private readonly originTypes: { [group: string]: string } = {
+    'Pessoal': 'Funcionário',
+    'Clientes': 'Cliente',
+    'Fornecedores': 'Fornecedor',
+    'Entidades Externas': 'Entidade Externa',
+    'Financiadores': 'Financiador',
+    'Credores': 'Credor'
+  };
+
+  private get selectedOriginType(): string {
+    for (const group of this.origins ?? []) {
+      if (group.items.some(origin => origin.value === this.selectedOrigin)) {
+        return this.originTypes[group.label] ?? group.label;
+      }
+    }
+    return '';
+  }
+
   private get selectedOriginName(): string {
     for (const group of this.origins ?? []) {
       const item = group.items.find(origin => origin.value === this.selectedOrigin);
@@ -115,7 +133,7 @@ export class ListCurrentAccountsComponent implements OnInit {
         const balance = logs.length > 0 ? logs[logs.length - 1].balance : 0;
 
         await exportStatementPdf({
-          title: `Extrato da Conta Corrente de ${this.selectedOriginName}`,
+          title: `Extrato da Conta Corrente de ${this.selectedOriginType} - ${this.selectedOriginName}`,
           period: periodLabel(dates),
           company: 'ALVEDA GOLD, LDA',
           fontSize: 8,
