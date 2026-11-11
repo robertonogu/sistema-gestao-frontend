@@ -129,7 +129,7 @@
                         mode="decimal"
                         inputId="currency-germany"
                         [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-                        locale="pt-PT" [useGrouping]="false"
+                        locale="en-US" [useGrouping]="false"
 						[ngClass]="{ 'ng-dirty ng-invalid': !totalValue }"
 					/>
 				</div>
@@ -189,7 +189,7 @@
                                     [max]="salesSelection.isCredit(sale) ? 0 : sale.pendingValue"
                                     mode="decimal"
                                     [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
-                                    locale="pt-PT" [useGrouping]="false"
+                                    locale="en-US" [useGrouping]="false"
                                 />
                             </td>
                         </tr>
