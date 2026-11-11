@@ -1625,6 +1625,10 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
   }
 
   newExpense() {
+    if (!this.selectedOrigin) {
+      this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Selecione a origem da despesa.' });
+      return;
+    }
     if (this.dynamicItemForm.invalid) {
       this.dynamicItemForm.markAllAsTouched();
       this.messageService.add({ severity: 'warn', summary: 'Campos obrigatórios', detail: 'Preencha todos os campos obrigatórios dos itens.' });
