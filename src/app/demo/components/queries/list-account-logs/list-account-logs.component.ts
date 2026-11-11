@@ -102,13 +102,14 @@ export class ListAccountLogsComponent {
     this.accountLogService.exportAccountLogs(this.selectedAccount, this.filters).subscribe({
       next: async (result) => {
         const data = {
-          title: `Extrato de Conta - ${this.selectedAccountName}`,
+          title: 'Extrato de Conta',
+          accountName: this.selectedAccountName,
           fileName: `extrato-conta-${this.selectedAccountName}`.replace(/\s+/g, '-').toLowerCase(),
           dateFrom: this.filters.dateFrom,
           dateTo: this.filters.dateTo,
           logs: result,
         };
-        if (format === 'pdf') exportAccountLogsPdf(data);
+        if (format === 'pdf') await exportAccountLogsPdf(data);
         else await exportAccountLogsExcel(data);
         this.exporting = false;
       },

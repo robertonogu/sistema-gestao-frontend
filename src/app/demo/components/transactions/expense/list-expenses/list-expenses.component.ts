@@ -159,12 +159,12 @@ export class ListExpensesComponent implements OnInit {
 
     const exportFilters = this.buildFilters(filters);
     this.expenseService.exportExpenses(exportFilters).subscribe({
-      next: (result) => {
+      next: async (result) => {
         const originIds: number[] | undefined = exportFilters.originIds as any;
         const originName = originIds?.length === 1 ? this.originNames.find(origin => origin.id === originIds[0])?.name : undefined;
         const dates = result.map((expense: ExpenseListItem) => parseLocalDate(expense.date as any));
 
-        exportStatementPdf({
+        await exportStatementPdf({
           title: originName ? `Despesas de ${originName.trim()}` : 'Despesas',
           period: periodLabel(dates),
           head: ['Data', 'Origem', 'Nº Documento', 'Estado', 'Meio de Pagamento', 'Valor', 'Valor Pendente'],

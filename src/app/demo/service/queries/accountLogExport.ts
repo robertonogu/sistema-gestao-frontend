@@ -3,9 +3,11 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AccountLog } from '../../api/accountLogs';
 import { MovementType } from '../../data/enum/movementType';
+import { registerPdfFont } from '../pdfFont';
 
 export interface AccountLogExport {
     title: string;
+    accountName?: string;
     fileName: string;
     dateFrom?: Date;
     dateTo?: Date;
@@ -39,17 +41,34 @@ function totals(logs: AccountLog[]) {
     return { credit, debt, finalBalance };
 }
 
-export function exportAccountLogsPdf(data: AccountLogExport): void {
+export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void> {
     const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
+    const font = await registerPdfFont(doc);
     const { credit, debt, finalBalance } = totals(data.logs);
 
-    doc.setFontSize(12);
-    doc.text(data.title, 14, 15);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont(font, 'normal');
     doc.setFontSize(9);
-    doc.text(periodLabel(data.dateFrom, data.dateTo), 14, 21);
+    doc.text('ALVEDA GOLD, LDA', 14, 15);
+
+    doc.setFont(font, 'bold');
+    doc.setFontSize(14);
+    doc.text(data.title, 14, 22);
+    if (data.accountName) {
+        doc.setFont(font, 'normal');
+        doc.setFontSize(10);
+        doc.text(data.accountName, doc.internal.pageSize.getWidth() - 14, 22, { align: 'right' });
+    }
+    let startY = 27;
+    if (data.dateFrom) {
+        doc.setFont(font, 'normal');
+        doc.setFontSize(9);
+        doc.text(periodLabel(data.dateFrom, data.dateTo), 14, 27);
+        startY = 32;
+    }
 
     autoTable(doc, {
-        startY: 26,
+        startY,
         head: [HEADERS],
         body: data.logs.map(log => [
             formatDate(log.date),
@@ -60,7 +79,7 @@ export function exportAccountLogsPdf(data: AccountLogExport): void {
             log.debt ? formatEUR(log.debt) : '',
             formatEUR(log.balance),
         ]),
-        foot: [['', '', '', 'Totais', formatEUR(credit), formatEUR(debt), formatEUR(finalBalance)]],
+        foot: [['Total', '', '', '', formatEUR(credit), formatEUR(debt), formatEUR(finalBalance)]],
         columnStyles: {
             0: { cellWidth: 17, overflow: 'ellipsize' },
             1: { cellWidth: 22, overflow: 'ellipsize' },
@@ -70,8 +89,21 @@ export function exportAccountLogsPdf(data: AccountLogExport): void {
             5: { cellWidth: 22, halign: 'right' },
             6: { cellWidth: 22, halign: 'right' },
         },
-        headStyles: { halign: 'center' },
-        styles: { fontSize: 7.5, cellPadding: 1.5 },
+        theme: 'plain',
+        showFoot: 'lastPage',
+        headStyles: { halign: 'center', fontStyle: 'bold', textColor: 0, lineColor: 0, lineWidth: { bottom: 0.5 }, cellPadding: { top: 1.5, bottom: 3, left: 1.5, right: 1.5 } },
+        footStyles: { halign: 'right', fontStyle: 'bold', textColor: 0, lineColor: 0, lineWidth: { top: 0.5 }, cellPadding: { top: 3, bottom: 1.5, left: 1.5, right: 1.5 } },
+        didParseCell: (hook) => {
+            if (hook.section === 'body') {
+                const first = hook.row.index === 0;
+                const last = hook.row.index === hook.table.body.length - 1;
+                if (first || last) {
+                    hook.cell.styles.cellPadding = { top: first ? 3 : 1.5, bottom: last ? 3 : 1.5, left: 1.5, right: 1.5 };
+                }
+            }
+            if (hook.section === 'foot' && hook.column.index < 4) hook.cell.styles.halign = 'left';
+        },
+        styles: { font, fontSize: 8, cellPadding: 1.5, textColor: 0, overflow: 'ellipsize' },
     });
 
     doc.save(`${data.fileName}.pdf`);
@@ -112,6 +144,10 @@ export async function exportAccountLogsExcel(data: AccountLogExport): Promise<vo
     sheet.getColumn(1).numFmt = 'dd/mm/yyyy';
     [5, 6, 7].forEach(col => sheet.getColumn(col).numFmt = '#,##0.00 €');
     [12, 16, 44, 24, 18, 18, 18].forEach((width, i) => sheet.getColumn(i + 1).width = width);
+
+    sheet.eachRow(row => row.eachCell(cell => {
+        cell.font = { ...cell.font, name: 'Calibri' };
+    }));
 
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

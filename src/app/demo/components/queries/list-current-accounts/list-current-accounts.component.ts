@@ -107,28 +107,31 @@ export class ListCurrentAccountsComponent implements OnInit {
     this.exporting = true;
 
     this.currentAccountLogService.exportCurrentAccountLogs(this.selectedOrigin, this.filters).subscribe({
-      next: (result) => {
+      next: async (result) => {
         const logs = result.objectList;
         const dates = logs.map(log => parseLocalDate(log.date as any));
         const totalCredit = logs.reduce((sum, log) => sum + log.credit, 0);
         const totalDebt = logs.reduce((sum, log) => sum + log.debt, 0);
         const balance = logs.length > 0 ? logs[logs.length - 1].balance : 0;
 
-        exportStatementPdf({
+        await exportStatementPdf({
           title: `Extrato da Conta Corrente de ${this.selectedOriginName}`,
           period: periodLabel(dates),
-          head: ['Data', 'Nº Documento', 'Método de Pagamento', 'Descrição', 'Crédito', 'Débito', 'Saldo'],
+          company: 'ALVEDA GOLD, LDA',
+          fontSize: 8,
+          singleLine: true,
+          head: ['Data', 'Documento', 'Método', 'Crédito', 'Débito', 'Saldo'],
+          columnWidths: { 0: 19, 1: 46, 2: 28, 3: 28, 4: 28, 5: 32 },
           body: logs.map((log, i) => [
             dates[i]?.toLocaleDateString('pt-PT') ?? '',
             log.documentNumber ?? '',
             log.paymentMethod ? (this.PaymentMethod[log.paymentMethod] ?? log.paymentMethod) : '',
-            log.description ?? '',
             log.credit !== 0 || log.debt === 0 ? euros(log.credit) : '',
             log.debt !== 0 ? euros(log.debt) : '',
             euros(log.balance)
           ]),
-          foot: [['Total', '', '', '', euros(totalCredit), euros(totalDebt), euros(balance)]],
-          rightAlignedColumns: [4, 5, 6],
+          foot: [['Total', '', '', euros(totalCredit), euros(totalDebt), euros(balance)]],
+          rightAlignedColumns: [3, 4, 5],
           fileName: ('extrato-conta-corrente-' + this.selectedOriginName).replace(/\s+/g, '-').toLowerCase()
         });
         this.exporting = false;

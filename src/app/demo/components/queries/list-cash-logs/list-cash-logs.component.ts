@@ -74,7 +74,7 @@ export class ListCashLogsComponent {
           dateTo: this.filters.dateTo,
           logs: result,
         };
-        if (format === 'pdf') exportAccountLogsPdf(data);
+        if (format === 'pdf') await exportAccountLogsPdf(data);
         else await exportAccountLogsExcel(data);
         this.exporting = false;
       },
