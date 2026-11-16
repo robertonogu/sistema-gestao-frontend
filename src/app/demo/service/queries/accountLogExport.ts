@@ -100,32 +100,37 @@ export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void
 
     const pageWidth = doc.internal.pageSize.getWidth();
 
-    doc.setTextColor(0, 0, 0);
-    let titleY = 15;
+    const pageHeight = doc.internal.pageSize.getHeight();
     const logo = await loadLogo();
-    if (logo) {
-        const logoHeight = 22;
-        doc.addImage(logo.dataUrl, 'PNG', 14, 8, logoHeight * logo.width / logo.height, logoHeight);
-        titleY = 38;
-    }
+    const titleY = logo ? 38 : 15;
+    const startY = titleY + (data.accountName ? 10 : 5);
+    const period = effectivePeriodLabel(data.dateFrom, data.dateTo, data.logs);
 
-    doc.setFont(font, 'bold');
-    doc.setFontSize(14);
-    doc.text(data.title, 14, titleY);
+    const drawHeader = () => {
+        doc.setTextColor(0, 0, 0);
+        if (logo) {
+            const logoHeight = 22;
+            doc.addImage(logo.dataUrl, 'PNG', 14, 8, logoHeight * logo.width / logo.height, logoHeight);
+        }
 
-    doc.setFontSize(9);
-    doc.text(effectivePeriodLabel(data.dateFrom, data.dateTo, data.logs), pageWidth - 14, titleY, { align: 'right' });
+        doc.setFont(font, 'bold');
+        doc.setFontSize(14);
+        doc.text(data.title, 14, titleY);
 
-    let startY = titleY + 5;
-    if (data.accountName) {
-        doc.setFont(font, 'normal');
-        doc.setFontSize(10);
-        doc.text(data.accountName, 14, titleY + 5);
-        startY = titleY + 10;
-    }
+        doc.setFontSize(9);
+        doc.text(period, pageWidth - 14, titleY, { align: 'right' });
+
+        if (data.accountName) {
+            doc.setFont(font, 'normal');
+            doc.setFontSize(10);
+            doc.text(data.accountName, 14, titleY + 5);
+        }
+    };
 
     autoTable(doc, {
         startY,
+        margin: { top: startY, bottom: 16, left: 14, right: 14 },
+        didDrawPage: drawHeader,
         head: [HEADERS],
         body: [
             [{ content: `Saldo transportado: ${formatEUR(openingBalance)}`, colSpan: HEADERS.length, styles: { halign: 'center', fontStyle: 'bold' } }],
@@ -171,6 +176,15 @@ export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void
         },
         styles: { font, fontSize: 8, cellPadding: 1.5, textColor: 0, overflow: 'ellipsize' },
     });
+
+    const totalPages = doc.getNumberOfPages();
+    for (let page = 1; page <= totalPages; page++) {
+        doc.setPage(page);
+        doc.setFont(font, 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${page}/${totalPages}`, pageWidth - 14, pageHeight - 8, { align: 'right' });
+    }
 
     doc.save(`${data.fileName}.pdf`);
 }
