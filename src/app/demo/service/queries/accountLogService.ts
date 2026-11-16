@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ObjectList } from '../../api/objectList';
 import { AccountLog } from '../../api/accountLogs';
 import { environment } from 'src/environments/environment';
@@ -39,6 +40,16 @@ export class AccountLogService {
     exportCashAccountLogs(filters?: AccountLogFilters) : Observable<AccountLog[]> {
         const url = this.cashAccountLogsUrl + "/export?" + this.filterParams(filters).substring(1);
         return this.http.get<AccountLog[]>(url);
+    }
+
+    openingBalance(accountId: number | null, dateFrom?: Date) : Observable<number> {
+        if (!dateFrom) return of(0);
+        const previousDay = new Date(dateFrom);
+        previousDay.setDate(previousDay.getDate() - 1);
+        const previousLogs = accountId == null
+            ? this.exportCashAccountLogs({ dateTo: previousDay })
+            : this.exportAccountLogs(accountId, { dateTo: previousDay });
+        return previousLogs.pipe(map(logs => logs[0]?.balance ?? 0));
     }
 
     private filterParams(filters?: AccountLogFilters): string {

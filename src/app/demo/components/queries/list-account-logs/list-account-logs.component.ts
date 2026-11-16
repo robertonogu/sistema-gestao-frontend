@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { AccountLog } from 'src/app/demo/api/accountLogs';
 import { ObjectName } from 'src/app/demo/api/objectName';
@@ -99,9 +100,13 @@ export class ListAccountLogsComponent {
     }
 
     this.exporting = true;
-    this.accountLogService.exportAccountLogs(this.selectedAccount, this.filters).subscribe({
-      next: async (result) => {
+    forkJoin({
+      result: this.accountLogService.exportAccountLogs(this.selectedAccount, this.filters),
+      openingBalance: this.accountLogService.openingBalance(this.selectedAccount, this.filters.dateFrom),
+    }).subscribe({
+      next: async ({ result, openingBalance }) => {
         const data = {
+          openingBalance,
           title: 'Extrato de Conta',
           accountName: this.selectedAccountName,
           fileName: `extrato-conta-${this.selectedAccountName}`.replace(/\s+/g, '-').toLowerCase(),

@@ -12,9 +12,12 @@ export interface AccountLogExport {
     dateFrom?: Date;
     dateTo?: Date;
     logs: AccountLog[];
+    openingBalance: number;
 }
 
-const HEADERS = ['Data', 'Tipo', 'Origem', 'Documento', 'Crédito', 'Débito', 'Saldo'];
+const LOGO_PIXEL_HEIGHT = 260;
+
+const HEADERS =['Data', 'Tipo', 'Origem', 'Documento', 'Crédito', 'Débito', 'Saldo'];
 
 function movementLabel(movementType: string): string {
     return (MovementType as any)[movementType] ?? movementType;
@@ -31,59 +34,111 @@ function formatEUR(value: number): string {
 export function periodLabel(dateFrom?: Date, dateTo?: Date): string {
     if (!dateFrom) return 'Todos os movimentos';
     if (!dateTo || formatDate(dateFrom) === formatDate(dateTo)) return `Dia ${formatDate(dateFrom)}`;
-    return `De ${formatDate(dateFrom)} a ${formatDate(dateTo)}`;
+    return `${formatDate(dateFrom)} a ${formatDate(dateTo)}`;
+}
+
+function effectivePeriodLabel(dateFrom: Date | undefined, dateTo: Date | undefined, logs: AccountLog[]): string {
+    if (dateFrom) return periodLabel(dateFrom, dateTo);
+    const times = logs.filter(log => log.date).map(log => new Date(log.date).getTime());
+    if (times.length === 0) return 'Sem movimentos';
+    return periodLabel(new Date(Math.min(...times)), new Date(Math.max(...times)));
+}
+
+async function loadLogo(): Promise<{ dataUrl: string; width: number; height: number } | null> {
+    try {
+        const response = await fetch('assets/layout/images/logotipo%20sem%20fundo.png');
+        if (!response.ok) return null;
+        const blob = await response.blob();
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+            const loaded = new Image();
+            loaded.onload = () => resolve(loaded);
+            loaded.onerror = reject;
+            loaded.src = dataUrl;
+        });
+        const targetHeight = Math.min(LOGO_PIXEL_HEIGHT, image.naturalHeight);
+        const targetWidth = Math.round(image.naturalWidth * targetHeight / image.naturalHeight);
+        const canvas = document.createElement('canvas');
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+        canvas.getContext('2d')!.drawImage(image, 0, 0, targetWidth, targetHeight);
+        return { dataUrl: canvas.toDataURL('image/png'), width: targetWidth, height: targetHeight };
+    } catch {
+        return null;
+    }
 }
 
 function chronological(logs: AccountLog[]): AccountLog[] {
     return [...logs].reverse();
 }
 
-function totals(logs: AccountLog[]) {
+function prepare(data: AccountLogExport): { logs: AccountLog[]; openingBalance: number } {
+    const logs = chronological(data.logs);
+    if (logs.length > 0 && logs[0].movementType === 'FIRST_INTERACTION') {
+        return { logs: logs.slice(1), openingBalance: logs[0].balance };
+    }
+    return { logs, openingBalance: data.openingBalance };
+}
+
+function totals(logs: AccountLog[], openingBalance: number) {
     const credit = logs.reduce((sum, log) => sum + (log.credit || 0), 0);
     const debt = logs.reduce((sum, log) => sum + (log.debt || 0), 0);
-    const finalBalance = logs.length > 0 ? logs[logs.length - 1].balance : 0;
+    const finalBalance = logs.length > 0 ? logs[logs.length - 1].balance : openingBalance;
     return { credit, debt, finalBalance };
 }
 
 export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void> {
-    const doc = new jsPDF({ orientation: 'portrait', format: 'a4' });
+    const doc = new jsPDF({ orientation: 'portrait', format: 'a4', compress: true });
     const font = await registerPdfFont(doc);
-    const logs = chronological(data.logs);
-    const { credit, debt, finalBalance } = totals(logs);
+    const { logs, openingBalance } = prepare(data);
+    const { credit, debt, finalBalance } = totals(logs, openingBalance);
+
+    const pageWidth = doc.internal.pageSize.getWidth();
 
     doc.setTextColor(0, 0, 0);
-    doc.setFont(font, 'normal');
-    doc.setFontSize(9);
-    doc.text('ALVEDA GOLD, LDA', 14, 15);
+    let titleY = 15;
+    const logo = await loadLogo();
+    if (logo) {
+        const logoHeight = 22;
+        doc.addImage(logo.dataUrl, 'PNG', 14, 8, logoHeight * logo.width / logo.height, logoHeight);
+        titleY = 38;
+    }
 
     doc.setFont(font, 'bold');
     doc.setFontSize(14);
-    doc.text(data.title, 14, 22);
+    doc.text(data.title, 14, titleY);
+
+    doc.setFontSize(9);
+    doc.text(effectivePeriodLabel(data.dateFrom, data.dateTo, data.logs), pageWidth - 14, titleY, { align: 'right' });
+
+    let startY = titleY + 5;
     if (data.accountName) {
         doc.setFont(font, 'normal');
         doc.setFontSize(10);
-        doc.text(data.accountName, doc.internal.pageSize.getWidth() - 14, 22, { align: 'right' });
-    }
-    let startY = 27;
-    if (data.dateFrom) {
-        doc.setFont(font, 'normal');
-        doc.setFontSize(9);
-        doc.text(periodLabel(data.dateFrom, data.dateTo), 14, 27);
-        startY = 32;
+        doc.text(data.accountName, 14, titleY + 5);
+        startY = titleY + 10;
     }
 
     autoTable(doc, {
         startY,
         head: [HEADERS],
-        body: logs.map(log => [
-            formatDate(log.date),
-            movementLabel(log.movementType),
-            log.origin ?? '',
-            log.documentNumber ?? '',
-            log.credit ? formatEUR(log.credit) : '',
-            log.debt ? formatEUR(log.debt) : '',
-            formatEUR(log.balance),
-        ]),
+        body: [
+            [{ content: `Saldo transportado: ${formatEUR(openingBalance)}`, colSpan: HEADERS.length, styles: { halign: 'center', fontStyle: 'bold' } }],
+            ...logs.map(log => [
+                formatDate(log.date),
+                movementLabel(log.movementType),
+                log.origin ?? '',
+                log.documentNumber ?? '',
+                log.credit ? formatEUR(log.credit) : '',
+                log.debt ? formatEUR(log.debt) : '',
+                formatEUR(log.balance),
+            ]),
+        ],
         foot: [['Total', '', '', '', formatEUR(credit), formatEUR(debt), formatEUR(finalBalance)]],
         columnStyles: {
             0: { cellWidth: 17, overflow: 'ellipsize' },
@@ -100,12 +155,18 @@ export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void
         footStyles: { halign: 'right', fontStyle: 'bold', textColor: 0, lineColor: 0, lineWidth: { top: 0.5 }, cellPadding: { top: 3, bottom: 1.5, left: 1.5, right: 1.5 } },
         didParseCell: (hook) => {
             if (hook.section === 'body') {
-                const first = hook.row.index === 0;
+                const transport = hook.row.index === 0;
+                const first = hook.row.index === 1;
                 const last = hook.row.index === hook.table.body.length - 1;
-                if (first || last) {
+                if (transport) {
+                    hook.cell.styles.cellPadding = { top: 3, bottom: 3, left: 1.5, right: 1.5 };
+                    hook.cell.styles.lineColor = 0;
+                    hook.cell.styles.lineWidth = { bottom: 0.5 };
+                } else if (first || last) {
                     hook.cell.styles.cellPadding = { top: first ? 3 : 1.5, bottom: last ? 3 : 1.5, left: 1.5, right: 1.5 };
                 }
             }
+            if (hook.section === 'head') hook.cell.styles.halign = hook.column.index < 4 ? 'left' : 'right';
             if (hook.section === 'foot' && hook.column.index < 4) hook.cell.styles.halign = 'left';
         },
         styles: { font, fontSize: 8, cellPadding: 1.5, textColor: 0, overflow: 'ellipsize' },
@@ -117,20 +178,26 @@ export async function exportAccountLogsPdf(data: AccountLogExport): Promise<void
 export async function exportAccountLogsExcel(data: AccountLogExport): Promise<void> {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Movimentos');
-    const logs = chronological(data.logs);
-    const { credit, debt, finalBalance } = totals(logs);
+    const { logs, openingBalance } = prepare(data);
+    const { credit, debt, finalBalance } = totals(logs, openingBalance);
 
     sheet.addRow([data.title]).font = { bold: true, size: 14 };
-    sheet.addRow([periodLabel(data.dateFrom, data.dateTo)]);
+    sheet.addRow([effectivePeriodLabel(data.dateFrom, data.dateTo, data.logs)]);
     sheet.addRow([]);
 
     const header = sheet.addRow(HEADERS);
     header.font = { bold: true };
-    header.alignment = { horizontal: 'center', vertical: 'middle' };
-    header.eachCell(cell => {
+    header.eachCell((cell, col) => {
+        cell.alignment = { horizontal: col <= 4 ? 'left' : 'right', vertical: 'middle' };
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6E8EC' } };
         cell.border = { bottom: { style: 'thin' } };
     });
+
+    const transport = sheet.addRow([`Saldo transportado: ${formatEUR(openingBalance)}`]);
+    sheet.mergeCells(transport.number, 1, transport.number, HEADERS.length);
+    transport.font = { bold: true };
+    transport.alignment = { horizontal: 'center' };
+    transport.getCell(1).border = { bottom: { style: 'thin' } };
 
     logs.forEach(log => {
         sheet.addRow([

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { AccountLog } from 'src/app/demo/api/accountLogs';
 import { MovementType } from 'src/app/demo/data/enum/movementType';
@@ -65,10 +66,14 @@ export class ListCashLogsComponent {
 
   export(format: 'pdf' | 'excel') {
     this.exporting = true;
-    this.accountLogService.exportCashAccountLogs(this.filters).subscribe({
-      next: async (result) => {
+    forkJoin({
+      result: this.accountLogService.exportCashAccountLogs(this.filters),
+      openingBalance: this.accountLogService.openingBalance(null, this.filters.dateFrom),
+    }).subscribe({
+      next: async ({ result, openingBalance }) => {
         const data = {
-          title: 'Extrato Caixa',
+          openingBalance,
+          title: 'Extrato de Caixa',
           fileName: 'extrato-caixa',
           dateFrom: this.filters.dateFrom,
           dateTo: this.filters.dateTo,
