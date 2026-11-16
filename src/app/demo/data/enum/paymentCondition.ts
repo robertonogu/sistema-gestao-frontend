@@ -6,6 +6,7 @@ export enum PaymentCondition {
     DAYS_120 = "120 dias",
     DAYS_150 = "150 dias",
     DAYS_180 = "180 dias",
+    END_OF_MONTH = "Fim do mês",
     OTHER = "Outra"
 }
 

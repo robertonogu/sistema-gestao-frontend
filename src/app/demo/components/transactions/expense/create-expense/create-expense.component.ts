@@ -991,6 +991,11 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     }
 
     const conditionKey = this.selectedPaymentCondition as unknown as string;
+    if (conditionKey === 'END_OF_MONTH' && this.date) {
+      const base = new Date(this.date);
+      this.paymentDeadline = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+      return;
+    }
     if (!this.date || !conditionKey || !(conditionKey in PAYMENT_CONDITION_DAYS)) {
       this.paymentDeadline = undefined as any;
       return;
