@@ -71,6 +71,11 @@ export class CreateToolComponent {
   }
 
   newTool() {
+    if (!this.editingToolId && this.code && !/^\d{4}\.\d{5}$/.test(this.code.trim())) {
+      this.messageService.add({ severity: 'error', summary: 'Código inválido', detail: 'O código deve ter o formato AAAA.NNNNN (ex.: 2026.00001).' });
+      return;
+    }
+
     this.tool = { code: this.code, name: this.name, brand: this.brand, model: this.model, purchaseDate: this.purchaseDate, purchaseValue: this.purchaseValue, location: this.location, status: this.selectedStatus,
       documentNumber: this.documentNumber, originId: this.selectedOrigin ?? undefined } as ToolCreation;
 

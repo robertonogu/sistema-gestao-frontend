@@ -65,6 +65,11 @@ export class CreateEquipmentComponent {
   }
 
   newEquipment() {
+    if (!this.editingEquipmentId && this.code && !/^\d{4}\.\d{5}$/.test(this.code.trim())) {
+      this.messageService.add({ severity: 'error', summary: 'Código inválido', detail: 'O código deve ter o formato AAAA.NNNNN (ex.: 2026.00001).' });
+      return;
+    }
+
     this.equipment = {
       code: this.code,
       name: this.name,

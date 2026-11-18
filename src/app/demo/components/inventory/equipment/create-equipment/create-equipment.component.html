@@ -36,9 +36,16 @@
 
 			<div class="p-fluid p-formgrid grid">
 
-                <div class="field col-12 md:col-4" *ngIf="editingEquipmentId">
+                <div class="field col-12 md:col-4">
                     <label>Código</label>
-                    <input [ngModel]="code" type="text" pInputText [disabled]="true" />
+                    <input
+                        [(ngModel)]="code"
+                        type="text"
+                        pInputText
+                        maxlength="10"
+                        placeholder="AAAA.NNNNN"
+                        [disabled]="!!editingEquipmentId"
+                    />
                 </div>
 
                 <div class="field col-12 md:col-4">
