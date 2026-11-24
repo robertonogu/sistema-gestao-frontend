@@ -12,5 +12,12 @@ export interface Equipment {
     warrantyStart: Date;
     warrantyEnd: Date;
     power: string;
+    purchaseDocumentUrl?: string;
     status: EquipmentStatus;
+}
+
+export interface EquipmentImage {
+    equipmentImageId: number;
+    equipmentId: number;
+    url: string;
 }

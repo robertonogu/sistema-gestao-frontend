@@ -3,7 +3,7 @@
 		<div class="card">
 
             <div class="flex flex-column sm:flex-row align-items-center gap-4 mb-3">
-				<div class="text-900 text-xl font-semibold">{{ editingEquipmentId ? 'Editar Equipamento' : 'Novo Equipamento' }}</div>
+				<div class="text-900 text-xl font-semibold">{{ viewMode ? 'Ver Equipamento' : editingEquipmentId ? 'Editar Equipamento' : 'Novo Equipamento' }}</div>
 				<div class="flex gap-2 sm:ml-auto">
                     <button
 						class="p-button-rounded p-button-outlined"
@@ -15,6 +15,7 @@
 						type="button"
 					></button>
 					<button
+						*ngIf="!viewMode"
 						class="p-button-rounded bg-red-500 border-red-500"
 						icon="pi pi-trash"
 						pButton
@@ -23,6 +24,16 @@
 						type="button"
 					></button>
 					<button
+						*ngIf="viewMode"
+						class="p-button-rounded"
+						(click)="edit()"
+						icon="pi pi-pencil"
+						label="Editar"
+						pButton
+						type="button"
+					></button>
+					<button
+						*ngIf="!viewMode"
 						class="p-button-rounded"
 						(click)="newEquipment()"
 						icon="pi pi-save"
@@ -44,19 +55,20 @@
                         pInputText
                         maxlength="10"
                         placeholder="AAAA.NNNNN"
-                        [disabled]="!!editingEquipmentId"
+                        [disabled]="!!editingEquipmentId || viewMode"
                     />
                 </div>
 
                 <div class="field col-12 md:col-4">
                     <label>Nome</label>
-                    <input [(ngModel)]="name" type="text" pInputText />
+                    <input [(ngModel)]="name" [disabled]="viewMode" type="text" pInputText />
                 </div>
 
                 <div class="field col-12 md:col-4">
 					<label>Estado</label>
 					<p-dropdown
                         [(ngModel)]="selectedStatus"
+                        [disabled]="viewMode"
                         [options]="equipmentStatus | keyvalue"
                         optionLabel="value"
                         optionValue="key"
@@ -66,28 +78,29 @@
 
                 <div class="field col-12 md:col-4">
                     <label>Marca</label>
-                    <input [(ngModel)]="brand" type="text" pInputText />
+                    <input [(ngModel)]="brand" [disabled]="viewMode" type="text" pInputText />
                 </div>
 
                 <div class="field col-12 md:col-4">
                     <label>Modelo</label>
-                    <input [(ngModel)]="model" type="text" pInputText />
+                    <input [(ngModel)]="model" [disabled]="viewMode" type="text" pInputText />
                 </div>
 
                 <div class="field col-12 md:col-4">
                     <label>Nº de Série</label>
-                    <input [(ngModel)]="serialNumber" type="text" pInputText />
+                    <input [(ngModel)]="serialNumber" [disabled]="viewMode" type="text" pInputText />
                 </div>
 
                 <div class="field col-12 md:col-4">
                     <label>Potência</label>
-                    <input [(ngModel)]="power" type="text" pInputText />
+                    <input [(ngModel)]="power" [disabled]="viewMode" type="text" pInputText />
                 </div>
 
                 <div class="field col-12 md:col-4">
 					<label>Data de Compra</label>
 					<p-calendar
                         [(ngModel)]="purchaseDate"
+                        [disabled]="viewMode"
                         dateFormat="dd/mm/yy"
                         [iconDisplay]="'input'"
                         [showIcon]="true"
@@ -99,6 +112,7 @@
                     <label>Valor de Compra</label>
                     <p-inputNumber
                         [(ngModel)]="purchaseValue"
+                        [disabled]="viewMode"
                         mode="decimal"
                         inputId="currency-germany"
                         [minFractionDigits]="2" [maxFractionDigits]="2" suffix=" €"
@@ -111,6 +125,7 @@
 					<label>Início de Garantia</label>
 					<p-calendar
                         [(ngModel)]="warrantyStart"
+                        [disabled]="viewMode"
                         dateFormat="dd/mm/yy"
                         [iconDisplay]="'input'"
                         [showIcon]="true"
@@ -122,6 +137,7 @@
 					<label>Fim de Garantia</label>
 					<p-calendar
                         [(ngModel)]="warrantyEnd"
+                        [disabled]="viewMode"
                         dateFormat="dd/mm/yy"
                         [iconDisplay]="'input'"
                         [showIcon]="true"
@@ -130,6 +146,88 @@
 				</div>
 
 			</div>
+
+			<div class="text-900 text-lg font-semibold mt-4 mb-3">Documento de compra</div>
+			<div *ngIf="purchaseDocumentUrl" class="flex align-items-center gap-3 surface-100 border-round p-3 mb-3">
+				<i class="pi pi-file text-2xl"></i>
+				<a [href]="purchaseDocumentUrl" target="_blank" rel="noopener" class="font-medium">Ver documento de compra</a>
+				<button
+					*ngIf="!viewMode"
+					pButton
+					type="button"
+					class="p-button-rounded p-button-text p-button-danger ml-auto"
+					icon="pi pi-trash"
+					pTooltip="Remover documento"
+					(click)="removeDocument()"
+				></button>
+			</div>
+			<div *ngIf="viewMode && !purchaseDocumentUrl" class="text-500">Sem documento de compra.</div>
+			<div *ngIf="!viewMode" class="flex align-items-center gap-3">
+				<p-fileUpload
+					#documentUpload
+					mode="basic"
+					accept=".pdf,image/*"
+					chooseIcon="pi pi-upload"
+					[chooseLabel]="purchaseDocumentUrl || pendingDocument ? 'Substituir documento' : 'Escolher documento'"
+					[auto]="false"
+					(onSelect)="onDocumentSelect($event)"
+				/>
+				<span *ngIf="pendingDocument" class="flex align-items-center gap-2">
+					<i class="pi pi-file"></i> {{ pendingDocument.name }}
+				</span>
+			</div>
+
+			<div class="text-900 text-lg font-semibold mt-5 mb-3">Imagens do equipamento</div>
+			<div *ngIf="viewMode && !images.length" class="text-500">Sem imagens.</div>
+			<div *ngIf="images.length" class="flex flex-wrap gap-3 mb-3">
+				<div *ngFor="let image of images" class="relative">
+					<p-image [src]="image.url" alt="Imagem do equipamento" [preview]="true" width="150" imageClass="border-round" />
+					<button
+						*ngIf="!viewMode"
+						pButton
+						type="button"
+						class="p-button-rounded p-button-danger absolute"
+						style="top: 4px; right: 4px; width: 2rem; height: 2rem; z-index: 1"
+						icon="pi pi-times"
+						pTooltip="Remover imagem"
+						(click)="removeImage(image)"
+					></button>
+				</div>
+			</div>
+			<p-fileUpload
+				*ngIf="!viewMode"
+					#imagesUpload
+				styleClass="upload-plain"
+				name="files"
+				accept="image/*"
+				[multiple]="true"
+				[customUpload]="true"
+				chooseIcon="pi pi-plus"
+				chooseLabel="Adicionar imagens"
+				uploadIcon="pi pi-upload"
+				uploadLabel="Enviar tudo"
+				[showUploadButton]="!!editingEquipmentId"
+				[showCancelButton]="false"
+				(uploadHandler)="uploadImages($event)"
+			>
+				<ng-template pTemplate="file" let-file let-i="index">
+					<div class="relative inline-block align-top m-2 border-round overflow-hidden border-1 surface-border" style="width: 10rem">
+						<p-image [src]="file.objectURL" [alt]="file.name" [preview]="true" width="160" imageClass="block" [imageStyle]="{ height: '8rem', objectFit: 'cover' }" />
+						<button
+							type="button"
+							pButton
+							class="p-button-rounded p-button-danger absolute"
+							style="top: 4px; right: 4px; width: 2rem; height: 2rem; z-index: 1"
+							icon="pi pi-times"
+							(click)="imagesUpload.remove($event, i)"
+						></button>
+						<div class="p-2">
+							<div class="text-xs font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ file.name }}</div>
+							<div class="text-xs text-500">{{ formatSize(file.size) }}</div>
+						</div>
+					</div>
+				</ng-template>
+			</p-fileUpload>
 		</div>
 	</div>
 </div>

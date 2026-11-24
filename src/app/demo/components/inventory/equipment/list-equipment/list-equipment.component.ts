@@ -44,6 +44,14 @@ export class ListEquipmentComponent {
     this.router.navigate(['./inventory/equipments/create-equipment']);
   }
 
+  onRowSelect(event: any) {
+    this.viewEquipment(event.data);
+  }
+
+  viewEquipment(equipment: Equipment) {
+    this.router.navigate(['./inventory/equipments/view-equipment', equipment.equipmentId]);
+  }
+
   editEquipment(equipment: Equipment) {
     this.router.navigate(['./inventory/equipments/edit-equipment', equipment.equipmentId]);
   }

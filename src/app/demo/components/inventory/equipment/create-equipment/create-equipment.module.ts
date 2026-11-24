@@ -10,6 +10,8 @@ import { ToastModule } from 'primeng/toast';
 import { CreateEquipmentComponent } from './create-equipment.component';
 import { CreateEquipmentRoutingModule } from './create-equipment-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { FileUploadModule } from 'primeng/fileupload';
+import { ImageModule } from 'primeng/image';
 
 @NgModule({
   imports: [
@@ -22,7 +24,9 @@ import { TooltipModule } from 'primeng/tooltip';
     DropdownModule,
     FormsModule,
     ToastModule,
-    TooltipModule
+    TooltipModule,
+    FileUploadModule,
+    ImageModule
   ],
   declarations: [CreateEquipmentComponent]
 })
