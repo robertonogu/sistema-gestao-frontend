@@ -185,8 +185,13 @@ export class CreateEquipmentComponent {
     } as EquipmentCreation;
 
     if (this.editingEquipmentId) {
-      this.equipmentService.updateEquipment(this.editingEquipmentId, this.equipment).subscribe(() => {
+      const equipmentId = this.editingEquipmentId;
+      this.equipmentService.updateEquipment(equipmentId, this.equipment).subscribe(() => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Equipamento atualizado com sucesso.' });
+        const pendingImages = this.imagesUpload?.files ?? [];
+        if (pendingImages.length) {
+          this.uploadImages({ files: pendingImages });
+        }
       });
       return;
     }
