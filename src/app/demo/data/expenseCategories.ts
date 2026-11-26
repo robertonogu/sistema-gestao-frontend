@@ -1,7 +1,7 @@
 import { CategoryType } from './enum/categoryType';
 import { SubCategoryType } from './enum/subCategoryType';
 
-export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
+const UNSORTED_EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
   [CategoryType.BANK]: [
     SubCategoryType.MAINTENANCE_COMMISSIONS, SubCategoryType.FEES, SubCategoryType.COMMISSIONS,
     SubCategoryType.CREDIT, SubCategoryType.CARD_COMMISSIONS, SubCategoryType.LOAN_INTEREST,
@@ -21,7 +21,7 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
   ],
   [CategoryType.OPERATION]: [
     SubCategoryType.FACILITY_RENT, SubCategoryType.ELECTRICITY, SubCategoryType.WATER, SubCategoryType.GAS, SubCategoryType.COMMUNICATIONS,
-    SubCategoryType.OFFICE_SUPPLIES, SubCategoryType.OFFICE_EQUIPMENT_REPAIR,
+    SubCategoryType.OFFICE_SUPPLIES,
     SubCategoryType.CLOUD_STORAGE, SubCategoryType.SOFTWARE, SubCategoryType.ACCOUNTING_SERVICES, SubCategoryType.LEGAL_SERVICES,
     SubCategoryType.CONSULTING_SERVICES, SubCategoryType.COMPANY_INSURANCE, SubCategoryType.CLEANING, SubCategoryType.FACILITY_SECURITY,
     SubCategoryType.DUES, SubCategoryType.LICENSES_PERMITS
@@ -39,14 +39,13 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
     SubCategoryType.VEHICLE_LEASING, SubCategoryType.VEHICLE_RENTAL
   ],
   [CategoryType.EQUIPMENTS]: [
-    SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION, SubCategoryType.EQUIPMENTS_MAINTENANCE,
+    SubCategoryType.EQUIPMENTS_PURCHASE, SubCategoryType.EQUIPMENTS_PURCHASE_PORTABLE, SubCategoryType.EQUIPMENTS_PURCHASE_FURNITURE,
+    SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION, SubCategoryType.EQUIPMENTS_MAINTENANCE,
     SubCategoryType.EQUIPMENT_CONSUMABLES,
     SubCategoryType.EQUIPMENT_RENTAL, SubCategoryType.EQUIPMENT_FUEL
   ],
   [CategoryType.TOOLS]: [
-    SubCategoryType.TOOLS_PURCHASE, SubCategoryType.ELECTRIC_TOOLS_PURCHASE,
-    SubCategoryType.MANUAL_TOOLS_CONSUMABLES, SubCategoryType.ELECTRIC_TOOLS_CONSUMABLES,
-    SubCategoryType.TOOLS_MAINTENANCE
+    SubCategoryType.TOOLS_PURCHASE, SubCategoryType.MANUAL_TOOLS_CONSUMABLES
   ],
   [CategoryType.INVENTORY]: [
     SubCategoryType.WOOD, SubCategoryType.CONSTRUCTION, SubCategoryType.METALS, SubCategoryType.HARDWARE,
@@ -54,17 +53,27 @@ export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = {
     SubCategoryType.WATERPROOFING_INSULATION, SubCategoryType.PLUMBING, SubCategoryType.ELECTRICAL_MATERIALS,
     SubCategoryType.HEATING, SubCategoryType.VENTILATION,
     SubCategoryType.SITE_CONSUMABLES, SubCategoryType.GLASS_MIRRORS, SubCategoryType.CLADDING, SubCategoryType.STONES, SubCategoryType.OTHER_MATERIALS,
-    SubCategoryType.REAL_ESTATE, SubCategoryType.INVENTORY_EXPENSES, SubCategoryType.INVENTORY_INVESTMENT
+    SubCategoryType.REAL_ESTATE, SubCategoryType.INVENTORY_EXPENSES, SubCategoryType.INVENTORY_INVESTMENT,
+    SubCategoryType.BOOKS
   ],
   [CategoryType.CONSTRUCTIONS]: [SubCategoryType.EXTERNAL_SERVICES],
 };
 
+const byLabel = (a: string, b: string): number => a.localeCompare(b, 'pt', { sensitivity: 'base' });
+
+export const EXPENSE_CATEGORIES: { [category: string]: SubCategoryType[] } = Object.fromEntries(
+  Object.entries(UNSORTED_EXPENSE_CATEGORIES)
+    .map(([category, subCategories]): [string, SubCategoryType[]] => [category, [...subCategories].sort(byLabel)])
+    .sort(([a], [b]) => byLabel(a, b))
+);
+
 export const EQUIPMENT_PURCHASE_SUBCATEGORIES: SubCategoryType[] = [
   SubCategoryType.EQUIPMENTS_PURCHASE,
+  SubCategoryType.EQUIPMENTS_PURCHASE_PORTABLE,
+  SubCategoryType.EQUIPMENTS_PURCHASE_FURNITURE,
   SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,
 ];
 
 export const TOOL_PURCHASE_SUBCATEGORIES: SubCategoryType[] = [
   SubCategoryType.TOOLS_PURCHASE,
-  SubCategoryType.ELECTRIC_TOOLS_PURCHASE,
 ];

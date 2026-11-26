@@ -34,6 +34,7 @@
                     background: $tabviewHeaderHoverBg;
                     border-color: $tabviewHeaderHoverBorderColor;
                     color: $tabviewHeaderTextHoverColor;
+                    box-shadow: inset 0 -2px 0 0 $tabviewHeaderHoverBorderColor;
                 }
             }
 
@@ -42,6 +43,7 @@
                     background: $tabviewHeaderActiveBg;
                     border-color: $tabviewHeaderActiveBorderColor;
                     color: $tabviewHeaderTextActiveColor;
+                    box-shadow: inset 0 -2px 0 0 $tabviewHeaderActiveBorderColor;
                 }
             }
         }

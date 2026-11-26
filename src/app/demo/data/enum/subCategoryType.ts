@@ -44,8 +44,7 @@ export enum SubCategoryType {
     GAS = 'Gás',
     COMMUNICATIONS = 'Comunicações',
     OFFICE_SUPPLIES = 'Material de Escritório',
-    OFFICE_EQUIPMENT_ACQUISITION = 'Aquisição de Equipamento de Escritório',
-    OFFICE_EQUIPMENT_REPAIR = 'Reparação de Equipamento de Escritório',
+    OFFICE_EQUIPMENT_ACQUISITION = 'Aquisição de Equipamento Administrativo',
     CLOUD_STORAGE = 'Armazenamento Cloud',
     SOFTWARE = 'Software',
     ACCOUNTING_SERVICES = 'Serviços de Contabilidade',
@@ -67,7 +66,7 @@ export enum SubCategoryType {
     INSURANCE_VEHICLES = 'Seguro',
     IUC = 'IUC',
     FUEL = 'Abastecimento',
-    MAINTENANCE_VEHICLES = 'Manutenção de Veículos',
+    MAINTENANCE_VEHICLES = 'Manutenção / Reparação de Veículos',
     INSPECTION = 'Inspeção',
     PARKING = 'Parques de Estacionamentos',
     TOLLS = 'Portagens',
@@ -75,17 +74,16 @@ export enum SubCategoryType {
     VEHICLE_LEASING = 'Leasing / Financiamento de Veículos',
     VEHICLE_RENTAL = 'Aluguer de Veículos',
 
-    EQUIPMENTS_PURCHASE = 'Aquisição de Equipamentos',
-    EQUIPMENTS_MAINTENANCE = 'Manutenção de Equipamentos',
+    EQUIPMENTS_PURCHASE = 'Aquisição de Equipamentos (Máq. Industriais)',
+    EQUIPMENTS_PURCHASE_PORTABLE = 'Aquisição de Equipamento (Máq. Portáteis)',
+    EQUIPMENTS_PURCHASE_FURNITURE = 'Aquisição de Equipamento (Mobiliário)',
+    EQUIPMENTS_MAINTENANCE = 'Manutenção / Reparação de Equipamentos',
     EQUIPMENT_CONSUMABLES = 'Consumíveis para Equipamentos',
     EQUIPMENT_RENTAL = 'Aluguer de Equipamentos',
     EQUIPMENT_FUEL = 'Combustível para Equipamentos',
 
     TOOLS_PURCHASE = 'Aquisição ferramentas manuais',
-    ELECTRIC_TOOLS_PURCHASE = 'Aquisição de ferramentas elétricas',
     MANUAL_TOOLS_CONSUMABLES = 'Consumíveis para ferramentas manuais',
-    ELECTRIC_TOOLS_CONSUMABLES = 'Consumíveis para ferramentas elétricas',
-    TOOLS_MAINTENANCE = 'Manutenção de ferramentas elétricas',
 
     WOOD = 'Madeiras',
     CONSTRUCTION = 'Materiais de construção',
@@ -107,6 +105,7 @@ export enum SubCategoryType {
     REAL_ESTATE = 'Imóveis',
     INVENTORY_EXPENSES = 'Despesas com inventário',
     INVENTORY_INVESTMENT = 'Investimento com inventário',
+    BOOKS = 'Livros',
 
     EXTERNAL_SERVICES = 'Serviços Externos'
 }

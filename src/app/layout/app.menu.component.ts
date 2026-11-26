@@ -195,6 +195,11 @@ export class AppMenuComponent implements OnInit, OnDestroy {
                         label: 'Ferramentas',
                         icon: 'pi pi-fw pi-wrench',
                         routerLink: ['/inventory/tools']
+                    },
+                    {
+                        label: 'Biblioteca',
+                        icon: 'pi pi-fw pi-book',
+                        routerLink: ['/inventory/library']
                     }
                 ]
             },

@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
         { path: 'articles', data: { breadcrumb: 'Artigos'}, loadChildren: () => import('./article/list-articles/list-articles.module').then(m => m.ListArticlesModule) },
         { path: 'tools', data: { breadcrumb: 'Ferramentas'}, loadChildren: () => import('./tool/list-tools/list-tools.module').then(m => m.ListToolsModule) },
         { path: 'equipments', data: { breadcrumb: 'Equipamentos'}, loadChildren: () => import('./equipment/list-equipment/list-equipment.module').then(m => m.ListEquipmentModule) },
+        { path: 'library', data: { breadcrumb: 'Biblioteca'}, loadChildren: () => import('./library/library.module').then(m => m.LibraryModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

@@ -1245,6 +1245,8 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   private readonly equipmentPurchaseSubCategories: SubCategoryType[] = [
     SubCategoryType.EQUIPMENTS_PURCHASE,
+    SubCategoryType.EQUIPMENTS_PURCHASE_PORTABLE,
+    SubCategoryType.EQUIPMENTS_PURCHASE_FURNITURE,
     SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,
   ];
 
@@ -1254,9 +1256,10 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   private readonly nonAssociableSubCategories: SubCategoryType[] = [
     SubCategoryType.EQUIPMENTS_PURCHASE,
+    SubCategoryType.EQUIPMENTS_PURCHASE_PORTABLE,
+    SubCategoryType.EQUIPMENTS_PURCHASE_FURNITURE,
     SubCategoryType.OFFICE_EQUIPMENT_ACQUISITION,
     SubCategoryType.TOOLS_PURCHASE,
-    SubCategoryType.ELECTRIC_TOOLS_PURCHASE,
   ];
 
   isNonAssociable(subCategoryType: SubCategoryType | null): boolean {
