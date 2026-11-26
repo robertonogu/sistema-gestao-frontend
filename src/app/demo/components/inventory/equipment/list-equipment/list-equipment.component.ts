@@ -2,6 +2,7 @@
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Equipment } from 'src/app/demo/api/equipment';
+import { EquipmentCategory } from 'src/app/demo/data/enum/equipmentCategory';
 import { EquipmentStatus } from 'src/app/demo/data/enum/equipmentStatus';
 import { EquipmentService } from 'src/app/demo/service/inventory/equipment.service';
 
@@ -16,6 +17,10 @@ export class ListEquipmentComponent {
   loading: boolean = true;
   totalRecords: number = 0;
   equipments!: Equipment[];
+
+  tabs = Object.entries(EquipmentCategory).map(([key, label]) => ({ key, label }));
+  activeTab: number = 0;
+  first: number = 0;
 
   currentPage: number = 0;
   pageSize: number = 20;
@@ -33,11 +38,18 @@ export class ListEquipmentComponent {
     this.currentPage = event.first / event.rows;
     this.pageSize = event.rows;
 
-    this.equipmentService.getEquipments(this.currentPage, this.pageSize).subscribe((equipments) => {
+    this.first = event.first;
+
+    this.equipmentService.getEquipments(this.currentPage, this.pageSize, this.tabs[this.activeTab].key).subscribe((equipments) => {
       this.equipments = equipments.objectList;
       this.totalRecords = equipments.totalElements;
       this.loading = false;
     });
+  }
+
+  onTabChange(event: any) {
+    this.activeTab = event.index;
+    this.nextPage({ first: 0, rows: this.pageSize });
   }
 
   newEquipment() {

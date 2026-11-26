@@ -1,3 +1,4 @@
+import { EquipmentCategory } from "../enum/equipmentCategory";
 import { EquipmentStatus } from "../enum/equipmentStatus";
 
 export interface EquipmentCreation {
@@ -12,4 +13,5 @@ export interface EquipmentCreation {
     warrantyEnd: Date;
     power: string;
     status: EquipmentStatus;
+    category: EquipmentCategory;
 }

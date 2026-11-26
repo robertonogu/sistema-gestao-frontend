@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
 import { EquipmentImage } from 'src/app/demo/api/equipment';
+import { EquipmentCategory } from 'src/app/demo/data/enum/equipmentCategory';
 import { EquipmentStatus } from 'src/app/demo/data/enum/equipmentStatus';
 import { EquipmentCreation } from 'src/app/demo/data/model/equipmentCreation.model';
 import { EquipmentService } from 'src/app/demo/service/inventory/equipment.service';
@@ -27,6 +28,7 @@ import { EquipmentService } from 'src/app/demo/service/inventory/equipment.servi
 export class CreateEquipmentComponent {
 
   equipmentStatus = EquipmentStatus;
+  equipmentCategory = EquipmentCategory;
 
   code!: string;
   name!: string;
@@ -39,6 +41,7 @@ export class CreateEquipmentComponent {
   warrantyEnd!: Date;
   power!: string;
   selectedStatus!: EquipmentStatus;
+  selectedCategory: any = 'INDUSTRIAL';
 
   equipment!: EquipmentCreation;
 
@@ -76,6 +79,7 @@ export class CreateEquipmentComponent {
         this.warrantyEnd = this.toDate(equipment.warrantyEnd);
         this.power = equipment.power;
         this.selectedStatus = equipment.status;
+        this.selectedCategory = equipment.category;
         this.purchaseDocumentUrl = equipment.purchaseDocumentUrl ?? null;
       });
       this.equipmentService.getImages(equipmentId).subscribe(images => this.images = images);
@@ -181,7 +185,8 @@ export class CreateEquipmentComponent {
       warrantyStart: this.warrantyStart,
       warrantyEnd: this.warrantyEnd,
       power: this.power,
-      status: this.selectedStatus
+      status: this.selectedStatus,
+      category: this.selectedCategory
     } as EquipmentCreation;
 
     if (this.editingEquipmentId) {
@@ -220,5 +225,6 @@ export class CreateEquipmentComponent {
     this.warrantyEnd = undefined as any;
     this.power = undefined as any;
     this.selectedStatus = undefined as any;
+    this.selectedCategory = 'INDUSTRIAL';
   }
 }

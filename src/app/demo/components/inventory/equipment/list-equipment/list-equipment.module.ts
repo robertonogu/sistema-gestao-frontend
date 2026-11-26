@@ -11,6 +11,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ListEquipmentComponent } from './list-equipment.component';
 import { ListEquipmentRoutingModule } from './list-equipment-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
 	imports: [
@@ -18,6 +19,7 @@ import { TooltipModule } from 'primeng/tooltip';
 		FormsModule,
 		TableModule,
 		TooltipModule,
+		TabViewModule,
 		ButtonModule,
 		InputTextModule,
 		RippleModule,

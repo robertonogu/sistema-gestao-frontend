@@ -21,8 +21,9 @@ export class EquipmentService {
         return this.http.get<ItemName[]>(this.activeEquipmentNamesUrl);
     }
 
-    getEquipments(currentPage: number, pageSize: number): Observable<ObjectList> {
+    getEquipments(currentPage: number, pageSize: number, category?: string): Observable<ObjectList> {
         let url = this.equipmentsUrl + "?pageNo=" + currentPage + "&pageSize=" + pageSize;
+        if (category) url += "&category=" + category;
         return this.http.get<ObjectList>(url);
     }
 

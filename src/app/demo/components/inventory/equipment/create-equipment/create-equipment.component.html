@@ -65,6 +65,18 @@
                 </div>
 
                 <div class="field col-12 md:col-4">
+					<label>Categoria</label>
+					<p-dropdown
+                        [(ngModel)]="selectedCategory"
+                        [disabled]="viewMode"
+                        [options]="equipmentCategory | keyvalue"
+                        optionLabel="value"
+                        optionValue="key"
+                        placeholder="Selecione uma Categoria"
+					/>
+				</div>
+
+                <div class="field col-12 md:col-4">
 					<label>Estado</label>
 					<p-dropdown
                         [(ngModel)]="selectedStatus"

@@ -24,9 +24,14 @@
                 </div>
             </div>
 
+            <p-tabView [(activeIndex)]="activeTab" (onChange)="onTabChange($event)">
+                <p-tabPanel *ngFor="let tab of tabs" [header]="tab.label"></p-tabPanel>
+            </p-tabView>
+
 			<p-table
                 currentPageReportTemplate="{first} de {last} de {totalRecords} equipamentos"
                 [lazy]="true"
+                [first]="first"
                 [loading]="loading"
                 (onLazyLoad)="nextPage($event)"
                 [paginator]="true"
@@ -66,16 +71,6 @@
                         <td>{{ equipment.warrantyEnd | date: 'dd/MM/yyyy' }}</td>
                         <td><span [class]="'equipment-badge status-' + equipment.status.toLowerCase()">{{ equipmentStatus[equipment.status] }}</span></td>
                         <td>
-                            <p-button
-                                pRipple
-                                icon="pi pi-eye"
-                                class="mr-2"
-                                [rounded]="true"
-                                [text]="true"
-                                severity="info"
-                                pTooltip="Ver"
-                                (click)="viewEquipment(equipment); $event.stopPropagation()"
-                            />
                             <p-button
                                 pRipple
                                 icon="pi pi-pencil"

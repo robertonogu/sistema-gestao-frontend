@@ -1,3 +1,4 @@
+import { EquipmentCategory } from "../data/enum/equipmentCategory";
 import { EquipmentStatus } from "../data/enum/equipmentStatus";
 
 export interface Equipment {
@@ -14,6 +15,7 @@ export interface Equipment {
     power: string;
     purchaseDocumentUrl?: string;
     status: EquipmentStatus;
+    category: EquipmentCategory;
 }
 
 export interface EquipmentImage {
