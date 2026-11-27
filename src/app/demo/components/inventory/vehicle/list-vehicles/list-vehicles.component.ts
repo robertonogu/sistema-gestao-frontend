@@ -43,6 +43,10 @@ export class ListVehiclesComponent {
     this.router.navigate(['./inventory/vehicles/create-vehicle']);
   }
 
+  openVehicle(vehicle: Vehicle) {
+    this.router.navigate(['./inventory/vehicles/dashboard', vehicle.vehicleId]);
+  }
+
   editVehicle(vehicle: Vehicle) {
     this.router.navigate(['./inventory/vehicles/edit-vehicle', vehicle.vehicleId]);
   }

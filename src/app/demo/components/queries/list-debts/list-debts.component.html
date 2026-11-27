@@ -9,9 +9,11 @@
                         class="p-button-rounded"
                         icon="pi pi-download" 
                         pButton 
-                        pTooltip="Exportar" 
-                        tooltipPosition="bottom" 
-                        type="button" 
+                        pTooltip="Exportar PDF"
+                        tooltipPosition="bottom"
+                        type="button"
+                        [disabled]="!debtsByOrigin.length"
+                        (click)="exportPdf(dt.filteredValue ?? debtsByOrigin)"
                     ></button>
                 </div>
             </div>
@@ -51,14 +53,15 @@
                                 </p-columnFilter>
                             </div>
                         </th>
-                        <th>Faturas</th>
+                        <th>Documentos</th>
                         <th>Total em Débito</th>
                     </tr>
                 </ng-template>
 
                 <ng-template pTemplate="body" let-group let-expanded="expanded" let-rowIndex="rowIndex">
                     <tr *ngIf="startsGroup(dt.filteredValue ?? debtsByOrigin, rowIndex)">
-                        <td colspan="4" class="surface-100 text-900 font-bold">{{ groupLabel(group.originType) }}</td>
+                        <td colspan="3" class="surface-100 text-900 font-bold">{{ groupLabel(group.originType) }}</td>
+                        <td class="surface-100 text-900 font-bold">{{ typeTotal(dt.filteredValue ?? debtsByOrigin, group.originType) | number: '1.2-2' }} €</td>
                     </tr>
                     <tr>
                         <td>

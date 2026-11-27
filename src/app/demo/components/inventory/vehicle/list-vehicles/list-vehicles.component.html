@@ -52,15 +52,15 @@
 
                 <ng-template pTemplate="body" let-vehicle>
                     <tr>
-                        <td class="font-bold">{{ vehicle.registration }}</td>
+                        <td class="font-bold text-primary cursor-pointer" pTooltip="Ver painel da viatura" (click)="openVehicle(vehicle)">{{ vehicle.registration }}</td>
                         <td>{{ vehicle.inspectionDate | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ vehicle.insuranceDate | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ vehicle.roadTaxDate | date: 'dd/MM/yyyy' }}</td>
                         <td>{{ vehicle.valueKilometer | number: '1.2-2' }} €</td>
                         <td>
-                            <p-button 
-                                pRipple 
-                                icon="pi pi-pencil" 
+                            <p-button
+                                pRipple
+                                icon="pi pi-pencil"
                                 class="mr-2" 
                                 [rounded]="true" 
                                 [text]="true"

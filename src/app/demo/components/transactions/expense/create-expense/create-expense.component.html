@@ -95,7 +95,7 @@
 						<p-dropdown
 							[(ngModel)]="selectedDocumentType"
 							(onChange)="onDocumentTypeChange()"
-							[options]="documentTypes | keyvalue"
+							[options]="documentTypes | keyvalue:originalOrder"
 							optionLabel="value"
 							optionValue="key"
 							placeholder="Selecione um Tipo de Documento"
@@ -179,7 +179,7 @@
 			<h4 class="section-title">{{ isCreditNote ? 'Reembolsos' : 'Dados de Pagamento' }}</h4>
 
 			<div class="grid p-formgrid p-fluid">
-				<div class="field col-12 md:col-6" *ngIf="!isCreditNote">
+				<div class="field col-12 md:col-4" *ngIf="!isCreditNote">
 					<label>Condições de Pagamento</label>
 					<p-dropdown
 						[(ngModel)]="selectedPaymentCondition"
@@ -192,7 +192,7 @@
 					/>
 				</div>
 
-				<div class="field col-12 md:col-6" *ngIf="!isCreditNote">
+				<div class="field col-12 md:col-4" *ngIf="!isCreditNote">
 					<label>Data Limite Pagamento</label>
 					<p-calendar
 						[(ngModel)]="paymentDeadline"
@@ -204,7 +204,15 @@
 					/>
 				</div>
 
-				<ng-container *ngIf="!editingExpenseId">
+				<div class="field col-12 md:col-4" *ngIf="!editingExpenseId && !isCreditNote">
+					<label>&nbsp;</label>
+					<div class="flex align-items-center gap-2" style="height: 2.5rem">
+						<p-checkbox inputId="saveAsPaid" (onChange)="onSaveAsPaidChange()" [binary]="true" [(ngModel)]="saveAsPaid" />
+						<label for="saveAsPaid" class="m-0">Guardar como pago</label>
+					</div>
+				</div>
+
+				<ng-container *ngIf="!editingExpenseId && showPaymentFields">
 					<div class="field col-12 md:col-4">
 						<label>{{ isCreditNote ? 'Valor Reembolsado' : 'Valor Pago' }}</label>
 						<p-inputNumber
@@ -215,13 +223,8 @@
 							locale="en-US" [useGrouping]="false"
 							[disabled]="disablePaidValue"
 						/>
-						<div class="flex align-items-center gap-2 mt-2">
-							<p-checkbox
-								inputId="integralPayment"
-								(onChange)="onCheckboxChange()"
-								[binary]="true"
-								[(ngModel)]="isIntegralPayment"
-							/>
+						<div class="flex align-items-center gap-2 mt-3">
+							<p-checkbox inputId="integralPayment" (onChange)="onCheckboxChange()" [binary]="true" [(ngModel)]="isIntegralPayment" />
 							<label for="integralPayment" class="m-0">{{ isCreditNote ? 'Reembolso Integral' : 'Pagamento Integral' }}</label>
 						</div>
 					</div>

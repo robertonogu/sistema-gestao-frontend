@@ -22,6 +22,7 @@ import { SaleService } from 'src/app/demo/service/transactions/saleService';
 export class CreateRevenueComponent {
 
   revenueTypes = RevenueType;
+  originalOrder = (): number => 0;
   origins!: Origin[];
   accountNames!: AccountName[];
   paymentMethods = PaymentMethod;

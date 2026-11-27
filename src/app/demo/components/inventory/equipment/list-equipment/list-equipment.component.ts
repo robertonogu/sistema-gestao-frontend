@@ -57,7 +57,11 @@ export class ListEquipmentComponent {
   }
 
   onRowSelect(event: any) {
-    this.viewEquipment(event.data);
+    this.openEquipment(event.data);
+  }
+
+  openEquipment(equipment: Equipment) {
+    this.router.navigate(['./inventory/equipments/dashboard', equipment.equipmentId]);
   }
 
   viewEquipment(equipment: Equipment) {

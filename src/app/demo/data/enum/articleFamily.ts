@@ -13,6 +13,8 @@ export enum ArticleFamily {
     GLASS_MIRRORS = 'Vidros e espelhos',
     CLADDING = 'Revestimentos',
     STONES = 'Pedras',
-    OTHER_MATERIALS = 'Outros materiais',
+    HEATING = 'Aquecimento',
+    VENTILATION = 'Ventilação',
+    OTHER_MATERIALS ='Outros materiais',
     REAL_ESTATE = 'Imóveis'
 }

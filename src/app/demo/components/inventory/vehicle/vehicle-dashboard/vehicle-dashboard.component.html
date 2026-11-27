@@ -1,0 +1,158 @@
+<div *ngIf="loading" class="flex flex-column align-items-center justify-content-center" style="min-height: 60vh">
+	<i class="pi pi-spin pi-spinner text-primary" style="font-size: 2.5rem"></i>
+	<span class="text-600 mt-3">A carregar…</span>
+</div>
+
+<div *ngIf="!loading && notFound" class="card flex flex-column align-items-center p-6">
+	<i class="pi pi-car text-500" style="font-size: 3rem"></i>
+	<span class="text-xl font-semibold mt-3">Viatura não encontrada</span>
+	<button pButton type="button" icon="pi pi-arrow-left" class="p-button-rounded p-button-outlined mt-4" pTooltip="Voltar" tooltipPosition="bottom" (click)="back()"></button>
+</div>
+
+<div class="grid" *ngIf="!loading && !notFound">
+
+	<div class="col-12">
+		<div class="card flex flex-column md:flex-row md:align-items-center gap-4">
+			<div class="flex align-items-center gap-3">
+				<div class="border-circle bg-primary flex align-items-center justify-content-center" style="width: 4rem; height: 4rem">
+					<i class="pi pi-car text-white" style="font-size: 1.8rem"></i>
+				</div>
+				<div>
+					<div class="flex align-items-center gap-2">
+						<span class="text-3xl font-bold text-900">{{ vehicle.registration }}</span>
+						<p-tag [value]="vehicle.active ? 'Ativa' : 'Inativa'" [severity]="vehicle.active ? 'success' : 'danger'" />
+					</div>
+					<div class="text-600 mt-1">{{ vehicleTypeLabel }}</div>
+					<div class="flex flex-wrap gap-4 text-500 text-sm mt-1">
+						<span *ngIf="registrationDate">Matrícula de {{ registrationDate | date: 'MM/yyyy' }}</span>
+						<span *ngIf="vehicle.valueKilometer">{{ vehicle.valueKilometer | number: '1.2-4' }} € por km</span>
+					</div>
+				</div>
+			</div>
+			<div class="flex gap-2 md:ml-auto">
+				<button pButton type="button" icon="pi pi-arrow-left" class="p-button-rounded p-button-outlined" pTooltip="Voltar" tooltipPosition="bottom" (click)="back()"></button>
+				<button pButton type="button" icon="pi pi-pencil" class="p-button-rounded" pTooltip="Editar" tooltipPosition="bottom" (click)="edit()"></button>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-12 md:col-4">
+		<div class="card h-full">
+			<span class="text-600 font-medium">Total gasto</span>
+			<div class="text-3xl font-bold text-900 mt-2">{{ totalSpent | number: '1.2-2' }} €</div>
+			<div class="text-500 text-sm mt-1">{{ expenses.length }} {{ expenses.length === 1 ? 'registo' : 'registos' }}</div>
+		</div>
+	</div>
+	<div class="col-12 md:col-4">
+		<div class="card h-full">
+			<span class="text-600 font-medium">Em {{ currentYear }}</span>
+			<div class="text-3xl font-bold text-900 mt-2">{{ yearSpent | number: '1.2-2' }} €</div>
+			<div class="text-500 text-sm mt-1">Desde 1 de janeiro</div>
+		</div>
+	</div>
+	<div class="col-12 md:col-4">
+		<div class="card h-full">
+			<span class="text-600 font-medium">Média mensal</span>
+			<div class="text-3xl font-bold text-900 mt-2">{{ monthlyAverage | number: '1.2-2' }} €</div>
+			<div class="text-500 text-sm mt-1">Últimos 12 meses</div>
+		</div>
+	</div>
+
+	<ng-container *ngIf="expenses.length; else noExpenses">
+
+		<div class="col-12 xl:col-8">
+			<div class="card h-full">
+				<div class="text-900 text-xl font-semibold mb-3">Gastos mensais</div>
+				<p-chart type="bar" [data]="barData" [options]="barOptions" height="22rem" />
+			</div>
+		</div>
+
+		<div class="col-12 xl:col-4">
+			<div class="card h-full">
+				<div class="text-900 text-xl font-semibold mb-3">Distribuição</div>
+				<p-chart type="doughnut" [data]="doughnutData" [options]="doughnutOptions" height="22rem" />
+			</div>
+		</div>
+
+		<div class="col-12 md:col-6 xl:col-3" *ngFor="let summary of groupSummaries">
+			<div class="card h-full cursor-pointer" [class.surface-100]="selectedGroup === summary.group.key" (click)="selectGroup(summary.group.key)" pTooltip="Filtrar a tabela" tooltipPosition="top">
+				<div class="flex align-items-center gap-2 mb-2">
+					<i [class]="summary.group.icon" [style.color]="'var(' + summary.group.color + ')'"></i>
+					<span class="text-600 font-medium">{{ summary.group.label }}</span>
+				</div>
+				<div class="text-2xl font-bold text-900">{{ summary.total | number: '1.2-2' }} €</div>
+				<div class="surface-200 border-round mt-3" style="height: 0.4rem">
+					<div class="border-round h-full" [style.width.%]="summary.share" [style.background]="'var(' + summary.group.color + ')'"></div>
+				</div>
+				<div class="text-500 text-sm mt-2">{{ summary.share | number: '1.0-0' }}% do total, {{ summary.count }} {{ summary.count === 1 ? 'registo' : 'registos' }}</div>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="card">
+				<div class="flex flex-column sm:flex-row sm:align-items-center gap-3 mb-3">
+					<div class="text-900 text-xl font-semibold">Histórico de despesas</div>
+					<div class="flex flex-wrap gap-2 sm:ml-auto">
+						<button pButton type="button" label="Todas" class="p-button-sm" [ngClass]="selectedGroup === null ? '' : 'p-button-outlined'" (click)="selectGroup(null)"></button>
+						<button pButton type="button" *ngFor="let summary of groupSummaries" [label]="summary.group.label" class="p-button-sm"
+							[ngClass]="selectedGroup === summary.group.key ? '' : 'p-button-outlined'" (click)="selectGroup(summary.group.key)"></button>
+					</div>
+				</div>
+
+				<p-table
+					[value]="tableRows"
+					[(first)]="first"
+					[paginator]="true"
+					[rows]="10"
+					[rowsPerPageOptions]="[10, 25, 50]"
+					[tableStyle]="{ 'min-width': '45rem' }"
+					styleClass="p-datatable-striped"
+					sortField="day"
+					[sortOrder]="-1"
+				>
+					<ng-template pTemplate="header">
+						<tr>
+							<th pSortableColumn="day">Data <p-sortIcon field="day" /></th>
+							<th pSortableColumn="subCategoryLabel">Tipo <p-sortIcon field="subCategoryLabel" /></th>
+							<th pSortableColumn="name">Descrição <p-sortIcon field="name" /></th>
+							<th>Documento</th>
+							<th>Origem</th>
+							<th class="text-right" pSortableColumn="totalValue">Valor <p-sortIcon field="totalValue" /></th>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="body" let-row>
+						<tr>
+							<td>{{ row.day | date: 'dd/MM/yyyy' }}</td>
+							<td>
+								<span class="inline-flex align-items-center gap-2">
+									<span class="border-circle inline-block" style="width: 0.6rem; height: 0.6rem" [style.background]="'var(' + groupOf(row.groupKey).color + ')'"></span>
+									{{ row.subCategoryLabel }}
+								</span>
+							</td>
+							<td>{{ row.name }}</td>
+							<td>{{ row.documentNumber }}</td>
+							<td>{{ row.origin }}</td>
+							<td class="text-right font-semibold">{{ row.totalValue | number: '1.2-2' }} €</td>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="emptymessage">
+						<tr>
+							<td colspan="6">Não existem despesas para este filtro.</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</div>
+		</div>
+	</ng-container>
+
+	<ng-template #noExpenses>
+		<div class="col-12">
+			<div class="card flex flex-column align-items-center p-6">
+				<i class="pi pi-chart-bar text-500" style="font-size: 2.5rem"></i>
+				<span class="text-lg font-semibold mt-3">Ainda não há despesas associadas a esta viatura</span>
+				<span class="text-600 mt-1">Ao lançar uma despesa de veículos, escolha esta viatura para aparecer aqui.</span>
+			</div>
+		</div>
+	</ng-template>
+
+</div>

@@ -932,6 +932,24 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     }));
   }
 
+  saveAsPaid: boolean = false;
+
+  get showPaymentFields(): boolean {
+    return this.isCreditNote || this.saveAsPaid;
+  }
+
+  onSaveAsPaidChange() {
+    if (this.saveAsPaid) return;
+    this.isIntegralPayment = false;
+    this.disablePaidValue = false;
+    this._paymentValue = 0;
+    this.roundingFavorable = 0;
+    this.roundingUnfavorable = 0;
+    this.selectedPaidFrom = null;
+    this.onPaidFromChange();
+    this.selectedPaymentMethod = undefined as any;
+  }
+
   onCheckboxChange() {
     if (this.isIntegralPayment) {
       this.disablePaidValue = true;
@@ -966,6 +984,7 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
 
   onPaymentConditionChange() {
     if ((this.selectedPaymentCondition as unknown as string) === 'IMMEDIATE') {
+      this.saveAsPaid = true;
       this.isIntegralPayment = true;
       this.disablePaidValue = true;
     } else {
@@ -994,6 +1013,11 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     if (conditionKey === 'END_OF_MONTH' && this.date) {
       const base = new Date(this.date);
       this.paymentDeadline = new Date(base.getFullYear(), base.getMonth() + 1, 0);
+      return;
+    }
+    if (conditionKey === 'DAY_10_NEXT_MONTH' && this.date) {
+      const base = new Date(this.date);
+      this.paymentDeadline = new Date(base.getFullYear(), base.getMonth() + 1, 10);
       return;
     }
     if (!this.date || !conditionKey || !(conditionKey in PAYMENT_CONDITION_DAYS)) {
@@ -1737,6 +1761,7 @@ export class CreateExpenseComponent implements OnInit, OnDestroy {
     this.selectedPaymentCondition = undefined as any;
     this.paymentDeadline = undefined as any;
     this.isIntegralPayment = false;
+    this.saveAsPaid = false;
     this.paymentValue = 0;
     this.roundingFavorable = 0;
     this.roundingUnfavorable = 0;

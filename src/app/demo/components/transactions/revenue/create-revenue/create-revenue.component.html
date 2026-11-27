@@ -30,7 +30,7 @@
 					<p-dropdown
 						[(ngModel)]="selectedRevenueType"
 						(onChange)="onRevenueTypeChange()"
-                        [options]="revenueTypes | keyvalue"
+                        [options]="revenueTypes | keyvalue:originalOrder"
                         optionLabel="value"
 						optionValue="key"
                         placeholder="Selecione um Tipo"
@@ -100,25 +100,6 @@
 						[disabled]="isCashAccountSelected"
 						[ngClass]="{ 'ng-dirty ng-invalid': !selectedPaymentMethod }"
 					/>
-				</div>
-
-				<div class="field col-12 md:col-4">
-					<label>IVA</label>
-					<p-dropdown
-						[(ngModel)]="iva"
-                        [options]="validIvaRates | keyvalue"
-                        optionLabel="value"
-						optionValue="value"
-                        placeholder="Selecione uma Taxa"
-						[disabled]="isSalesRevenueType || isMemberLoan"
-					>
-						<ng-template let-option pTemplate="item">
-							{{ option.value }}%
-						</ng-template>
-						<ng-template let-option pTemplate="selectedItem">
-							{{ option?.value ? option.value + '%' : '' }}
-						</ng-template>
-					</p-dropdown>
 				</div>
 
 				<div class="field col-12 md:col-4">
