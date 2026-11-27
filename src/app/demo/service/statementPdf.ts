@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
 import { registerPdfFont } from './pdfFont';
+import { loadLogo } from './pdfLogo';
 
 export interface StatementPdf {
     title: string;
@@ -24,7 +25,12 @@ export async function exportStatementPdf(data: StatementPdf): Promise<void> {
     const pageWidth = doc.internal.pageSize.getWidth();
 
     doc.setTextColor(0, 0, 0);
-    let titleY = 15;
+    const logo = await loadLogo();
+    let titleY = logo ? 38 : 15;
+    if (logo) {
+        const logoHeight = 22;
+        doc.addImage(logo.dataUrl, 'PNG', MARGIN, 8, logoHeight * logo.width / logo.height, logoHeight);
+    }
     if (data.company) {
         doc.setFont(font, 'normal');
         doc.setFontSize(9);
